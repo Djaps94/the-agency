@@ -8,6 +8,7 @@ public class ACLMessage implements Serializable{
 	
 	private static final long serialVersionUID = -361951712504554701L;
 	
+	private Performative performative;
 	private AID sender;
 	private List<AID> recievers;
 	private AID replyTo;
@@ -23,9 +24,31 @@ public class ACLMessage implements Serializable{
 	private String inReplyTo;
 	private Long replyBy;
 	
+	private enum Performative { ACCEPT_PROPOSAL,
+							    AGREE,
+							    CANCEL,
+							    CFP,
+							    CONFIRM,
+							    DISCONFIRM,
+							    FAILURE,
+							    INFORM,
+							    INFORM_IF,
+							    INFORM_REF,
+							    NOT_UNDERSTOOD,
+							    PROPAGATE,
+							    PROPOSE,
+							    PROXY,
+							    QUERY_IF,
+							    QUERY_REF,
+							    REFUSE,
+							    REJECT_PROPOSAL,
+							    REQUEST,
+							    REQUEST_WHEN,
+							    REQUEST_WHENEVER,
+							    SUBSCRIBE} ;
 	
 	public ACLMessage() { }
-	
+		
 	public AID getSender() {
 		return sender;
 	}
@@ -109,5 +132,13 @@ public class ACLMessage implements Serializable{
 	}
 	public void setReplyBy(Long replyBy) {
 		this.replyBy = replyBy;
+	}
+
+	public Performative getPerformative() {
+		return performative;
+	}
+
+	public void setPerformative(Performative performative) {
+		this.performative = performative;
 	}
 }
