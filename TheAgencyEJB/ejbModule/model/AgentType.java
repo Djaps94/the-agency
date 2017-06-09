@@ -28,6 +28,11 @@ public class AgentType implements Serializable {
 	public void setModule(String module) {
 		this.module = module;
 	}
+
+	@Override
+	public boolean equals(Object arg0) {
+		return this.getName() == ((AgentType)arg0).getName();
+	}
 	
 	
 

@@ -1,6 +1,7 @@
 package model;
 
 import java.io.Serializable;
+import java.util.Set;
 
 public class AgentCenter implements Serializable{
 	
@@ -8,6 +9,7 @@ public class AgentCenter implements Serializable{
 	
 	private String alias;
 	private String address;
+	private Set<AgentType> supportedTypes; 
 	
 	public AgentCenter(){ }
 	
@@ -27,6 +29,14 @@ public class AgentCenter implements Serializable{
 	}
 	public void setAddress(String address) {
 		this.address = address;
+	}
+
+	public Set<AgentType> getSupportedTypes() {
+		return supportedTypes;
+	}
+
+	public void setSupportedTypes(Set<AgentType> supportedTypes) {
+		this.supportedTypes = supportedTypes;
 	}
 
 }
