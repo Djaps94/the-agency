@@ -13,7 +13,7 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
 	<classpathentry kind="lib" path="/TheAgencyWEB/WebContent/WEB-INF/lib/jackson-core-2.8.8.jar"/>
-	<classpathentry kind="lib" path="/TheAgencyWEB/WebContent/WEB-INF/lib/jackson-databind-2.8.8.jar"/>
-	<classpathentry kind="lib" path="/TheAgencyWEB/WebContent/WEB-INF/lib/jeromq-0.3.6.jar"/>
+	<classpathentry kind="lib" path="/TheAgencyWEB/WebContent/WEB-INF/lib/jackson-databind-2.8.8.jar" sourcepath="/home/predrag/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.8.8/jackson-databind-2.8.8-sources.jar"/>
+	<classpathentry kind="lib" path="/TheAgencyWEB/WebContent/WEB-INF/lib/jeromq-0.3.6.jar" sourcepath="/home/predrag/.m2/repository/org/zeromq/jeromq/0.3.6/jeromq-0.3.6-sources.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
