@@ -1,5 +1,7 @@
 package handshake;
 
+import java.io.IOException;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.Stateless;
@@ -9,7 +11,9 @@ import org.zeromq.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import exceptions.ConnectionException;
 import model.HandshakeMessage;
+import util.PortTransformation;
 
 @Stateless
 public class HandshakeRequester implements HandshakeRequesterLocal {
@@ -25,14 +29,24 @@ public class HandshakeRequester implements HandshakeRequesterLocal {
 		request = context.socket(ZMQ.REQ);
 	}
 	
-	public void sendMessage(String destination, HandshakeMessage message){
-		request.connect("tcp://"+destination);
+	public HandshakeMessage sendMessage(String destination, HandshakeMessage message) throws ConnectionException{
+		request.connect("tcp://"+PortTransformation.transform(destination, 0));
 		ObjectMapper mapper = new ObjectMapper();
 		try {
 			request.send(mapper.writeValueAsString(message));
 		} catch (JsonProcessingException e) {
-			e.printStackTrace();
+			throw new ConnectionException("Could not send message!");
 		}
+		String data = request.recvStr();
+		HandshakeMessage msg = null;
+		if(data.equals("Register successful"))
+			return msg;
+		try {
+			msg = mapper.readValue(data, HandshakeMessage.class);
+		} catch (IOException e) {
+			throw new ConnectionException("Can not process response!");
+		}
+		return msg;
 	}
 	
 	@PreDestroy

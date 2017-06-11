@@ -2,11 +2,12 @@ package handshake;
 
 import javax.ejb.Local;
 
+import exceptions.ConnectionException;
 import model.HandshakeMessage;
 
 @Local
 public interface HandshakeRequesterLocal {
 	
-	public void sendMessage(String destination, HandshakeMessage message);
+	public HandshakeMessage sendMessage(String destination, HandshakeMessage message) throws ConnectionException;
 
 }

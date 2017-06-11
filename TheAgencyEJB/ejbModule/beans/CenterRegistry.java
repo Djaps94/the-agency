@@ -1,7 +1,9 @@
 package beans;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.ejb.ConcurrencyManagement;
 import javax.ejb.ConcurrencyManagementType;
 import javax.ejb.Lock;
@@ -18,6 +20,11 @@ public class CenterRegistry implements CenterRegistryLocal{
 	private List<AgentCenter> registeredCenters;
 	
 	public CenterRegistry() { }
+	
+	@PostConstruct
+	private void initialise(){
+		this.registeredCenters = new ArrayList<AgentCenter>();
+	}
 	 
 	@Override
 	@Lock(LockType.WRITE)

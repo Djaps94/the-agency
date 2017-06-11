@@ -11,7 +11,12 @@ import javax.ejb.Local;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 
+import exceptions.ConnectionException;
+import handshake.HandshakeRequesterLocal;
+import handshake.HandshakeResponseLocal;
 import model.AgentCenter;
+import model.HandshakeMessage;
+import model.HandshakeMessage.handshakeType;
 
 @Startup
 @Singleton
@@ -29,15 +34,24 @@ public class NetworkManagment implements NetworkManagmentLocal{
 	private boolean master;
 	private String masterIpAddress;
 	
+	
 	@EJB
 	private CenterRegistryLocal registryBean;
 	
+	@EJB
+	private HandshakeRequesterLocal requester;
+	
+	@EJB
+	private HandshakeResponseLocal timer;
+	
 	@PostConstruct
-	public void initialise(){
-		if(MASTER == null){
+	public void initialise(){		
+		if(System.getProperty(MASTER) == null){
 			master = true;
 			try {
 				registryBean.setThisCenter(createCenter());
+				System.out.println("MASTER NODE UP");
+				timer.startTimer();
 			} catch (UnknownHostException e) {
 				//TODO: shutdown script
 			}
@@ -47,6 +61,23 @@ public class NetworkManagment implements NetworkManagmentLocal{
 		AgentCenter slave = null;
 		try {
 			slave = createCenter();
+			System.out.println("SLAVE NODE UP "+slave.getAlias());
+			registryBean.setThisCenter(slave);
+			master = false;
+			timer.startTimer();
+			try {
+				HandshakeMessage message = sendMessageToMaster(masterIpAddress, slave);
+				if(message != null)
+					message.getCenters().forEach(center -> registryBean.addCenter(center));
+			} catch (ConnectionException e) {
+				try {
+					HandshakeMessage message = sendMessageToMaster(masterIpAddress, slave);
+					if(message != null)
+						message.getCenters().forEach(center -> registryBean.addCenter(center));
+				} catch (ConnectionException e1) {
+					// TODO: rollback!
+				}
+			}
 		} catch (UnknownHostException e) {
 			//TODO: shutdown script
 		}
@@ -61,8 +92,16 @@ public class NetworkManagment implements NetworkManagmentLocal{
 		int offset 		 = System.getProperty(OFFSET) == null ? 0 : Integer.parseInt(System.getProperty(OFFSET));
 		String filename  = System.getProperty(TYPES) == null ? "" : System.getProperty(TYPES);
 		
-		AgentCenter center = new AgentCenter(alias, ipAddress+":"+PORT+offset);
+		AgentCenter center = new AgentCenter(alias, ipAddress+":"+(PORT+offset));
 		//TODO: Set AgentTypes for agent center
 		return center;
+	}
+		
+	private HandshakeMessage sendMessageToMaster(String masterIpAddress, AgentCenter slave) throws ConnectionException{
+		return requester.sendMessage(masterIpAddress, new HandshakeMessage(slave, handshakeType.REGISTER));
+	}
+	
+	public boolean isMaster(){
+		return master;
 	}
 }

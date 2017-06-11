@@ -1,11 +1,16 @@
 package model;
 
+import java.util.List;
+
 public class HandshakeMessage {
 
-	public enum handshakeType { REGISTER };
+	public enum handshakeType { REGISTER,
+								GET_CENTERS
+							  };
 	
 	private AgentCenter center;
 	private handshakeType type;
+	private List<AgentCenter> centers;
 	
 	public HandshakeMessage() { }
 	
@@ -28,6 +33,14 @@ public class HandshakeMessage {
 
 	public void setType(handshakeType type) {
 		this.type = type;
+	}
+
+	public List<AgentCenter> getCenters() {
+		return centers;
+	}
+
+	public void setCenters(List<AgentCenter> centers) {
+		this.centers = centers;
 	}
 	
 	
