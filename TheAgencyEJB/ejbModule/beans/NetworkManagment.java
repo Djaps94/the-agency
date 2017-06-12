@@ -17,6 +17,7 @@ import handshake.HandshakeResponseLocal;
 import model.AgentCenter;
 import model.HandshakeMessage;
 import model.HandshakeMessage.handshakeType;
+import util.PortTransformation;
 
 @Startup
 @Singleton
@@ -51,6 +52,7 @@ public class NetworkManagment implements NetworkManagmentLocal{
 			try {
 				registryBean.setThisCenter(createCenter());
 				System.out.println("MASTER NODE UP");
+				System.out.println(registryBean.getThisCenter().getSupportedTypes());
 				timer.startTimer();
 			} catch (UnknownHostException e) {
 				//TODO: shutdown script
@@ -90,10 +92,9 @@ public class NetworkManagment implements NetworkManagmentLocal{
 		String ipAddress = System.getProperty(LOCAL) == null ? "127.0.0.1" : System.getProperty(LOCAL);
 		String alias     = System.getProperty(ALIAS) == null ? InetAddress.getLocalHost().getHostName() : System.getProperty(ALIAS);
 		int offset 		 = System.getProperty(OFFSET) == null ? 0 : Integer.parseInt(System.getProperty(OFFSET));
-		String filename  = System.getProperty(TYPES) == null ? "" : System.getProperty(TYPES);
-		
+		String filename  = System.getProperty(TYPES) == null ? "/default" : System.getProperty(TYPES);
 		AgentCenter center = new AgentCenter(alias, ipAddress+":"+(PORT+offset));
-		//TODO: Set AgentTypes for agent center
+		center.setSupportedTypes(PortTransformation.agentTypes(filename));
 		return center;
 	}
 		

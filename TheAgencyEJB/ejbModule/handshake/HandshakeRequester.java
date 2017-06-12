@@ -39,12 +39,10 @@ public class HandshakeRequester implements HandshakeRequesterLocal {
 		}
 		String data = request.recvStr();
 		HandshakeMessage msg = null;
-		if(data.equals("Register successful"))
-			return msg;
 		try {
 			msg = mapper.readValue(data, HandshakeMessage.class);
-		} catch (IOException e) {
-			throw new ConnectionException("Can not process response!");
+		} catch (Exception e) {
+			return msg;
 		}
 		return msg;
 	}

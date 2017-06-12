@@ -53,7 +53,6 @@ public class HandshakeResponse implements HandshakeResponseLocal{
 		ZMQ.Context context = ZMQ.context(1);
 		ZMQ.Socket response = context.socket(ZMQ.REP);
 		response.bind("tcp://"+PortTransformation.transform(registry.getThisCenter().getAddress(),0));
-		System.out.println("STIGAO SAM OVDE");
 			while(!Thread.currentThread().isInterrupted()){
 				try {
 					String data = response.recvStr();
@@ -88,9 +87,9 @@ public class HandshakeResponse implements HandshakeResponseLocal{
 						} catch (RegisterSlaveException | ConnectionException e1) {
 							//TODO: rollback!
 						}
-					}
-									 
-								   } break;
+					}				 
+								   } 
+								   break;
 					default:
 						break;
 					
@@ -102,17 +101,17 @@ public class HandshakeResponse implements HandshakeResponseLocal{
 			response.close();
 			context.term();
 }
-	
+		
 	private List<AgentCenter> registerCenter(HandshakeMessage message) throws RegisterSlaveException, ConnectionException{
 		if(nodesManagment.isMaster()){
 			registry.addCenter(message.getCenter());
 			
 			for(AgentCenter center : registry.getCenters()){
-				if(!center.getAddress().equals(message.getCenter().getAddress()))
+				if(!center.getAlias().equals(message.getCenter().getAlias()))
 						requester.sendMessage(center.getAddress(), message);
 			}
 			return registry.getCenters().stream()
-										.filter(center -> !center.getAddress().equals(message.getCenter().getAddress()))
+										.filter(center -> !center.getAlias().equals(message.getCenter().getAlias()))
 										.collect(Collectors.toList());
 		}
 		
