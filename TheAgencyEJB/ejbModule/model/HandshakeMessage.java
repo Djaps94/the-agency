@@ -8,13 +8,15 @@ public class HandshakeMessage {
 	public enum handshakeType { REGISTER,
 								GET_CENTERS,
 								GET_TYPES,
-								DELIVER_TYPES
+								DELIVER_TYPES,
+								ROLLBACK
 							  };
 	
 	private AgentCenter center;
 	private handshakeType type;
 	private List<AgentCenter> centers;
 	private Set<AgentType> agentTypes;
+	private String message;
 	
 	public HandshakeMessage() { }
 	
@@ -53,6 +55,14 @@ public class HandshakeMessage {
 
 	public void setAgentTypes(Set<AgentType> agentTypes) {
 		this.agentTypes = agentTypes;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
 	}
 	
 	

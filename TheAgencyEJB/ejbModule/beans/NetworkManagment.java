@@ -78,7 +78,13 @@ public class NetworkManagment implements NetworkManagmentLocal{
 					HandshakeMessage message = sendMessageToMaster(masterIpAddress, slave);
 					if(message != null) message.getCenters().forEach(center -> registryBean.addCenter(center));
 				} catch (ConnectionException e1) {
-					// TODO: rollback!
+					try {
+						HandshakeMessage message = rollback(masterIpAddress, slave);
+						if(message != null) shutdownServer();
+					} catch (ConnectionException e2) {
+						System.out.println("Handshake failed. Rollback failed. Shuting down server...");
+						shutdownServer();
+					}
 				}
 			}
 			
@@ -90,12 +96,18 @@ public class NetworkManagment implements NetworkManagmentLocal{
 					HandshakeMessage message = getAllAgentTypes(masterIpAddress, slave);
 					if(message != null) agency.getOtherSupportedTypes().addAll(message.getAgentTypes());
 				} catch (ConnectionException e1) {
-					// TODO: rollback!
+					try {
+						HandshakeMessage message = rollback(masterIpAddress, slave);
+						if(message != null) shutdownServer();
+					} catch (ConnectionException e2) {
+						System.out.println("Handshake failed. Rollback failed. Shuting down server...");
+						shutdownServer();
+					}
 				}
 			}
 			
 		} catch (UnknownHostException e) {
-			//TODO: shutdown script
+			shutdownServer();
 		}
 		
 		
@@ -124,7 +136,23 @@ public class NetworkManagment implements NetworkManagmentLocal{
 		return requester.sendMessage(masterIpAddress, message);
 	}
 
+	private HandshakeMessage rollback(String masterIpAddress, AgentCenter slave) throws ConnectionException{
+		HandshakeMessage message = new HandshakeMessage();
+		message.setType(handshakeType.ROLLBACK);
+		message.setAgentTypes(agency.getSupportedTypes());
+		message.setCenter(slave);
+		return requester.sendMessage(masterIpAddress, message);
+	}
+	
+	private void shutdownServer(){
+		//TODO: Load script and exec it
+	}
+	
 	public boolean isMaster(){
 		return master;
+	}
+	
+	public String getMasterAddress(){
+		return masterIpAddress;
 	}
 }

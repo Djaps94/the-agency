@@ -40,6 +40,9 @@ public class HandshakeResponse implements HandshakeResponseLocal{
 	@EJB
 	private HandshakeDealerLocal dealer;
 	
+	@EJB
+	private HandshakeRequesterLocal requester;
+	
 	@Resource
 	private TimerService timer;
 	
@@ -70,7 +73,11 @@ public class HandshakeResponse implements HandshakeResponseLocal{
 							try {
 								sendRegisterResponse(message, response, mapper);
 							} catch (RegisterSlaveException | ConnectionException e1) {
-								//TODO: rollback!
+								try {
+									requester.sendMessage(nodesManagment.getMasterAddress(), message);
+								} catch (ConnectionException e2) {
+									//TODO: shutdown server
+								}
 							}
 						}				 
 					} 
@@ -82,12 +89,18 @@ public class HandshakeResponse implements HandshakeResponseLocal{
 							try {
 								sendGetTypesResponse(message, response, mapper);
 							} catch (ConnectionException | JsonEOFException e1) {
-								// TODO: rollback!
+								try {
+									requester.sendMessage(nodesManagment.getMasterAddress(), message);
+								} catch (ConnectionException e2) {
+									// TODO: shutdown server
+								}
 							}
 						}
 					}
 					break;
 					case DELIVER_TYPES: addTypes(message, response); 
+					break;
+					case ROLLBACK: rollback(message, response, mapper); 
 					break;
 					default:
 						break;
@@ -125,6 +138,19 @@ public class HandshakeResponse implements HandshakeResponseLocal{
 	private void addTypes(HandshakeMessage message, ZMQ.Socket response){
 		dealer.addTypes(message);
 		response.send("Added types to other nodes.");
+	}
+	
+	private void rollback(HandshakeMessage message, ZMQ.Socket response, ObjectMapper mapper){
+		try {
+			dealer.rollback(message);
+			HandshakeMessage msg = new HandshakeMessage();
+			msg.setMessage("Rollback completed!");
+			String data = mapper.writeValueAsString(msg);
+			response.send(data);
+		} catch (ConnectionException | JsonProcessingException e) {
+			response.send("Shuting down server. Rollback failed.");
+		}
+		
 	}
 	
 	

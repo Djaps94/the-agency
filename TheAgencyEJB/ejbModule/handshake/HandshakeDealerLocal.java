@@ -17,4 +17,5 @@ public interface HandshakeDealerLocal {
 	public List<AgentCenter> registerCenter(HandshakeMessage message) throws RegisterSlaveException, ConnectionException;
 	public Set<AgentType> registerAgentTypes(HandshakeMessage message) throws ConnectionException;
 	public void addTypes(HandshakeMessage message);
+	public void rollback(HandshakeMessage message) throws ConnectionException;
 }

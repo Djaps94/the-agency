@@ -6,4 +6,5 @@ import javax.ejb.Local;
 public interface NetworkManagmentLocal {
 
 	public boolean isMaster();
+	public String getMasterAddress();
 }

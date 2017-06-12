@@ -76,4 +76,16 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 		manager.getOtherSupportedTypes().addAll(message.getAgentTypes());
 	}
 	
+	public void rollback(HandshakeMessage message) throws ConnectionException{
+		if(nodesManagment.isMaster()){
+			registry.deleteCenter(message.getCenter());
+			manager.getOtherSupportedTypes().removeAll(message.getAgentTypes());
+			for(AgentCenter center : registry.getCenters())
+				requester.sendMessage(center.getAddress(), message);
+		}
+		
+		registry.deleteCenter(message.getCenter());
+		manager.getOtherSupportedTypes().removeAll(message.getAgentTypes());
+	}
+	
 }
