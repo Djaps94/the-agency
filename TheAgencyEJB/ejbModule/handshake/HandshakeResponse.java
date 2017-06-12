@@ -2,7 +2,7 @@ package handshake;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.ejb.AccessTimeout;
@@ -14,6 +14,8 @@ import javax.ejb.TimerService;
 
 import org.zeromq.ZMQ;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.io.JsonEOFException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import beans.AgencyRegistryLocal;
@@ -21,6 +23,7 @@ import beans.NetworkManagmentLocal;
 import exceptions.ConnectionException;
 import exceptions.RegisterSlaveException;
 import model.AgentCenter;
+import model.AgentType;
 import model.HandshakeMessage;
 import util.PortTransformation;
 
@@ -35,7 +38,7 @@ public class HandshakeResponse implements HandshakeResponseLocal{
 	private NetworkManagmentLocal nodesManagment;
 	
 	@EJB
-	private HandshakeRequesterLocal requester;
+	private HandshakeDealerLocal dealer;
 	
 	@Resource
 	private TimerService timer;
@@ -62,34 +65,31 @@ public class HandshakeResponse implements HandshakeResponseLocal{
 					switch(message.getType()){
 					case REGISTER: { 
 						try {
-							List<AgentCenter> centers = registerCenter(message);
-							if(centers == null)
-								response.send("Register successful", 0);
-							else{
-								HandshakeMessage msg = new HandshakeMessage();
-								msg.setCenters(centers);
-								msg.setType(HandshakeMessage.handshakeType.GET_CENTERS);
-								String m = mapper.writeValueAsString(msg);
-								response.send(m);
-							}
+							sendRegisterResponse(message, response, mapper);
 					} catch (RegisterSlaveException | ConnectionException e) {
 						try {
-							List<AgentCenter> centers = registerCenter(message);
-							if(centers == null)
-								response.send("Register successful", 0);
-							else{
-								HandshakeMessage msg = new HandshakeMessage();
-								msg.setCenters(centers);
-								msg.setType(HandshakeMessage.handshakeType.GET_CENTERS);
-								String m = mapper.writeValueAsString(msg);
-								response.send(m);
-							}
+							sendRegisterResponse(message, response, mapper);
 						} catch (RegisterSlaveException | ConnectionException e1) {
 							//TODO: rollback!
 						}
 					}				 
-								   } 
-								   break;
+								   } break;
+					case GET_TYPES: {
+						try {
+							sendGetTypesResponse(message, response, mapper);
+						} catch (ConnectionException | JsonProcessingException e) {
+							try {
+								sendGetTypesResponse(message, response, mapper);
+							} catch (ConnectionException | JsonEOFException e1) {
+								// TODO: rollback!
+							}
+						}
+									break;
+					}
+					case DELIVER_TYPES: {
+						//TODO: Add types to other slaves
+									break;
+					}
 					default:
 						break;
 					
@@ -102,20 +102,24 @@ public class HandshakeResponse implements HandshakeResponseLocal{
 			context.term();
 }
 		
-	private List<AgentCenter> registerCenter(HandshakeMessage message) throws RegisterSlaveException, ConnectionException{
-		if(nodesManagment.isMaster()){
-			registry.addCenter(message.getCenter());
-			
-			for(AgentCenter center : registry.getCenters()){
-				if(!center.getAlias().equals(message.getCenter().getAlias()))
-						requester.sendMessage(center.getAddress(), message);
-			}
-			return registry.getCenters().stream()
-										.filter(center -> !center.getAlias().equals(message.getCenter().getAlias()))
-										.collect(Collectors.toList());
+	private void sendRegisterResponse(HandshakeMessage message, ZMQ.Socket response, ObjectMapper mapper) throws ConnectionException, RegisterSlaveException, JsonProcessingException{
+		List<AgentCenter> centers = dealer.registerCenter(message);
+		if(centers.isEmpty())
+			response.send("Register successful", 0);
+		else{
+			HandshakeMessage msg = new HandshakeMessage();
+			msg.setCenters(centers);
+			msg.setType(HandshakeMessage.handshakeType.GET_CENTERS);
+			String m = mapper.writeValueAsString(msg);
+			response.send(m);
 		}
-		
-		registry.addCenter(message.getCenter());
-		return null;
+	}
+	
+	private void sendGetTypesResponse(HandshakeMessage message, ZMQ.Socket response, ObjectMapper mapper) throws ConnectionException, JsonProcessingException{
+		Set<AgentType> types = dealer.registerAgentTypes(message);
+		HandshakeMessage msg = new HandshakeMessage();
+		msg.setAgentTypes(types);
+		String m = mapper.writeValueAsString(msg);
+		response.send(m);
 	}
 }

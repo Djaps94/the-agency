@@ -69,19 +69,31 @@ public class NetworkManagment implements NetworkManagmentLocal{
 			registryBean.setThisCenter(slave);
 			master = false;
 			timer.startTimer();
+			
 			try {
 				HandshakeMessage message = sendMessageToMaster(masterIpAddress, slave);
-				if(message != null)
-					message.getCenters().forEach(center -> registryBean.addCenter(center));
+				if(message != null) message.getCenters().forEach(center -> registryBean.addCenter(center));
 			} catch (ConnectionException e) {
 				try {
 					HandshakeMessage message = sendMessageToMaster(masterIpAddress, slave);
-					if(message != null)
-						message.getCenters().forEach(center -> registryBean.addCenter(center));
+					if(message != null) message.getCenters().forEach(center -> registryBean.addCenter(center));
 				} catch (ConnectionException e1) {
 					// TODO: rollback!
 				}
 			}
+			
+			try {
+				HandshakeMessage message = getAllAgentTypes(masterIpAddress, slave);
+				if(message != null) agency.getOtherSupportedTypes().addAll(message.getAgentTypes());
+			} catch (ConnectionException e) {
+				try {
+					HandshakeMessage message = getAllAgentTypes(masterIpAddress, slave);
+					if(message != null) agency.getOtherSupportedTypes().addAll(message.getAgentTypes());
+				} catch (ConnectionException e1) {
+					// TODO: rollback!
+				}
+			}
+			
 		} catch (UnknownHostException e) {
 			//TODO: shutdown script
 		}
@@ -104,6 +116,14 @@ public class NetworkManagment implements NetworkManagmentLocal{
 		return requester.sendMessage(masterIpAddress, new HandshakeMessage(slave, handshakeType.REGISTER));
 	}
 	
+	private HandshakeMessage getAllAgentTypes(String masterIpAddress, AgentCenter slave) throws ConnectionException{
+		HandshakeMessage message = new HandshakeMessage();
+		message.setType(handshakeType.GET_TYPES);
+		message.setAgentTypes(agency.getSupportedTypes());
+		message.setCenter(slave);
+		return requester.sendMessage(masterIpAddress, message);
+	}
+
 	public boolean isMaster(){
 		return master;
 	}

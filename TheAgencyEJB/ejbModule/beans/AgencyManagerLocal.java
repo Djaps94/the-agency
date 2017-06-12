@@ -15,4 +15,6 @@ public interface AgencyManagerLocal {
 	public void setSupportedTypes(Set<AgentType> supportedTypes);
 	public List<Agent> getRunningAgents();
 	public void setRunningAgents(List<Agent> runningAgents);
+	public Set<AgentType> getOtherSupportedTypes();
+	public void setOtherSupportedTypes(Set<AgentType> otherSupportedTypes);
 }

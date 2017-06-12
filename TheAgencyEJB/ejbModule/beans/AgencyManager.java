@@ -13,6 +13,7 @@ public class AgencyManager implements AgencyManagerLocal {
 
 	private List<Agent> runningAgents;
 	private Set<AgentType> supportedTypes; 
+	private Set<AgentType> otherSupportedTypes;
 	
 	public AgencyManager() { }
 	
@@ -30,5 +31,13 @@ public class AgencyManager implements AgencyManagerLocal {
 
 	public void setRunningAgents(List<Agent> runningAgents) {
 		this.runningAgents = runningAgents;
+	}
+
+	public Set<AgentType> getOtherSupportedTypes() {
+		return otherSupportedTypes;
+	}
+
+	public void setOtherSupportedTypes(Set<AgentType> otherSupportedTypes) {
+		this.otherSupportedTypes = otherSupportedTypes;
 	}
 }
