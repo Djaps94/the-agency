@@ -14,12 +14,12 @@ import model.AgentCenter;
 
 @Singleton
 @ConcurrencyManagement(ConcurrencyManagementType.CONTAINER)
-public class CenterRegistry implements CenterRegistryLocal{
+public class AgencyRegistry implements AgencyRegistryLocal{
 
 	private AgentCenter thisCenter;
 	private List<AgentCenter> registeredCenters;
 	
-	public CenterRegistry() { }
+	public AgencyRegistry() { }
 	
 	@PostConstruct
 	private void initialise(){

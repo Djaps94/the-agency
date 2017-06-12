@@ -16,7 +16,7 @@ import model.AgentCenter;
 public class Test {
 
 	@EJB
-	private CenterRegistryLocal registry;
+	private AgencyRegistryLocal registry;
 	
 	@Path("/centers")
 	@GET

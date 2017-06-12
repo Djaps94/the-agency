@@ -7,7 +7,7 @@ import javax.ejb.Local;
 import model.AgentCenter;
 
 @Local
-public interface CenterRegistryLocal {
+public interface AgencyRegistryLocal {
 	
 	public void addCenter(AgentCenter center);
 	public void deleteCenter(AgentCenter center);

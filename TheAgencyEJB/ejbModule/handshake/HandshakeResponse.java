@@ -16,7 +16,7 @@ import org.zeromq.ZMQ;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import beans.CenterRegistryLocal;
+import beans.AgencyRegistryLocal;
 import beans.NetworkManagmentLocal;
 import exceptions.ConnectionException;
 import exceptions.RegisterSlaveException;
@@ -29,7 +29,7 @@ import util.PortTransformation;
 public class HandshakeResponse implements HandshakeResponseLocal{	
 	
 	@EJB
-	private CenterRegistryLocal registry;
+	private AgencyRegistryLocal registry;
 	
 	@EJB
 	private NetworkManagmentLocal nodesManagment;

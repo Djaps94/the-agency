@@ -37,13 +37,16 @@ public class NetworkManagment implements NetworkManagmentLocal{
 	
 	
 	@EJB
-	private CenterRegistryLocal registryBean;
+	private AgencyRegistryLocal registryBean;
 	
 	@EJB
 	private HandshakeRequesterLocal requester;
 	
 	@EJB
 	private HandshakeResponseLocal timer;
+	
+	@EJB 
+	private AgencyManagerLocal agency;
 	
 	@PostConstruct
 	public void initialise(){		
@@ -52,7 +55,6 @@ public class NetworkManagment implements NetworkManagmentLocal{
 			try {
 				registryBean.setThisCenter(createCenter());
 				System.out.println("MASTER NODE UP");
-				System.out.println(registryBean.getThisCenter().getSupportedTypes());
 				timer.startTimer();
 			} catch (UnknownHostException e) {
 				//TODO: shutdown script
@@ -94,7 +96,7 @@ public class NetworkManagment implements NetworkManagmentLocal{
 		int offset 		 = System.getProperty(OFFSET) == null ? 0 : Integer.parseInt(System.getProperty(OFFSET));
 		String filename  = System.getProperty(TYPES) == null ? "/default" : System.getProperty(TYPES);
 		AgentCenter center = new AgentCenter(alias, ipAddress+":"+(PORT+offset));
-		center.setSupportedTypes(PortTransformation.agentTypes(filename));
+		agency.setSupportedTypes(PortTransformation.agentTypes(filename));
 		return center;
 	}
 		
