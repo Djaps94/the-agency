@@ -44,9 +44,12 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 				if(!center.getAlias().equals(message.getCenter().getAlias()))
 						requester.sendMessage(center.getAddress(), message);
 			}
-			return registry.getCenters().stream()
-										.filter(center -> !center.getAlias().equals(message.getCenter().getAlias()))
-										.collect(Collectors.toList());
+			List<AgentCenter> list = registry.getCenters().stream()
+											 .filter(center -> !center.getAlias().equals(message.getCenter().getAlias()))
+											 .collect(Collectors.toList());
+			
+			list.add(registry.getThisCenter());									
+			return list;
 		}
 		
 		registry.addCenter(message.getCenter());
@@ -67,6 +70,10 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 			return returnSet;
 		}	
 		return returnSet;
+	}
+	
+	public void addTypes(HandshakeMessage message){
+		manager.getOtherSupportedTypes().addAll(message.getAgentTypes());
 	}
 	
 }

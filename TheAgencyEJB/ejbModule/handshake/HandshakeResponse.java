@@ -66,14 +66,15 @@ public class HandshakeResponse implements HandshakeResponseLocal{
 					case REGISTER: { 
 						try {
 							sendRegisterResponse(message, response, mapper);
-					} catch (RegisterSlaveException | ConnectionException e) {
-						try {
-							sendRegisterResponse(message, response, mapper);
-						} catch (RegisterSlaveException | ConnectionException e1) {
-							//TODO: rollback!
-						}
-					}				 
-								   } break;
+						} catch (RegisterSlaveException | ConnectionException e) {
+							try {
+								sendRegisterResponse(message, response, mapper);
+							} catch (RegisterSlaveException | ConnectionException e1) {
+								//TODO: rollback!
+							}
+						}				 
+					} 
+					break;
 					case GET_TYPES: {
 						try {
 							sendGetTypesResponse(message, response, mapper);
@@ -84,12 +85,10 @@ public class HandshakeResponse implements HandshakeResponseLocal{
 								// TODO: rollback!
 							}
 						}
-									break;
 					}
-					case DELIVER_TYPES: {
-						//TODO: Add types to other slaves
-									break;
-					}
+					break;
+					case DELIVER_TYPES: addTypes(message, response); 
+					break;
 					default:
 						break;
 					
@@ -122,4 +121,11 @@ public class HandshakeResponse implements HandshakeResponseLocal{
 		String m = mapper.writeValueAsString(msg);
 		response.send(m);
 	}
+	
+	private void addTypes(HandshakeMessage message, ZMQ.Socket response){
+		dealer.addTypes(message);
+		response.send("Added types to other nodes.");
+	}
+	
+	
 }
