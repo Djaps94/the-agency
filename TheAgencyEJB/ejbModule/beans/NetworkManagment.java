@@ -110,6 +110,7 @@ public class NetworkManagment implements NetworkManagmentLocal{
 				}
 			}
 			
+			
 		} catch (UnknownHostException e) {
 			shutdownServer();
 		}
@@ -140,11 +141,13 @@ public class NetworkManagment implements NetworkManagmentLocal{
 		return requester.sendMessage(masterIpAddress, message);
 	}
 
+
 	private HandshakeMessage rollback(String masterIpAddress, AgentCenter slave) throws ConnectionException{
 		HandshakeMessage message = new HandshakeMessage();
 		message.setType(handshakeType.ROLLBACK);
 		message.setAgentTypes(agency.getSupportedTypes());
 		message.setCenter(slave);
+		message.setRunningAgents(agency.getRunningAgents());
 		return requester.sendMessage(masterIpAddress, message);
 	}
 	

@@ -19,6 +19,7 @@ public class HandshakeMessage {
 	private Set<AgentType> agentTypes;
 	private Map<String, Set<AgentType>> otherTypes;
 	private String message;
+	private List<Agent> runningAgents;
 	
 	public HandshakeMessage() { }
 	
@@ -73,6 +74,14 @@ public class HandshakeMessage {
 
 	public void setOtherTypes(Map<String, Set<AgentType>> otherTypes) {
 		this.otherTypes = otherTypes;
+	}
+
+	public List<Agent> getRunningAgents() {
+		return runningAgents;
+	}
+
+	public void setRunningAgents(List<Agent> runningAgents) {
+		this.runningAgents = runningAgents;
 	}
 	
 	

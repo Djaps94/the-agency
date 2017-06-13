@@ -84,12 +84,14 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 		if(nodesManagment.isMaster()){
 			registry.deleteCenter(message.getCenter());
 			manager.deleteOtherTypes(message.getCenter().getAlias());
+			manager.getRunningAgents().removeAll(message.getRunningAgents());
 			for(AgentCenter center : registry.getCenters())
 				requester.sendMessage(center.getAddress(), message);
 		}
 		
 		registry.deleteCenter(message.getCenter());
 		manager.deleteOtherTypes(message.getCenter().getAlias());
+		manager.getRunningAgents().removeAll(message.getRunningAgents());
 	}
 	
 }
