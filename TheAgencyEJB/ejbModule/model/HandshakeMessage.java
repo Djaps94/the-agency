@@ -1,6 +1,7 @@
 package model;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class HandshakeMessage {
@@ -16,6 +17,7 @@ public class HandshakeMessage {
 	private handshakeType type;
 	private List<AgentCenter> centers;
 	private Set<AgentType> agentTypes;
+	private Map<String, Set<AgentType>> otherTypes;
 	private String message;
 	
 	public HandshakeMessage() { }
@@ -63,6 +65,14 @@ public class HandshakeMessage {
 
 	public void setMessage(String message) {
 		this.message = message;
+	}
+
+	public Map<String, Set<AgentType>> getOtherTypes() {
+		return otherTypes;
+	}
+
+	public void setOtherTypes(Map<String, Set<AgentType>> otherTypes) {
+		this.otherTypes = otherTypes;
 	}
 	
 	

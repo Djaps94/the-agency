@@ -1,6 +1,10 @@
 package beans;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.ejb.Singleton;
@@ -13,9 +17,15 @@ public class AgencyManager implements AgencyManagerLocal {
 
 	private List<Agent> runningAgents;
 	private Set<AgentType> supportedTypes; 
-	private Set<AgentType> otherSupportedTypes;
+	private Map<String,Set<AgentType>> otherSupportedTypes;
 	
 	public AgencyManager() { }
+	
+	public void initialise(){
+		this.runningAgents  = new LinkedList<Agent>();
+		this.supportedTypes = new HashSet<AgentType>();
+		this.otherSupportedTypes = new HashMap<String, Set<AgentType>>();
+	}
 	
 	public Set<AgentType> getSupportedTypes() {
 		return supportedTypes;
@@ -33,11 +43,28 @@ public class AgencyManager implements AgencyManagerLocal {
 		this.runningAgents = runningAgents;
 	}
 
-	public Set<AgentType> getOtherSupportedTypes() {
+	public Map<String, Set<AgentType>> getOtherSupportedTypes() {
 		return otherSupportedTypes;
 	}
 
-	public void setOtherSupportedTypes(Set<AgentType> otherSupportedTypes) {
+	public void setOtherSupportedTypes(Map<String, Set<AgentType>> otherSupportedTypes) {
 		this.otherSupportedTypes = otherSupportedTypes;
 	}
+	
+	public boolean isContained(String alias){
+		return otherSupportedTypes.containsKey(alias);
+	}
+	
+	public void addOtherTypes(String alias, Set<AgentType> types){
+		if(!isContained(alias))
+			otherSupportedTypes.put(alias, types);
+		else
+			otherSupportedTypes.get(alias).addAll(types);
+	}
+	
+	public void deleteOtherTypes(String alias){
+		otherSupportedTypes.remove(alias);
+	}
+	
+	
 }

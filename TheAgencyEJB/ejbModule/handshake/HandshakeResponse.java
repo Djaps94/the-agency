@@ -2,6 +2,7 @@ package handshake;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Resource;
@@ -128,9 +129,9 @@ public class HandshakeResponse implements HandshakeResponseLocal{
 	}
 	
 	private void sendGetTypesResponse(HandshakeMessage message, ZMQ.Socket response, ObjectMapper mapper) throws ConnectionException, JsonProcessingException{
-		Set<AgentType> types = dealer.registerAgentTypes(message);
+		Map<String, Set<AgentType>> types = dealer.registerAgentTypes(message);
 		HandshakeMessage msg = new HandshakeMessage();
-		msg.setAgentTypes(types);
+		msg.setOtherTypes(types);
 		String m = mapper.writeValueAsString(msg);
 		response.send(m);
 	}

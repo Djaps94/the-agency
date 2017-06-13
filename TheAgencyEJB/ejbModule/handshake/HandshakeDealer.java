@@ -1,8 +1,9 @@
 package handshake;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -56,12 +57,15 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 		return new ArrayList<AgentCenter>();
 	}
 	
-	public Set<AgentType> registerAgentTypes(HandshakeMessage message) throws ConnectionException{
-		Set<AgentType> returnSet = new HashSet<AgentType>();
+	public Map<String, Set<AgentType>> registerAgentTypes(HandshakeMessage message) throws ConnectionException{
+		Map<String,Set<AgentType>> returnSet = new HashMap<String, Set<AgentType>>();
 		if(nodesManagment.isMaster()){
-			returnSet.addAll(manager.getSupportedTypes());
-			returnSet.addAll(manager.getOtherSupportedTypes());
-			manager.getOtherSupportedTypes().addAll(message.getAgentTypes());
+			returnSet.put(registry.getThisCenter().getAlias(),manager.getSupportedTypes());
+			manager.getOtherSupportedTypes().entrySet()
+											.stream()
+											.forEach(entrySet -> returnSet.put(entrySet.getKey(), entrySet.getValue()));
+			
+			manager.addOtherTypes(message.getCenter().getAlias(), message.getAgentTypes());
 			message.setType(handshakeType.DELIVER_TYPES);
 			for(AgentCenter center : registry.getCenters()){
 				if(!center.getAlias().equals(message.getCenter().getAlias()))
@@ -73,19 +77,19 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 	}
 	
 	public void addTypes(HandshakeMessage message){
-		manager.getOtherSupportedTypes().addAll(message.getAgentTypes());
+		manager.addOtherTypes(message.getCenter().getAlias(), message.getAgentTypes());
 	}
 	
 	public void rollback(HandshakeMessage message) throws ConnectionException{
 		if(nodesManagment.isMaster()){
 			registry.deleteCenter(message.getCenter());
-			manager.getOtherSupportedTypes().removeAll(message.getAgentTypes());
+			manager.deleteOtherTypes(message.getCenter().getAlias());
 			for(AgentCenter center : registry.getCenters())
 				requester.sendMessage(center.getAddress(), message);
 		}
 		
 		registry.deleteCenter(message.getCenter());
-		manager.getOtherSupportedTypes().removeAll(message.getAgentTypes());
+		manager.deleteOtherTypes(message.getCenter().getAlias());
 	}
 	
 }

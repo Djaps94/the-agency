@@ -90,11 +90,15 @@ public class NetworkManagment implements NetworkManagmentLocal{
 			
 			try {
 				HandshakeMessage message = getAllAgentTypes(masterIpAddress, slave);
-				if(message != null) agency.getOtherSupportedTypes().addAll(message.getAgentTypes());
+				if(message != null) message.getOtherTypes().entrySet()
+														   .stream()
+														   .forEach(entry -> agency.addOtherTypes(entry.getKey(), entry.getValue()));
 			} catch (ConnectionException e) {
 				try {
 					HandshakeMessage message = getAllAgentTypes(masterIpAddress, slave);
-					if(message != null) agency.getOtherSupportedTypes().addAll(message.getAgentTypes());
+					if(message != null) message.getOtherTypes().entrySet()
+															   .stream()
+															   .forEach(entry -> agency.addOtherTypes(entry.getKey(), entry.getValue()));
 				} catch (ConnectionException e1) {
 					try {
 						HandshakeMessage message = rollback(masterIpAddress, slave);
