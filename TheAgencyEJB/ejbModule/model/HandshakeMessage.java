@@ -10,7 +10,8 @@ public class HandshakeMessage {
 								GET_CENTERS,
 								GET_TYPES,
 								DELIVER_TYPES,
-								ROLLBACK
+								ROLLBACK,
+								GET_RUNNING
 							  };
 	
 	private AgentCenter center;

@@ -23,9 +23,11 @@ import beans.AgencyRegistryLocal;
 import beans.NetworkManagmentLocal;
 import exceptions.ConnectionException;
 import exceptions.RegisterSlaveException;
+import model.Agent;
 import model.AgentCenter;
 import model.AgentType;
 import model.HandshakeMessage;
+import model.HandshakeMessage.handshakeType;
 import util.PortTransformation;
 
 @Singleton
@@ -75,6 +77,7 @@ public class HandshakeResponse implements HandshakeResponseLocal{
 								sendRegisterResponse(message, response, mapper);
 							} catch (RegisterSlaveException | ConnectionException e1) {
 								try {
+									message.setType(handshakeType.ROLLBACK);
 									requester.sendMessage(nodesManagment.getMasterAddress(), message);
 								} catch (ConnectionException e2) {
 									//TODO: shutdown server
@@ -91,6 +94,7 @@ public class HandshakeResponse implements HandshakeResponseLocal{
 								sendGetTypesResponse(message, response, mapper);
 							} catch (ConnectionException | JsonEOFException e1) {
 								try {
+									message.setType(handshakeType.ROLLBACK);
 									requester.sendMessage(nodesManagment.getMasterAddress(), message);
 								} catch (ConnectionException e2) {
 									// TODO: shutdown server
@@ -100,6 +104,23 @@ public class HandshakeResponse implements HandshakeResponseLocal{
 					}
 					break;
 					case DELIVER_TYPES: addTypes(message, response); 
+					break;
+					case GET_RUNNING: {
+						try {
+							sendGetRunningResponse(response, mapper);
+						} catch(JsonProcessingException e){
+							try {
+								sendGetRunningResponse(response, mapper);
+							} catch(JsonProcessingException e1){
+								try {
+									message.setType(handshakeType.ROLLBACK);
+									requester.sendMessage(nodesManagment.getMasterAddress(), message);
+								} catch (ConnectionException e2) {
+									// TODO shutdown server
+								}
+							}
+						}
+					}
 					break;
 					case ROLLBACK: rollback(message, response, mapper); 
 					break;
@@ -134,6 +155,14 @@ public class HandshakeResponse implements HandshakeResponseLocal{
 		msg.setOtherTypes(types);
 		String m = mapper.writeValueAsString(msg);
 		response.send(m);
+	}
+	
+	private void sendGetRunningResponse(ZMQ.Socket response, ObjectMapper mapper) throws JsonProcessingException{
+		List<Agent> agents = dealer.getRunningAgents();
+		HandshakeMessage msg = new HandshakeMessage();
+		msg.setRunningAgents(agents);
+		String data = mapper.writeValueAsString(msg);
+		response.send(data);
 	}
 	
 	private void addTypes(HandshakeMessage message, ZMQ.Socket response){

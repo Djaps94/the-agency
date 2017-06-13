@@ -109,7 +109,23 @@ public class NetworkManagment implements NetworkManagmentLocal{
 					}
 				}
 			}
-			
+			try {
+				HandshakeMessage message = getAllRunningAgents(masterIpAddress, slave);
+				if(message != null) message.getRunningAgents().addAll(message.getRunningAgents());
+			} catch (ConnectionException e) {
+				try {
+					HandshakeMessage message = getAllRunningAgents(masterIpAddress, slave);
+					if(message != null) message.getRunningAgents().addAll(message.getRunningAgents());
+				} catch (ConnectionException e1) {
+					try {
+						HandshakeMessage message = rollback(masterIpAddress, slave);
+						if(message != null) shutdownServer();
+					} catch (ConnectionException e2) {
+						System.out.println("Handshake failed. Rollback failed. Shuting down serve...");
+						shutdownServer();
+					}
+				}
+			}
 			
 		} catch (UnknownHostException e) {
 			shutdownServer();
@@ -134,21 +150,24 @@ public class NetworkManagment implements NetworkManagmentLocal{
 	}
 	
 	private HandshakeMessage getAllAgentTypes(String masterIpAddress, AgentCenter slave) throws ConnectionException{
-		HandshakeMessage message = new HandshakeMessage();
-		message.setType(handshakeType.GET_TYPES);
-		message.setAgentTypes(agency.getSupportedTypes());
-		message.setCenter(slave);
-		return requester.sendMessage(masterIpAddress, message);
+		return requester.sendMessage(masterIpAddress, createMessage(slave, handshakeType.GET_TYPES));
+	}
+	
+	private HandshakeMessage getAllRunningAgents(String masterIpAddress, AgentCenter slave) throws ConnectionException{
+		return requester.sendMessage(masterIpAddress, createMessage(slave, handshakeType.GET_RUNNING));
 	}
 
-
 	private HandshakeMessage rollback(String masterIpAddress, AgentCenter slave) throws ConnectionException{
+		return requester.sendMessage(masterIpAddress, createMessage(slave, handshakeType.ROLLBACK));
+	}
+	
+	private HandshakeMessage createMessage(AgentCenter slave, handshakeType type){
 		HandshakeMessage message = new HandshakeMessage();
-		message.setType(handshakeType.ROLLBACK);
+		message.setType(type);
 		message.setAgentTypes(agency.getSupportedTypes());
 		message.setCenter(slave);
 		message.setRunningAgents(agency.getRunningAgents());
-		return requester.sendMessage(masterIpAddress, message);
+		return message;
 	}
 	
 	private void shutdownServer(){

@@ -8,6 +8,7 @@ import javax.ejb.Local;
 
 import exceptions.ConnectionException;
 import exceptions.RegisterSlaveException;
+import model.Agent;
 import model.AgentCenter;
 import model.AgentType;
 import model.HandshakeMessage;
@@ -19,4 +20,5 @@ public interface HandshakeDealerLocal {
 	public Map<String, Set<AgentType>> registerAgentTypes(HandshakeMessage message) throws ConnectionException;
 	public void addTypes(HandshakeMessage message);
 	public void rollback(HandshakeMessage message) throws ConnectionException;
+	public List<Agent> getRunningAgents();
 }

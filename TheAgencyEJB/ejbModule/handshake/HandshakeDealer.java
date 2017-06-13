@@ -15,6 +15,7 @@ import beans.AgencyRegistryLocal;
 import beans.NetworkManagmentLocal;
 import exceptions.ConnectionException;
 import exceptions.RegisterSlaveException;
+import model.Agent;
 import model.AgentCenter;
 import model.AgentType;
 import model.HandshakeMessage;
@@ -45,7 +46,8 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 				if(!center.getAlias().equals(message.getCenter().getAlias()))
 						requester.sendMessage(center.getAddress(), message);
 			}
-			List<AgentCenter> list = registry.getCenters().stream()
+			List<AgentCenter> list = registry.getCenters()
+											 .stream()
 											 .filter(center -> !center.getAlias().equals(message.getCenter().getAlias()))
 											 .collect(Collectors.toList());
 			
@@ -92,6 +94,10 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 		registry.deleteCenter(message.getCenter());
 		manager.deleteOtherTypes(message.getCenter().getAlias());
 		manager.getRunningAgents().removeAll(message.getRunningAgents());
+	}
+	
+	public List<Agent> getRunningAgents(){
+		return manager.getRunningAgents();
 	}
 	
 }
