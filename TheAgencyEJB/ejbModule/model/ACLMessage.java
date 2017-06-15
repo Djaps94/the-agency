@@ -24,7 +24,7 @@ public class ACLMessage implements Serializable{
 	private String inReplyTo;
 	private Long replyBy;
 	
-	private enum Performative { ACCEPT_PROPOSAL,
+	public enum Performative { ACCEPT_PROPOSAL,
 							    AGREE,
 							    CANCEL,
 							    CFP,

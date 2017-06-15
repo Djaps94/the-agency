@@ -70,8 +70,8 @@ public class NetworkManagment implements NetworkManagmentLocal{
 			try {
 				registryBean.setThisCenter(createCenter());
 				System.out.println("MASTER NODE UP");
-				startReciever();
-				hrequester.startTimer();
+				//startReciever();
+				//hrequester.startTimer();
 			} catch (UnknownHostException e) {
 				//TODO: shutdown script
 			}
