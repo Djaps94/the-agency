@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
 
 import model.Agent;
@@ -21,6 +22,7 @@ public class AgencyManager implements AgencyManagerLocal {
 	
 	public AgencyManager() { }
 	
+	@PostConstruct
 	public void initialise(){
 		this.runningAgents  = new LinkedList<Agent>();
 		this.supportedTypes = new HashSet<AgentType>();

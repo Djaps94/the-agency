@@ -40,12 +40,11 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 	
 	public List<AgentCenter> registerCenter(HandshakeMessage message) throws RegisterSlaveException, ConnectionException{
 		if(nodesManagment.isMaster()){
-			registry.addCenter(message.getCenter());
 			
-			for(AgentCenter center : registry.getCenters()){
-				if(!center.getAlias().equals(message.getCenter().getAlias()))
+			for(AgentCenter center : registry.getCenters())
 						requester.sendMessage(center.getAddress(), message);
-			}
+			
+			registry.addCenter(message.getCenter());
 			List<AgentCenter> list = registry.getCenters()
 											 .stream()
 											 .filter(center -> !center.getAlias().equals(message.getCenter().getAlias()))
@@ -63,10 +62,11 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 		Map<String,Set<AgentType>> returnSet = new HashMap<String, Set<AgentType>>();
 		if(nodesManagment.isMaster()){
 			returnSet.put(registry.getThisCenter().getAlias(),manager.getSupportedTypes());
-			manager.getOtherSupportedTypes().entrySet()
-											.stream()
-											.forEach(entrySet -> returnSet.put(entrySet.getKey(), entrySet.getValue()));
-			
+			if(!manager.getOtherSupportedTypes().isEmpty())
+				manager.getOtherSupportedTypes().entrySet()
+												.stream()
+												.forEach(entrySet -> returnSet.put(entrySet.getKey(), entrySet.getValue()));
+				
 			manager.addOtherTypes(message.getCenter().getAlias(), message.getAgentTypes());
 			message.setType(handshakeType.DELIVER_TYPES);
 			for(AgentCenter center : registry.getCenters()){

@@ -1,6 +1,5 @@
 package handshake;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.Stateless;
 
@@ -15,19 +14,12 @@ import util.PortTransformation;
 
 @Stateless
 public class HandshakeRequester implements HandshakeRequesterLocal {
-
-	private ZMQ.Context context;
-	private ZMQ.Socket request;
 	
 	public HandshakeRequester() { }
-	
-	@PostConstruct
-	public void initialise(){
-		context = ZMQ.context(1);
-		request = context.socket(ZMQ.REQ);
-	}
-	
+		
 	public HandshakeMessage sendMessage(String destination, HandshakeMessage message) throws ConnectionException{
+		ZMQ.Context context = ZMQ.context(1);
+		ZMQ.Socket request = context.socket(ZMQ.REQ);
 		request.connect("tcp://"+PortTransformation.transform(destination, 0));
 		ObjectMapper mapper = new ObjectMapper();
 		try {
@@ -40,14 +32,13 @@ public class HandshakeRequester implements HandshakeRequesterLocal {
 		try {
 			msg = mapper.readValue(data, HandshakeMessage.class);
 		} catch (Exception e) {
+			request.close();
+			context.term();
 			return msg;
 		}
+		request.close();
+		context.term();
 		return msg;
 	}
 	
-	@PreDestroy
-	public void destroy(){
-		request.close();
-		context.term();
-	}
 }

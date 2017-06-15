@@ -5,5 +5,5 @@ import javax.ejb.Local;
 @Local
 public interface HandshakeResponseLocal {
 
-	public void startTimer();
+	public void waitMessage();
 }

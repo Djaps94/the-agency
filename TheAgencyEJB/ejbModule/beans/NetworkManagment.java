@@ -4,16 +4,19 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import javax.annotation.PostConstruct;
-import javax.ejb.ConcurrencyManagement;
-import javax.ejb.ConcurrencyManagementType;
+import javax.annotation.PreDestroy;
+import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.Local;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
+import javax.inject.Inject;
+import javax.jms.Destination;
+import javax.jms.JMSContext;
+import javax.jms.JMSProducer;
 
 import exceptions.ConnectionException;
 import handshake.HandshakeRequesterLocal;
-import handshake.HandshakeResponseLocal;
 import model.AgentCenter;
 import model.HandshakeMessage;
 import model.HandshakeMessage.handshakeType;
@@ -21,7 +24,6 @@ import util.PortTransformation;
 
 @Startup
 @Singleton
-@ConcurrencyManagement(ConcurrencyManagementType.CONTAINER)
 @Local(NetworkManagmentLocal.class)
 public class NetworkManagment implements NetworkManagmentLocal{
 	
@@ -34,6 +36,7 @@ public class NetworkManagment implements NetworkManagmentLocal{
 	
 	private boolean master;
 	private String masterIpAddress;
+	private boolean recieverRunning = false;
 	
 	
 	@EJB
@@ -41,12 +44,15 @@ public class NetworkManagment implements NetworkManagmentLocal{
 	
 	@EJB
 	private HandshakeRequesterLocal requester;
-	
-	@EJB
-	private HandshakeResponseLocal timer;
-	
+		
 	@EJB 
 	private AgencyManagerLocal agency;
+	
+	@Inject
+	JMSContext context;
+	
+	@Resource(mappedName = "java:/jms/queue/ZeroMQ")
+	private Destination queue;
 	
 	@PostConstruct
 	public void initialise(){		
@@ -55,7 +61,7 @@ public class NetworkManagment implements NetworkManagmentLocal{
 			try {
 				registryBean.setThisCenter(createCenter());
 				System.out.println("MASTER NODE UP");
-				timer.startTimer();
+				startReciever();
 			} catch (UnknownHostException e) {
 				//TODO: shutdown script
 			}
@@ -68,11 +74,15 @@ public class NetworkManagment implements NetworkManagmentLocal{
 			System.out.println("SLAVE NODE UP "+slave.getAlias());
 			registryBean.setThisCenter(slave);
 			master = false;
-			timer.startTimer();
+			startReciever();
 			
 			try {
 				HandshakeMessage message = sendMessageToMaster(masterIpAddress, slave);
-				if(message != null) message.getCenters().forEach(center -> registryBean.addCenter(center));
+				if(message != null){
+					for(AgentCenter center : message.getCenters()){
+						registryBean.addCenter(center);
+					}
+				}
 			} catch (ConnectionException e) {
 				try {
 					HandshakeMessage message = sendMessageToMaster(masterIpAddress, slave);
@@ -115,7 +125,7 @@ public class NetworkManagment implements NetworkManagmentLocal{
 			} catch (ConnectionException e) {
 				try {
 					HandshakeMessage message = getAllRunningAgents(masterIpAddress, slave);
-					if(message != null) message.getRunningAgents().addAll(message.getRunningAgents());
+					if(message != null) message.getRunningAgents().addAll(message.getRunningAgents());									
 				} catch (ConnectionException e1) {
 					try {
 						HandshakeMessage message = rollback(masterIpAddress, slave);
@@ -174,11 +184,28 @@ public class NetworkManagment implements NetworkManagmentLocal{
 		//TODO: Load script and exec it
 	}
 	
+	private void startReciever(){
+		JMSProducer producer = context.createProducer();
+		producer.send(queue, "Activate");
+	}
+	
+	@PreDestroy
+	public void destroy(){
+	}
+	
 	public boolean isMaster(){
 		return master;
 	}
 	
 	public String getMasterAddress(){
 		return masterIpAddress;
+	}
+	
+	public boolean isRecieverRunning(){
+		return recieverRunning;
+	}
+	
+	public void setRecieverRunning(boolean flag){
+		this.recieverRunning = flag;
 	}
 }
