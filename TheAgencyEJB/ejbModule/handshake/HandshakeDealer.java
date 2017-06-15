@@ -14,6 +14,7 @@ import beans.AgencyManagerLocal;
 import beans.AgencyRegistryLocal;
 import beans.NetworkManagmentLocal;
 import exceptions.ConnectionException;
+import exceptions.NodeExistsException;
 import exceptions.RegisterSlaveException;
 import model.Agent;
 import model.AgentCenter;
@@ -38,7 +39,7 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 	
 	public HandshakeDealer() { }
 	
-	public List<AgentCenter> registerCenter(HandshakeMessage message) throws RegisterSlaveException, ConnectionException{
+	public List<AgentCenter> registerCenter(HandshakeMessage message) throws RegisterSlaveException, ConnectionException, NodeExistsException{
 		if(nodesManagment.isMaster()){
 			
 			for(AgentCenter center : registry.getCenters())

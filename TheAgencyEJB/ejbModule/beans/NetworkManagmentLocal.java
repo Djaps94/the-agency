@@ -9,4 +9,6 @@ public interface NetworkManagmentLocal {
 	public String getMasterAddress();
 	public boolean isRecieverRunning();
 	public void setRecieverRunning(boolean flag);
+	public boolean isHeartbeatFlag();
+	public void setHeartbeatFlag(boolean heartbeatFlag);
 }

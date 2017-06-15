@@ -11,7 +11,8 @@ public class HandshakeMessage {
 								GET_TYPES,
 								DELIVER_TYPES,
 								ROLLBACK,
-								GET_RUNNING
+								GET_RUNNING,
+								TURN_OFF
 							  };
 	
 	private AgentCenter center;

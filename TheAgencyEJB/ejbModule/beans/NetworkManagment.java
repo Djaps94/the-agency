@@ -16,7 +16,9 @@ import javax.jms.JMSContext;
 import javax.jms.JMSProducer;
 
 import exceptions.ConnectionException;
+import exceptions.NodeExistsException;
 import handshake.HandshakeRequesterLocal;
+import heartbeat.HeartbeatRequestLocal;
 import model.AgentCenter;
 import model.HandshakeMessage;
 import model.HandshakeMessage.handshakeType;
@@ -37,6 +39,7 @@ public class NetworkManagment implements NetworkManagmentLocal{
 	private boolean master;
 	private String masterIpAddress;
 	private boolean recieverRunning = false;
+	private boolean heartbeatFlag = false;																																																																																																																																																																																	
 	
 	
 	@EJB
@@ -48,11 +51,17 @@ public class NetworkManagment implements NetworkManagmentLocal{
 	@EJB 
 	private AgencyManagerLocal agency;
 	
+	@EJB
+	private HeartbeatRequestLocal hrequester;
+	
 	@Inject
 	JMSContext context;
 	
 	@Resource(mappedName = "java:/jms/queue/ZeroMQ")
 	private Destination queue;
+	
+	@Resource(mappedName = "java:/jms/queue/Heartbeat")
+	private Destination beatQueue;
 	
 	@PostConstruct
 	public void initialise(){		
@@ -62,6 +71,7 @@ public class NetworkManagment implements NetworkManagmentLocal{
 				registryBean.setThisCenter(createCenter());
 				System.out.println("MASTER NODE UP");
 				startReciever();
+				hrequester.startTimer();
 			} catch (UnknownHostException e) {
 				//TODO: shutdown script
 			}
@@ -79,15 +89,17 @@ public class NetworkManagment implements NetworkManagmentLocal{
 			try {
 				HandshakeMessage message = sendMessageToMaster(masterIpAddress, slave);
 				if(message != null){
-					for(AgentCenter center : message.getCenters()){
+					for(AgentCenter center : message.getCenters())
 						registryBean.addCenter(center);
-					}
 				}
-			} catch (ConnectionException e) {
+			} catch (ConnectionException | NodeExistsException e) {
 				try {
 					HandshakeMessage message = sendMessageToMaster(masterIpAddress, slave);
-					if(message != null) message.getCenters().forEach(center -> registryBean.addCenter(center));
-				} catch (ConnectionException e1) {
+					if(message != null) {
+						for(AgentCenter center : message.getCenters())
+							registryBean.addCenter(center);
+					}
+				} catch (ConnectionException | NodeExistsException e1) {
 					try {
 						HandshakeMessage message = rollback(masterIpAddress, slave);
 						if(message != null) shutdownServer();
@@ -136,7 +148,7 @@ public class NetworkManagment implements NetworkManagmentLocal{
 					}
 				}
 			}
-			
+			hrequester.startTimer();
 		} catch (UnknownHostException e) {
 			shutdownServer();
 		}
@@ -187,10 +199,18 @@ public class NetworkManagment implements NetworkManagmentLocal{
 	private void startReciever(){
 		JMSProducer producer = context.createProducer();
 		producer.send(queue, "Activate");
+		producer.send(beatQueue, "Start protocol");
 	}
 	
 	@PreDestroy
 	public void destroy(){
+		HandshakeMessage message = new HandshakeMessage();
+		message.setType(handshakeType.TURN_OFF);
+		try {
+			requester.sendMessage(registryBean.getThisCenter().getAddress(), message);
+		} catch (ConnectionException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public boolean isMaster(){
@@ -205,6 +225,14 @@ public class NetworkManagment implements NetworkManagmentLocal{
 		return recieverRunning;
 	}
 	
+	public boolean isHeartbeatFlag() {
+		return heartbeatFlag;
+	}
+
+	public void setHeartbeatFlag(boolean heartbeatFlag) {
+		this.heartbeatFlag = heartbeatFlag;
+	}
+
 	public void setRecieverRunning(boolean flag){
 		this.recieverRunning = flag;
 	}

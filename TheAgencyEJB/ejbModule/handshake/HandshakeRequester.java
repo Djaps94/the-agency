@@ -1,6 +1,5 @@
 package handshake;
 
-import javax.annotation.PreDestroy;
 import javax.ejb.Stateless;
 
 import org.zeromq.ZMQ;
@@ -21,6 +20,7 @@ public class HandshakeRequester implements HandshakeRequesterLocal {
 		ZMQ.Context context = ZMQ.context(1);
 		ZMQ.Socket request = context.socket(ZMQ.REQ);
 		request.connect("tcp://"+PortTransformation.transform(destination, 0));
+		request.setReceiveTimeOut(5000);
 		ObjectMapper mapper = new ObjectMapper();
 		try {
 			request.send(mapper.writeValueAsString(message));
@@ -28,6 +28,9 @@ public class HandshakeRequester implements HandshakeRequesterLocal {
 			throw new ConnectionException("Could not send message!");
 		}
 		String data = request.recvStr();
+		if(data == null)
+			throw new ConnectionException("Timeout elapse");
+		
 		HandshakeMessage msg = null;
 		try {
 			msg = mapper.readValue(data, HandshakeMessage.class);

@@ -2,12 +2,11 @@ package beans;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
-import javax.ejb.AccessTimeout;
 import javax.ejb.Singleton;
 
+import exceptions.NodeExistsException;
 import model.AgentCenter;
 
 @Singleton
@@ -24,8 +23,10 @@ public class AgencyRegistry implements AgencyRegistryLocal{
 	}
 	 
 	@Override
-	@AccessTimeout(value = 1, unit = TimeUnit.MINUTES)
-	public void addCenter(AgentCenter center) {
+	public void addCenter(AgentCenter center) throws NodeExistsException {
+		if(registeredCenters.stream().anyMatch(c -> c.getAlias().equals(center.getAlias())))
+			throw new NodeExistsException("Center already running");
+		
 		registeredCenters.add(center);		
 	}
 	

@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import beans.AgencyRegistryLocal;
 import beans.NetworkManagmentLocal;
 import exceptions.ConnectionException;
+import exceptions.NodeExistsException;
 import exceptions.RegisterSlaveException;
 import model.HandshakeMessage;
 import model.HandshakeMessage.handshakeType;
@@ -67,10 +68,10 @@ public class HandshakeResponse implements MessageListener{
 					case REGISTER: { 
 						try {
 							operations.sendRegisterResponse(message, response, mapper);
-						} catch (RegisterSlaveException | ConnectionException e) {
+						} catch (RegisterSlaveException | ConnectionException | NodeExistsException e) {
 							try {
 								operations.sendRegisterResponse(message, response, mapper);
-							} catch (RegisterSlaveException | ConnectionException e1) {
+							} catch (RegisterSlaveException | ConnectionException | NodeExistsException e1) {
 								try {
 									message.setType(handshakeType.ROLLBACK);
 									requester.sendMessage(nodesManagment.getMasterAddress(), message);
@@ -119,6 +120,12 @@ public class HandshakeResponse implements MessageListener{
 					break;
 					case ROLLBACK: operations.rollback(message, response, mapper); 
 					break;
+					case TURN_OFF: {
+						System.out.println("OVDE SAM!");
+						response.close();
+						context.term();
+						break;
+					}
 					default:
 						break;
 					
@@ -127,8 +134,6 @@ public class HandshakeResponse implements MessageListener{
 					continue;
 				}
 			}
-			response.close();
-			context.term();
 	}
 }
 			

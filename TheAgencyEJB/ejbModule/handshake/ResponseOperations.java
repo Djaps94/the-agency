@@ -13,6 +13,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import exceptions.ConnectionException;
+import exceptions.NodeExistsException;
 import exceptions.RegisterSlaveException;
 import model.Agent;
 import model.AgentCenter;
@@ -25,7 +26,7 @@ public class ResponseOperations implements ResponseOperationsLocal{
 	@EJB
 	private HandshakeDealerLocal dealer;
 
-	public void sendRegisterResponse(HandshakeMessage message, ZMQ.Socket response, ObjectMapper mapper) throws ConnectionException, RegisterSlaveException, JsonProcessingException{
+	public void sendRegisterResponse(HandshakeMessage message, ZMQ.Socket response, ObjectMapper mapper) throws ConnectionException, RegisterSlaveException, JsonProcessingException, NodeExistsException{
 		List<AgentCenter> centers = dealer.registerCenter(message);
 		if(centers.isEmpty())
 			response.send("Register successful", 0);

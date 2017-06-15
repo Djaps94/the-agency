@@ -7,6 +7,7 @@ import java.util.Set;
 import javax.ejb.Local;
 
 import exceptions.ConnectionException;
+import exceptions.NodeExistsException;
 import exceptions.RegisterSlaveException;
 import model.Agent;
 import model.AgentCenter;
@@ -16,7 +17,7 @@ import model.HandshakeMessage;
 @Local
 public interface HandshakeDealerLocal {
 
-	public List<AgentCenter> registerCenter(HandshakeMessage message) throws RegisterSlaveException, ConnectionException;
+	public List<AgentCenter> registerCenter(HandshakeMessage message) throws RegisterSlaveException, ConnectionException, NodeExistsException;
 	public Map<String, Set<AgentType>> registerAgentTypes(HandshakeMessage message) throws ConnectionException;
 	public void addTypes(HandshakeMessage message);
 	public void rollback(HandshakeMessage message) throws ConnectionException;
