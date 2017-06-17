@@ -10,6 +10,7 @@ import java.util.Set;
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
 
+import model.ACLMessage.Performative;
 import model.Agent;
 import model.AgentType;
 
@@ -19,6 +20,7 @@ public class AgencyManager implements AgencyManagerLocal {
 	private List<Agent> runningAgents;
 	private Set<AgentType> supportedTypes; 
 	private Map<String,Set<AgentType>> otherSupportedTypes;
+	private Performative performative;
 	
 	public AgencyManager() { }
 	
@@ -27,6 +29,10 @@ public class AgencyManager implements AgencyManagerLocal {
 		this.runningAgents  = new LinkedList<Agent>();
 		this.supportedTypes = new HashSet<AgentType>();
 		this.otherSupportedTypes = new HashMap<String, Set<AgentType>>();
+	}
+	
+	public Performative getPerformative(){
+		return performative;
 	}
 	
 	public Set<AgentType> getSupportedTypes() {

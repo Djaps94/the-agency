@@ -20,7 +20,7 @@ import heartbeat.HeartbeatRequestLocal;
 import model.AgentCenter;
 import model.HandshakeMessage;
 import model.HandshakeMessage.handshakeType;
-import util.PortTransformation;
+import util.AgencyUtil;
 
 @Startup
 @Singleton
@@ -35,10 +35,7 @@ public class NetworkManagment implements NetworkManagmentLocal{
 	private final String LOCAL  = "local";
 	
 	private boolean master;
-	private String masterIpAddress;
-	private boolean recieverRunning = false;
-	private boolean heartbeatFlag = false;																																																																																																																																																																																	
-	
+	private String masterIpAddress;																																																																																																																																																																																
 	
 	@EJB
 	private AgencyRegistryLocal registryBean;
@@ -159,7 +156,7 @@ public class NetworkManagment implements NetworkManagmentLocal{
 		int offset 		 = System.getProperty(OFFSET) == null ? 0 : Integer.parseInt(System.getProperty(OFFSET));
 		String filename  = System.getProperty(TYPES) == null ? "/default" : System.getProperty(TYPES);
 		AgentCenter center = new AgentCenter(alias, ipAddress+":"+(PORT+offset));
-		agency.setSupportedTypes(PortTransformation.agentTypes(filename));
+		agency.setSupportedTypes(AgencyUtil.agentTypes(filename));
 		return center;
 	}
 		
@@ -198,21 +195,5 @@ public class NetworkManagment implements NetworkManagmentLocal{
 	
 	public String getMasterAddress(){
 		return masterIpAddress;
-	}
-	
-	public boolean isRecieverRunning(){
-		return recieverRunning;
-	}
-	
-	public boolean isHeartbeatFlag() {
-		return heartbeatFlag;
-	}
-
-	public void setHeartbeatFlag(boolean heartbeatFlag) {
-		this.heartbeatFlag = heartbeatFlag;
-	}
-
-	public void setRecieverRunning(boolean flag){
-		this.recieverRunning = flag;
 	}
 }

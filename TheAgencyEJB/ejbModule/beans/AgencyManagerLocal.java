@@ -8,6 +8,7 @@ import javax.ejb.Local;
 
 import model.Agent;
 import model.AgentType;
+import model.ACLMessage.Performative;
 
 @Local
 public interface AgencyManagerLocal {
@@ -21,4 +22,5 @@ public interface AgencyManagerLocal {
 	public void deleteOtherTypes(String typeName);
 	public void addOtherTypes(String typeName, Set<AgentType> types);
 	public boolean isContained(String typeName);
+	public Performative getPerformative();
 }
