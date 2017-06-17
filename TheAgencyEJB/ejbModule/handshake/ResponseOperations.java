@@ -1,16 +1,18 @@
 package handshake;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 
-import org.zeromq.ZMQ;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rabbitmq.client.AMQP.BasicProperties;
+import com.rabbitmq.client.Channel;
 
 import exceptions.ConnectionException;
 import exceptions.NodeExistsException;
@@ -26,52 +28,50 @@ public class ResponseOperations implements ResponseOperationsLocal{
 	@EJB
 	private HandshakeDealerLocal dealer;
 
-	public void sendRegisterResponse(HandshakeMessage message, ZMQ.Socket response, ObjectMapper mapper) throws ConnectionException, RegisterSlaveException, JsonProcessingException, NodeExistsException{
+	public void sendRegisterResponse(HandshakeMessage message, Channel channel, ObjectMapper mapper, BasicProperties property) throws ConnectionException, RegisterSlaveException, NodeExistsException, IOException, TimeoutException, InterruptedException{
 		List<AgentCenter> centers = dealer.registerCenter(message);
 		if(centers.isEmpty())
-			response.send("Register successful", 0);
+			channel.basicPublish("", property.getReplyTo(), new BasicProperties().builder().build(), "Register successful".getBytes());
 		else{
 			HandshakeMessage msg = new HandshakeMessage();
 			msg.setCenters(centers);
 			msg.setType(HandshakeMessage.handshakeType.GET_CENTERS);
 			String m = mapper.writeValueAsString(msg);
-			response.send(m);
+			channel.basicPublish("", property.getReplyTo(), new BasicProperties().builder().build(), m.getBytes());
 		}
 	}
 	
-	public void sendGetTypesResponse(HandshakeMessage message, ZMQ.Socket response, ObjectMapper mapper) throws ConnectionException, JsonProcessingException{
+	public void sendGetTypesResponse(HandshakeMessage message, Channel channel, ObjectMapper mapper, BasicProperties property) throws ConnectionException, IOException, TimeoutException, InterruptedException{
 		Map<String, Set<AgentType>> types = dealer.registerAgentTypes(message);
 		HandshakeMessage msg = new HandshakeMessage();
 		msg.setOtherTypes(types);
 		String m = mapper.writeValueAsString(msg);
-		response.send(m);
+		channel.basicPublish("", property.getReplyTo(), new BasicProperties().builder().build(), m.getBytes());
 	}
 	
-	public void sendGetRunningResponse(ZMQ.Socket response, ObjectMapper mapper) throws JsonProcessingException{
+	public void sendGetRunningResponse(Channel channel, ObjectMapper mapper, BasicProperties property) throws IOException{
 		List<Agent> agents = dealer.getRunningAgents();
 		HandshakeMessage msg = new HandshakeMessage();
 		msg.setRunningAgents(agents);
 		String data = mapper.writeValueAsString(msg);
-		response.send(data);
+		channel.basicPublish("", property.getReplyTo(), new BasicProperties().builder().build(), data.getBytes());
 	}
 	
-	public void addTypes(HandshakeMessage message, ZMQ.Socket response){
+	public void addTypes(HandshakeMessage message, Channel channel, BasicProperties property) throws IOException{
 		dealer.addTypes(message);
-		response.send("Added types to other nodes.");
+		channel.basicPublish("", property.getReplyTo(), new BasicProperties().builder().build(), "Add types to other nodes".getBytes());
 	}
 	
-	public void rollback(HandshakeMessage message, ZMQ.Socket response, ObjectMapper mapper){
+	public void rollback(HandshakeMessage message, Channel channel, ObjectMapper mapper, BasicProperties property) throws IOException{
 		try {
 			dealer.rollback(message);
 			HandshakeMessage msg = new HandshakeMessage();
 			msg.setMessage("Rollback completed!");
 			String data = mapper.writeValueAsString(msg);
-			response.send(data);
-		} catch (ConnectionException | JsonProcessingException e) {
-			response.send("Shuting down server. Rollback failed.");
+			channel.basicPublish("", property.getReplyTo(), new BasicProperties().builder().build(), data.getBytes());
+		} catch (ConnectionException | JsonProcessingException | TimeoutException | InterruptedException e) {
+			channel.basicPublish("", property.getReplyTo(), new BasicProperties().builder().build(), "rollback failed".getBytes());
 		}
 		
 	}
-	
-	
-}
+}	

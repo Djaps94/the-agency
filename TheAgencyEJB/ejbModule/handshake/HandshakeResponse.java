@@ -1,35 +1,23 @@
 package handshake;
 
 import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 
-import javax.ejb.ActivationConfigProperty;
-import javax.ejb.Asynchronous;
+import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
-import javax.ejb.MessageDriven;
-import javax.jms.Message;
-import javax.jms.MessageListener;
+import javax.ejb.Singleton;
 
-import org.zeromq.ZMQ;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.io.JsonEOFException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
 
 import beans.AgencyRegistryLocal;
 import beans.NetworkManagmentLocal;
-import exceptions.ConnectionException;
-import exceptions.NodeExistsException;
-import exceptions.RegisterSlaveException;
-import model.HandshakeMessage;
-import model.HandshakeMessage.handshakeType;
-import util.PortTransformation;
+import util.HandshakeResponseConsumer;
 
-@MessageDriven(activationConfig ={
-		@ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
-		@ActivationConfigProperty(propertyName = "destination", propertyValue = "java:/jms/queue/ZeroMQ"),
-		@ActivationConfigProperty(propertyName = "transactionTimeout", propertyValue = "300000")
-})
-public class HandshakeResponse implements MessageListener{	
+@Singleton
+public class HandshakeResponse implements HandshakeResponseLocal{	
 	
 	@EJB
 	private AgencyRegistryLocal registry;
@@ -42,98 +30,37 @@ public class HandshakeResponse implements MessageListener{
 	
 	@EJB
 	private ResponseOperationsLocal operations;
-		
+	
+	private ConnectionFactory factory;
+	private Connection connection;
+	private Channel channel;
 	
 	public HandshakeResponse() { }
 	
-	@Override
-	public void onMessage(Message message) {
-		if(!nodesManagment.isRecieverRunning())
-			waitMessage();
+	@PostConstruct
+	private void initialise(){
+    	factory = new ConnectionFactory();
+		try {
+        	factory.setHost("127.0.0.1");
+        	factory.setPort(5672);
+        	factory.setVirtualHost("/");
+			connection = factory.newConnection();
+			channel    = connection.createChannel();
+		} catch (IOException | TimeoutException e) {
+			e.printStackTrace();
+		}
 	}
 	
-	@Asynchronous
-	public void waitMessage(){
-		nodesManagment.setRecieverRunning(true);
+	public void waitMessage() throws IOException{
+		try {
+			channel.queueDeclare(registry.getThisCenter().getAddress(), false, false, false, null);
+			channel.basicQos(1);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		ObjectMapper mapper = new ObjectMapper();
-		ZMQ.Context context = ZMQ.context(1);
-		ZMQ.Socket response = context.socket(ZMQ.REP);
-		response.bind("tcp://"+PortTransformation.transform(registry.getThisCenter().getAddress(),0));
-		
-			while(!Thread.currentThread().isInterrupted()){
-				try {
-					String data = response.recvStr();
-					HandshakeMessage message = mapper.readValue(data, HandshakeMessage.class);
-					switch(message.getType()){
-					case REGISTER: { 
-						try {
-							operations.sendRegisterResponse(message, response, mapper);
-						} catch (RegisterSlaveException | ConnectionException | NodeExistsException e) {
-							try {
-								operations.sendRegisterResponse(message, response, mapper);
-							} catch (RegisterSlaveException | ConnectionException | NodeExistsException e1) {
-								try {
-									message.setType(handshakeType.ROLLBACK);
-									requester.sendMessage(nodesManagment.getMasterAddress(), message);
-								} catch (ConnectionException e2) {
-									//TODO: shutdown server
-								}
-							}
-						}				 
-					} 
-					break;
-					case GET_TYPES: {
-						try {
-							operations.sendGetTypesResponse(message, response, mapper);
-						} catch (ConnectionException | JsonProcessingException e) {
-							try {
-								operations.sendGetTypesResponse(message, response, mapper);
-							} catch (ConnectionException | JsonEOFException e1) {
-								try {
-									message.setType(handshakeType.ROLLBACK);
-									requester.sendMessage(nodesManagment.getMasterAddress(), message);
-								} catch (ConnectionException e2) {
-									// TODO: shutdown server
-								}
-							}
-						}
-					}
-					break;
-					case DELIVER_TYPES: operations.addTypes(message, response); 
-					break;
-					case GET_RUNNING: {
-						try {
-							operations.sendGetRunningResponse(response, mapper);
-						} catch(JsonProcessingException e){
-							try {
-								operations.sendGetRunningResponse(response, mapper);
-							} catch(JsonProcessingException e1){
-								try {
-									message.setType(handshakeType.ROLLBACK);
-									requester.sendMessage(nodesManagment.getMasterAddress(), message);
-								} catch (ConnectionException e2) {
-									// TODO shutdown server
-								}
-							}
-						}
-					}
-					break;
-					case ROLLBACK: operations.rollback(message, response, mapper); 
-					break;
-					case TURN_OFF: {
-						System.out.println("OVDE SAM!");
-						response.close();
-						context.term();
-						break;
-					}
-					default:
-						break;
-					
-					}
-				} catch (IOException e) {
-					continue;
-				}
-			}
+		channel.basicConsume(registry.getThisCenter().getAddress(), new HandshakeResponseConsumer(channel, mapper, nodesManagment, requester, operations));
+
 	}
 }
 			

@@ -1,47 +1,43 @@
 package handshake;
 
+import java.io.IOException;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeoutException;
+
 import javax.ejb.Stateless;
 
-import org.zeromq.ZMQ;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rabbitmq.client.AMQP.BasicProperties;
+import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
 
 import exceptions.ConnectionException;
 import model.HandshakeMessage;
-import util.PortTransformation;
+import util.HandshakeConsumer;
 
 @Stateless
 public class HandshakeRequester implements HandshakeRequesterLocal {
 	
 	public HandshakeRequester() { }
 		
-	public HandshakeMessage sendMessage(String destination, HandshakeMessage message) throws ConnectionException{
-		ZMQ.Context context = ZMQ.context(1);
-		ZMQ.Socket request = context.socket(ZMQ.REQ);
-		request.connect("tcp://"+PortTransformation.transform(destination, 0));
-		//request.setReceiveTimeOut(5000);
+	public HandshakeMessage sendMessage(String destination, HandshakeMessage message) throws ConnectionException, IOException, TimeoutException, InterruptedException{
+		ConnectionFactory factory = new ConnectionFactory();
+	  	factory.setHost("127.0.0.1");
+    	factory.setPort(5672);
+    	factory.setVirtualHost("/");
+		Connection connection = factory.newConnection();
+		Channel channel = connection.createChannel();
+		String ReplyQueueName = channel.queueDeclare().getQueue();
+		BlockingQueue<HandshakeMessage> response = new ArrayBlockingQueue<>(1);
 		ObjectMapper mapper = new ObjectMapper();
-		try {
-			request.send(mapper.writeValueAsString(message));
-		} catch (JsonProcessingException e) {
-			throw new ConnectionException("Could not send message!");
-		}
-		String data = request.recvStr();
-		if(data == null)
-			throw new ConnectionException("Timeout elapse");
-		
-		HandshakeMessage msg = null;
-		try {
-			msg = mapper.readValue(data, HandshakeMessage.class);
-		} catch (Exception e) {
-			request.close();
-			context.term();
-			return msg;
-		}
-		request.close();
-		context.term();
-		return msg;
+		String msg = mapper.writeValueAsString(message);
+		BasicProperties props = new BasicProperties().builder().replyTo(ReplyQueueName).build();
+	
+		channel.basicPublish("", destination, props, msg.getBytes());
+		channel.basicConsume(ReplyQueueName, true, new HandshakeConsumer(channel, mapper, response));
+		return response.take();
 	}
 	
 }

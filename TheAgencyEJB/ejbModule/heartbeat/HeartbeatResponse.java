@@ -1,9 +1,6 @@
 package heartbeat;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.TimeoutException;
 
 import javax.annotation.PostConstruct;
@@ -16,14 +13,10 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DefaultConsumer;
-import com.rabbitmq.client.DefaultSaslConfig;
 import com.rabbitmq.client.Envelope;
-import com.rabbitmq.client.JDKSaslConfig;
-import com.rabbitmq.client.SaslConfig;
 
 import beans.AgencyRegistryLocal;
 import beans.NetworkManagmentLocal;
-import util.PortTransformation;
 
 
 @Singleton
@@ -54,7 +47,6 @@ public class HeartbeatResponse implements HeartBeatResponseLocal{
 			connection = factory.newConnection();
 			channel    = connection.createChannel();
 		} catch (IOException | TimeoutException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     }
@@ -88,7 +80,6 @@ public class HeartbeatResponse implements HeartBeatResponseLocal{
 			channel.close();
 			connection.close();
 		} catch (IOException | TimeoutException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
     }

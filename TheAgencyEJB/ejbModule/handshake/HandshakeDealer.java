@@ -1,10 +1,12 @@
 package handshake;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
 
 import javax.ejb.EJB;
@@ -39,7 +41,7 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 	
 	public HandshakeDealer() { }
 	
-	public List<AgentCenter> registerCenter(HandshakeMessage message) throws RegisterSlaveException, ConnectionException, NodeExistsException{
+	public List<AgentCenter> registerCenter(HandshakeMessage message) throws RegisterSlaveException, ConnectionException, NodeExistsException, IOException, TimeoutException, InterruptedException{
 		if(nodesManagment.isMaster()){
 			
 			for(AgentCenter center : registry.getCenters())
@@ -59,7 +61,7 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 		return new ArrayList<AgentCenter>();
 	}
 	
-	public Map<String, Set<AgentType>> registerAgentTypes(HandshakeMessage message) throws ConnectionException{
+	public Map<String, Set<AgentType>> registerAgentTypes(HandshakeMessage message) throws ConnectionException, IOException, TimeoutException, InterruptedException{
 		Map<String,Set<AgentType>> returnSet = new HashMap<String, Set<AgentType>>();
 		if(nodesManagment.isMaster()){
 			returnSet.put(registry.getThisCenter().getAlias(),manager.getSupportedTypes());
@@ -83,7 +85,7 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 		manager.addOtherTypes(message.getCenter().getAlias(), message.getAgentTypes());
 	}
 	
-	public void rollback(HandshakeMessage message) throws ConnectionException{
+	public void rollback(HandshakeMessage message) throws ConnectionException, IOException, TimeoutException, InterruptedException{
 		if(nodesManagment.isMaster()){
 			registry.deleteCenter(message.getCenter());
 			manager.deleteOtherTypes(message.getCenter().getAlias());

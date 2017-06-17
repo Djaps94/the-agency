@@ -1,8 +1,10 @@
 package handshake;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
 
 import javax.ejb.Local;
 
@@ -17,9 +19,9 @@ import model.HandshakeMessage;
 @Local
 public interface HandshakeDealerLocal {
 
-	public List<AgentCenter> registerCenter(HandshakeMessage message) throws RegisterSlaveException, ConnectionException, NodeExistsException;
-	public Map<String, Set<AgentType>> registerAgentTypes(HandshakeMessage message) throws ConnectionException;
+	public List<AgentCenter> registerCenter(HandshakeMessage message) throws RegisterSlaveException, ConnectionException, NodeExistsException, IOException, TimeoutException, InterruptedException;
+	public Map<String, Set<AgentType>> registerAgentTypes(HandshakeMessage message) throws ConnectionException, IOException, TimeoutException, InterruptedException;
 	public void addTypes(HandshakeMessage message);
-	public void rollback(HandshakeMessage message) throws ConnectionException;
+	public void rollback(HandshakeMessage message) throws ConnectionException, IOException, TimeoutException, InterruptedException;
 	public List<Agent> getRunningAgents();
 }
