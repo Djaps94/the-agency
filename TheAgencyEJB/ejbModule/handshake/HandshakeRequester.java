@@ -20,7 +20,7 @@ public class HandshakeRequester implements HandshakeRequesterLocal {
 		ZMQ.Context context = ZMQ.context(1);
 		ZMQ.Socket request = context.socket(ZMQ.REQ);
 		request.connect("tcp://"+PortTransformation.transform(destination, 0));
-		request.setReceiveTimeOut(5000);
+		//request.setReceiveTimeOut(5000);
 		ObjectMapper mapper = new ObjectMapper();
 		try {
 			request.send(mapper.writeValueAsString(message));

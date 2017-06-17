@@ -18,6 +18,7 @@ import javax.jms.JMSProducer;
 import exceptions.ConnectionException;
 import exceptions.NodeExistsException;
 import handshake.HandshakeRequesterLocal;
+import heartbeat.HeartBeatResponseLocal;
 import heartbeat.HeartbeatRequestLocal;
 import model.AgentCenter;
 import model.HandshakeMessage;
@@ -54,6 +55,9 @@ public class NetworkManagment implements NetworkManagmentLocal{
 	@EJB
 	private HeartbeatRequestLocal hrequester;
 	
+	@EJB
+	private HeartBeatResponseLocal hresponse;
+	
 	@Inject
 	JMSContext context;
 	
@@ -71,7 +75,8 @@ public class NetworkManagment implements NetworkManagmentLocal{
 				registryBean.setThisCenter(createCenter());
 				System.out.println("MASTER NODE UP");
 				//startReciever();
-				//hrequester.startTimer();
+				hrequester.startTimer();
+				hresponse.pulseTick();
 			} catch (UnknownHostException e) {
 				//TODO: shutdown script
 			}
@@ -85,7 +90,6 @@ public class NetworkManagment implements NetworkManagmentLocal{
 			registryBean.setThisCenter(slave);
 			master = false;
 			startReciever();
-			
 			try {
 				HandshakeMessage message = sendMessageToMaster(masterIpAddress, slave);
 				if(message != null){
@@ -149,6 +153,7 @@ public class NetworkManagment implements NetworkManagmentLocal{
 				}
 			}
 			hrequester.startTimer();
+			hresponse.pulseTick();
 		} catch (UnknownHostException e) {
 			shutdownServer();
 		}
@@ -199,18 +204,10 @@ public class NetworkManagment implements NetworkManagmentLocal{
 	private void startReciever(){
 		JMSProducer producer = context.createProducer();
 		producer.send(queue, "Activate");
-		producer.send(beatQueue, "Start protocol");
 	}
 	
 	@PreDestroy
 	public void destroy(){
-		HandshakeMessage message = new HandshakeMessage();
-		message.setType(handshakeType.TURN_OFF);
-		try {
-			requester.sendMessage(registryBean.getThisCenter().getAddress(), message);
-		} catch (ConnectionException e) {
-			e.printStackTrace();
-		}
 	}
 	
 	public boolean isMaster(){
