@@ -22,5 +22,7 @@ public interface ResponseOperationsLocal {
 	public void sendGetRunningResponse(Channel channel, ObjectMapper mapper, BasicProperties property) throws IOException;
 	public void addTypes(HandshakeMessage message, Channel channel, BasicProperties property) throws IOException;
 	public void rollback(HandshakeMessage message, Channel channel, ObjectMapper mapper, BasicProperties property) throws IOException;
-
+	public void deleteRunningAgent(HandshakeMessage message, Channel channel, BasicProperties property) throws IOException;
+	public void addAgent(HandshakeMessage message, Channel channel,BasicProperties property) throws IOException;
+	public void runAgent(HandshakeMessage message, Channel channel, BasicProperties property) throws IOException;
 }

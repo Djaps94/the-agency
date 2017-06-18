@@ -12,7 +12,10 @@ public class HandshakeMessage {
 								DELIVER_TYPES,
 								ROLLBACK,
 								GET_RUNNING,
-								TURN_OFF
+								TURN_OFF,
+								DELETE_AGENT,
+								ADD_AGENT,
+								RUN_AGENT
 							  };
 	
 	private AgentCenter center;
@@ -20,7 +23,9 @@ public class HandshakeMessage {
 	private List<AgentCenter> centers;
 	private Set<AgentType> agentTypes;
 	private Map<String, Set<AgentType>> otherTypes;
-	private String message;
+	private String[] message;
+	private Agent agent;
+	private AgentType agentType;
 	private List<Agent> runningAgents;
 	
 	public HandshakeMessage() { }
@@ -28,6 +33,10 @@ public class HandshakeMessage {
 	public HandshakeMessage(AgentCenter center, handshakeType type){
 		this.center = center;
 		this.type   = type;
+	}
+	
+	public HandshakeMessage(handshakeType type){
+		this.type = type;
 	}
 
 	public AgentCenter getCenter() {
@@ -62,11 +71,11 @@ public class HandshakeMessage {
 		this.agentTypes = agentTypes;
 	}
 
-	public String getMessage() {
+	public String[] getMessage() {
 		return message;
 	}
 
-	public void setMessage(String message) {
+	public void setMessage(String[] message) {
 		this.message = message;
 	}
 
@@ -84,6 +93,22 @@ public class HandshakeMessage {
 
 	public void setRunningAgents(List<Agent> runningAgents) {
 		this.runningAgents = runningAgents;
+	}
+
+	public Agent getAgent() {
+		return agent;
+	}
+
+	public void setAgent(Agent agent) {
+		this.agent = agent;
+	}
+
+	public AgentType getAgentType() {
+		return agentType;
+	}
+
+	public void setAgentType(AgentType agentType) {
+		this.agentType = agentType;
 	}
 	
 	

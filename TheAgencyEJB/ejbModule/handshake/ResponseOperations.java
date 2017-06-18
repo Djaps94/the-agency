@@ -66,12 +66,35 @@ public class ResponseOperations implements ResponseOperationsLocal{
 		try {
 			dealer.rollback(message);
 			HandshakeMessage msg = new HandshakeMessage();
-			msg.setMessage("Rollback completed!");
 			String data = mapper.writeValueAsString(msg);
 			channel.basicPublish("", property.getReplyTo(), new BasicProperties().builder().build(), data.getBytes());
 		} catch (ConnectionException | JsonProcessingException | TimeoutException | InterruptedException e) {
 			channel.basicPublish("", property.getReplyTo(), new BasicProperties().builder().build(), "rollback failed".getBytes());
 		}
+		
+	}
+
+	@Override
+	public void deleteRunningAgent(HandshakeMessage message, Channel channel, BasicProperties property) throws IOException {
+		dealer.deleteAgent(message);
+		channel.basicPublish("", property.getReplyTo(), new BasicProperties().builder().build(), "Agent deleted".getBytes());
+	}
+
+	@Override
+	public void addAgent(HandshakeMessage message, Channel channel, BasicProperties property) throws IOException {
+		dealer.addAgent(message);
+		channel.basicPublish("", property.getReplyTo(), new BasicProperties().builder().build(), "Agent added".getBytes());
+		
+	}
+
+	@Override
+	public void runAgent(HandshakeMessage message, Channel channel, BasicProperties property) throws IOException {
+		Agent agent = dealer.runAgent(message);
+		HandshakeMessage msg = new HandshakeMessage();
+		msg.setAgent(agent);
+		ObjectMapper mapper = new ObjectMapper();
+		String data = mapper.writeValueAsString(msg);
+		channel.basicPublish("", property.getReplyTo(), new BasicProperties().builder().build(), data.getBytes());
 		
 	}
 }	

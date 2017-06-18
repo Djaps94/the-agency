@@ -23,10 +23,14 @@ public class HandshakeConsumer extends DefaultConsumer{
 	}
 	
 	@Override
-	public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body) throws IOException {
+	public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body) {
 		String data = new String(body);
 		HandshakeMessage msg = null;
-		msg = mapper.readValue(data, HandshakeMessage.class);
+		try {
+			msg = mapper.readValue(data, HandshakeMessage.class);
+		} catch (IOException e) {
+			
+		}
 		response.offer(msg);
 	}
 

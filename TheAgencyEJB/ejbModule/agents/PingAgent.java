@@ -1,10 +1,13 @@
 package agents;
 
+import javax.ejb.Stateful;
+
 import model.ACLMessage;
 import model.Agent;
 
 @SuppressWarnings("serial")
-public class PingAgent extends Agent {
+@Stateful
+public class PingAgent extends Agent implements PingInterface{
 
 	@Override
 	public void handleMessage(ACLMessage message) {

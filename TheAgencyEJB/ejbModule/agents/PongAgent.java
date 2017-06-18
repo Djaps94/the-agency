@@ -1,10 +1,13 @@
 package agents;
 
+import javax.ejb.Stateful;
+
 import model.ACLMessage;
 import model.Agent;
 
 @SuppressWarnings("serial")
-public class PongAgent extends Agent {
+@Stateful
+public class PongAgent extends Agent implements PongInterface{
 
 	@Override
 	public void handleMessage(ACLMessage message) {

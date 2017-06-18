@@ -24,4 +24,7 @@ public interface HandshakeDealerLocal {
 	public void addTypes(HandshakeMessage message);
 	public void rollback(HandshakeMessage message) throws ConnectionException, IOException, TimeoutException, InterruptedException;
 	public List<Agent> getRunningAgents();
+	public void deleteAgent(HandshakeMessage message);
+	public void addAgent(HandshakeMessage message);
+	public Agent runAgent(HandshakeMessage message);
 }
