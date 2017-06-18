@@ -8,7 +8,7 @@ import model.AgentType;
 @Local
 public interface AgentManagerLocal {
 	
-	public Agent startAgent(Agent agent, String[] typesPart, AgentType t);
-	public void stopAgent(Agent agent);
+	public Agent startAgent(Agent agent, String[] typesPart, AgentType t, String name);
+	public Agent stopAgent(Agent agent);
 
 }

@@ -50,9 +50,9 @@ public class ResponseOperations implements ResponseOperationsLocal{
 	}
 	
 	public void sendGetRunningResponse(Channel channel, ObjectMapper mapper, BasicProperties property) throws IOException{
-		List<Agent> agents = dealer.getRunningAgents();
+		Map<String, List<Agent>> agents = dealer.getRunningAgents();
 		HandshakeMessage msg = new HandshakeMessage();
-		msg.setRunningAgents(agents);
+		msg.setOtherAgents(agents);
 		String data = mapper.writeValueAsString(msg);
 		channel.basicPublish("", property.getReplyTo(), new BasicProperties().builder().build(), data.getBytes());
 	}
@@ -96,5 +96,15 @@ public class ResponseOperations implements ResponseOperationsLocal{
 		String data = mapper.writeValueAsString(msg);
 		channel.basicPublish("", property.getReplyTo(), new BasicProperties().builder().build(), data.getBytes());
 		
+	}
+
+	@Override
+	public void stopAgent(HandshakeMessage message, Channel channel, BasicProperties property) throws IOException {
+		Agent agent = dealer.stopAgent(message);
+		HandshakeMessage msg = new HandshakeMessage();
+		msg.setAgent(agent);
+		ObjectMapper mapper = new ObjectMapper();
+		String data = mapper.writeValueAsString(agent);
+		channel.basicPublish("", property.getReplyTo(), new BasicProperties().builder().build(), data.getBytes());
 	}
 }	

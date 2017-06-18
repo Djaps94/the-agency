@@ -125,11 +125,11 @@ public class NetworkManagment implements NetworkManagmentLocal{
 			}
 			try {
 				HandshakeMessage message = getAllRunningAgents(masterIpAddress, slave);
-				if(message != null) message.getRunningAgents().addAll(message.getRunningAgents());
+				if(message != null) agency.getCenterAgents().putAll(message.getOtherAgents());
 			} catch (ConnectionException | IOException | TimeoutException | InterruptedException e) {
 				try {
 					HandshakeMessage message = getAllRunningAgents(masterIpAddress, slave);
-					if(message != null) message.getRunningAgents().addAll(message.getRunningAgents());									
+					if(message != null) agency.getCenterAgents().putAll(message.getOtherAgents());									
 				} catch (ConnectionException | IOException | TimeoutException | InterruptedException e1) {
 					try {
 						HandshakeMessage message = rollback(masterIpAddress, slave);

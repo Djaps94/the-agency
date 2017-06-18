@@ -15,7 +15,8 @@ public class HandshakeMessage {
 								TURN_OFF,
 								DELETE_AGENT,
 								ADD_AGENT,
-								RUN_AGENT
+								RUN_AGENT,
+								STOP_AGENT
 							  };
 	
 	private AgentCenter center;
@@ -23,10 +24,13 @@ public class HandshakeMessage {
 	private List<AgentCenter> centers;
 	private Set<AgentType> agentTypes;
 	private Map<String, Set<AgentType>> otherTypes;
+	private Map<String, List<Agent>> otherAgents;
 	private String[] message;
 	private Agent agent;
 	private AgentType agentType;
 	private List<Agent> runningAgents;
+	private String agentName;
+	private AID aid;
 	
 	public HandshakeMessage() { }
 	
@@ -109,6 +113,30 @@ public class HandshakeMessage {
 
 	public void setAgentType(AgentType agentType) {
 		this.agentType = agentType;
+	}
+
+	public Map<String, List<Agent>> getOtherAgents() {
+		return otherAgents;
+	}
+
+	public void setOtherAgents(Map<String, List<Agent>> otherAgents) {
+		this.otherAgents = otherAgents;
+	}
+
+	public String getAgentName() {
+		return agentName;
+	}
+
+	public void setAgentName(String agentName) {
+		this.agentName = agentName;
+	}
+
+	public AID getAid() {
+		return aid;
+	}
+
+	public void setAid(AID aid) {
+		this.aid = aid;
 	}
 	
 	

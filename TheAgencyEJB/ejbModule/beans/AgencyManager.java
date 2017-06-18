@@ -18,6 +18,7 @@ import model.AgentType;
 public class AgencyManager implements AgencyManagerLocal {
 
 	private List<Agent> runningAgents;
+	private Map<String, List<Agent>> centerAgents;
 	private Set<AgentType> supportedTypes; 
 	private Map<String,Set<AgentType>> otherSupportedTypes;
 	private Performative performative;
@@ -72,6 +73,14 @@ public class AgencyManager implements AgencyManagerLocal {
 	
 	public void deleteOtherTypes(String alias){
 		otherSupportedTypes.remove(alias);
+	}
+
+	public Map<String, List<Agent>> getCenterAgents() {
+		return centerAgents;
+	}
+
+	public void setCenterAgents(Map<String, List<Agent>> centerAgents) {
+		this.centerAgents = centerAgents;
 	}
 	
 	

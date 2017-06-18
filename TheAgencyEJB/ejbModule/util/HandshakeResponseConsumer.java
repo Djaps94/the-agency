@@ -96,16 +96,18 @@ public class HandshakeResponseConsumer extends DefaultConsumer{
 			}
 		}
 		break;
-		case ROLLBACK: operations.rollback(message, channel, mapper, properties); 
+		case 	ROLLBACK: operations.rollback(message, channel, mapper, properties); 
 		break;
 		case DELETE_AGENT: operations.deleteRunningAgent(message, channel, properties);
 		break;
-		case ADD_AGENT: operations.addAgent(message, channel, properties);
+		case 	ADD_AGENT: operations.addAgent(message, channel, properties);
 		break;
-		case RUN_AGENT: 
+		case 	RUN_AGENT: operations.runAgent(message, channel, properties); 
 		break; 
+		case   STOP_AGENT: operations.stopAgent(message, channel, properties);
+		break;
 		default:
-			break;
+		break;
 		
 		}
 	}

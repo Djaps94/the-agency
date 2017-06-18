@@ -23,4 +23,6 @@ public interface AgencyManagerLocal {
 	public void addOtherTypes(String typeName, Set<AgentType> types);
 	public boolean isContained(String typeName);
 	public Performative getPerformative();
+	public Map<String, List<Agent>> getCenterAgents();
+	public void setCenterAgents(Map<String, List<Agent>> centerAgents);
 }

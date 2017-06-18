@@ -103,26 +103,39 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 		manager.getRunningAgents().removeAll(message.getRunningAgents());
 	}
 	
-	public List<Agent> getRunningAgents(){
-		return manager.getRunningAgents();
+	public Map<String,List<Agent>> getRunningAgents(){
+		Map<String,List<Agent>> agents = new HashMap<String, List<Agent>>();
+		agents.put(registry.getThisCenter().getAlias(), manager.getRunningAgents());
+		return agents;
 	}
 
 	@Override
 	public void deleteAgent(HandshakeMessage message) {
-		manager.getRunningAgents().removeAll(message.getRunningAgents());
+		manager.getCenterAgents().get(message.getCenter().getAlias()).remove(message.getAgent());
 		//TODO: ws
 	}
 
 	@Override
 	public void addAgent(HandshakeMessage message) {
-		manager.getRunningAgents().addAll(message.getRunningAgents());
+		if(manager.getCenterAgents().containsKey(message.getCenter().getAlias())){
+			manager.getCenterAgents().get(message.getCenter().getAlias()).add(message.getAgent());
+		}else{
+			List<Agent> list = new ArrayList<>();
+			list.add(message.getAgent());
+			manager.getCenterAgents().put(message.getCenter().getAlias(), list);
+		}
 		//TODO: ws
 	}
 
 	@Override
 	public Agent runAgent(HandshakeMessage message) {
-		return agentManager.startAgent(message.getAgent(), message.getMessage(), message.getAgentType());
+		return agentManager.startAgent(message.getAgent(), message.getMessage(), message.getAgentType(), message.getAgentName());
 		//TODO: ws
+	}
+	
+	public Agent stopAgent(HandshakeMessage message){
+		return agentManager.stopAgent(message.getAgent());
+		
 	}
 	
 }

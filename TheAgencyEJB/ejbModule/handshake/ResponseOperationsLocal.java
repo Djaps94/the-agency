@@ -25,4 +25,5 @@ public interface ResponseOperationsLocal {
 	public void deleteRunningAgent(HandshakeMessage message, Channel channel, BasicProperties property) throws IOException;
 	public void addAgent(HandshakeMessage message, Channel channel,BasicProperties property) throws IOException;
 	public void runAgent(HandshakeMessage message, Channel channel, BasicProperties property) throws IOException;
+	public void stopAgent(HandshakeMessage message, Channel channel, BasicProperties property) throws IOException;
 }
