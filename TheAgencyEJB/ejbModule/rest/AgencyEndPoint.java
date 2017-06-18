@@ -27,6 +27,7 @@ import beans.AgencyRegistryLocal;
 import beans.AgentManagerLocal;
 import exceptions.ConnectionException;
 import handshake.HandshakeRequesterLocal;
+import intercommunication.MessageDispatcherLocal;
 import model.ACLMessage;
 import model.ACLMessage.Performative;
 import model.AID;
@@ -51,6 +52,9 @@ public class AgencyEndPoint {
 	
 	@EJB
 	private AgentManagerLocal agentManager;
+	
+	@EJB
+	private MessageDispatcherLocal dispatcher;
 
 	@GET
 	@Path("/agents/classes")
@@ -86,8 +90,17 @@ public class AgencyEndPoint {
 	@Path("/messages")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public void sendMessageToAgent(ACLMessage message){
-		//TODO: look up for agent on this center and send message through jms
-		//TODO: If's not on this center, find first center and send message to it
+		for(AID aid : message.getRecievers()){
+			if(aid.getHost().getAlias().equals(registry.getThisCenter().getAlias())){
+				dispatcher.sendMesssage(message, aid.getName());
+			}else{
+				for(Entry<String, List<Agent>> entry : manager.getCenterAgents().entrySet()){
+					if(entry.getKey().equals(aid.getHost().getAlias())){
+						// Send message via Rest or RabbitMQ
+					}
+				}
+			}
+		}
 	}
 	@PUT
 	@Path("/agents/running/{type}/{name}")
@@ -106,17 +119,14 @@ public class AgencyEndPoint {
 				if(entry.getValue().contains(t)){
 					Optional<AgentCenter> center = registry.getCenters().stream().filter(cent -> cent.getAlias().equals(entry.getKey())).findFirst();
 					HandshakeMessage message = new HandshakeMessage(handshakeType.RUN_AGENT);
-					message.setMessage(typesPart);
-					message.setAgent(agent);
-					message.setAgentType(t);
-					message.setCenter(center.get());
-					message.setAgentName(name);
+					message.setMessage(typesPart); message.setAgent(agent); message.setAgentType(t); message.setCenter(center.get()); message.setAgentName(name);
 					if(center.isPresent())
 						try {
 							HandshakeMessage msg = requester.sendMessage(center.get().getAddress(), message);
 							return msg.getAgent();
 						} catch (ConnectionException | IOException | TimeoutException | InterruptedException e) {
 							System.out.println("Could not initialise agent");
+							return null;
 						}
 				}
 			}
@@ -147,8 +157,5 @@ public class AgencyEndPoint {
 			}
 		}
 		return null;
-		
-		
-		
 	}
 }
