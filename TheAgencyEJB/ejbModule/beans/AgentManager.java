@@ -6,14 +6,10 @@ import java.util.concurrent.TimeoutException;
 import javax.ejb.EJB;
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
 
 import exceptions.ConnectionException;
 import handshake.HandshakeRequesterLocal;
 import model.AID;
-import model.Agent;
-import model.AgentType;
 import model.HandshakeMessage;
 import model.HandshakeMessage.handshakeType;
 
@@ -35,21 +31,10 @@ public class AgentManager implements AgentManagerLocal {
     }
 
 	@Override
-	public Agent startAgent(Agent agent, String[] typesPart, AgentType t, String name) {
-		try {
-			InitialContext context = new InitialContext();
-			agent = (Agent)context.lookup("ejb:/TheAgency/"+typesPart[1].trim()+"!"+Class.forName(typesPart[1].trim()).getName()+"?stateful");
-			AID aid = new AID();
-			aid.setType(t);
-			aid.setName(name);
-			aid.setHost(registry.getThisCenter());
-		} catch (NamingException | ClassNotFoundException e) { 
-			System.out.println("Agent not found!");
-			return null;
-		}
-		manager.getRunningAgents().add(agent);
+	public AID startAgent(AID aid) {
+		manager.getRunningAgents().add(aid);
 		HandshakeMessage message = new HandshakeMessage(handshakeType.ADD_AGENT);
-		message.setAgent(agent);
+		message.setAid(aid);
 		message.setCenter(registry.getThisCenter());
 		registry.getCenters().stream().forEach(center -> {
 			try {
@@ -59,14 +44,14 @@ public class AgentManager implements AgentManagerLocal {
 			}
 		});
 		
-		return agent;
+		return aid;
 	}
 
 	@Override
-	public Agent stopAgent(Agent agent) {
+	public AID stopAgent(AID agent) {
 		manager.getRunningAgents().remove(agent);
 		HandshakeMessage message = new HandshakeMessage(handshakeType.DELETE_AGENT);
-		message.setAgent(agent);
+		message.setAid(agent);
 		message.setCenter(registry.getThisCenter());
 		registry.getCenters().stream().forEach(center -> {
 			try {

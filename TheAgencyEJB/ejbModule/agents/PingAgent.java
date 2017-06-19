@@ -2,12 +2,16 @@ package agents;
 
 import javax.ejb.Stateful;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
+
 import model.ACLMessage;
+import model.AID;
 import model.Agent;
 
 @SuppressWarnings("serial")
 @Stateful
-public class PingAgent extends Agent implements PingInterface{
+@JsonTypeName("Ping")
+public class PingAgent extends Agent {
 
 	@Override
 	public void handleMessage(ACLMessage message) {
@@ -61,6 +65,16 @@ public class PingAgent extends Agent implements PingInterface{
 		
 		}
 
+	}
+	
+	@Override
+	public AID getId() {
+		return id;
+	}
+	
+	@Override
+	public void setId(AID id) {
+		this.id = id;
 	}
 
 }

@@ -2,12 +2,15 @@ package agents;
 
 import javax.ejb.Stateful;
 
+import com.fasterxml.jackson.annotation.JsonTypeName;
+
 import model.ACLMessage;
 import model.Agent;
 
 @SuppressWarnings("serial")
 @Stateful
-public class PongAgent extends Agent implements PongInterface{
+@JsonTypeName("Pong")
+public class PongAgent extends Agent {
 
 	@Override
 	public void handleMessage(ACLMessage message) {

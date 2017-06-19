@@ -2,13 +2,13 @@ package beans;
 
 import javax.ejb.Local;
 
-import model.Agent;
+import model.AID;
 import model.AgentType;
 
 @Local
 public interface AgentManagerLocal {
 	
-	public Agent startAgent(Agent agent, String[] typesPart, AgentType t, String name);
-	public Agent stopAgent(Agent agent);
+	public AID startAgent(AID agent);
+	public AID stopAgent(AID agent);
 
 }

@@ -1,10 +1,11 @@
 package model;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class HandshakeMessage {
+public class HandshakeMessage implements Serializable {
 
 	public enum handshakeType { REGISTER,
 								GET_CENTERS,
@@ -24,11 +25,9 @@ public class HandshakeMessage {
 	private List<AgentCenter> centers;
 	private Set<AgentType> agentTypes;
 	private Map<String, Set<AgentType>> otherTypes;
-	private Map<String, List<Agent>> otherAgents;
-	private String[] message;
-	private Agent agent;
+	private Map<String, List<AID>> otherAgents;
 	private AgentType agentType;
-	private List<Agent> runningAgents;
+	private List<AID> runningAgents;
 	private String agentName;
 	private AID aid;
 	
@@ -75,14 +74,6 @@ public class HandshakeMessage {
 		this.agentTypes = agentTypes;
 	}
 
-	public String[] getMessage() {
-		return message;
-	}
-
-	public void setMessage(String[] message) {
-		this.message = message;
-	}
-
 	public Map<String, Set<AgentType>> getOtherTypes() {
 		return otherTypes;
 	}
@@ -91,20 +82,12 @@ public class HandshakeMessage {
 		this.otherTypes = otherTypes;
 	}
 
-	public List<Agent> getRunningAgents() {
+	public List<AID> getRunningAgents() {
 		return runningAgents;
 	}
 
-	public void setRunningAgents(List<Agent> runningAgents) {
+	public void setRunningAgents(List<AID> runningAgents) {
 		this.runningAgents = runningAgents;
-	}
-
-	public Agent getAgent() {
-		return agent;
-	}
-
-	public void setAgent(Agent agent) {
-		this.agent = agent;
 	}
 
 	public AgentType getAgentType() {
@@ -115,11 +98,11 @@ public class HandshakeMessage {
 		this.agentType = agentType;
 	}
 
-	public Map<String, List<Agent>> getOtherAgents() {
+	public Map<String, List<AID>> getOtherAgents() {
 		return otherAgents;
 	}
 
-	public void setOtherAgents(Map<String, List<Agent>> otherAgents) {
+	public void setOtherAgents(Map<String, List<AID>> otherAgents) {
 		this.otherAgents = otherAgents;
 	}
 

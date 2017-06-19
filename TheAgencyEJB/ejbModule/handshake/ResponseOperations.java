@@ -17,7 +17,7 @@ import com.rabbitmq.client.Channel;
 import exceptions.ConnectionException;
 import exceptions.NodeExistsException;
 import exceptions.RegisterSlaveException;
-import model.Agent;
+import model.AID;
 import model.AgentCenter;
 import model.AgentType;
 import model.HandshakeMessage;
@@ -50,7 +50,7 @@ public class ResponseOperations implements ResponseOperationsLocal{
 	}
 	
 	public void sendGetRunningResponse(Channel channel, ObjectMapper mapper, BasicProperties property) throws IOException{
-		Map<String, List<Agent>> agents = dealer.getRunningAgents();
+		Map<String, List<AID>> agents = dealer.getRunningAgents();
 		HandshakeMessage msg = new HandshakeMessage();
 		msg.setOtherAgents(agents);
 		String data = mapper.writeValueAsString(msg);
@@ -83,15 +83,18 @@ public class ResponseOperations implements ResponseOperationsLocal{
 	@Override
 	public void addAgent(HandshakeMessage message, Channel channel, BasicProperties property) throws IOException {
 		dealer.addAgent(message);
-		channel.basicPublish("", property.getReplyTo(), new BasicProperties().builder().build(), "Agent added".getBytes());
+		HandshakeMessage msg = new HandshakeMessage();
+		ObjectMapper mapper = new ObjectMapper();
+		String data = mapper.writeValueAsString(msg);
+		channel.basicPublish("", property.getReplyTo(), new BasicProperties().builder().build(), data.getBytes());
 		
 	}
 
 	@Override
 	public void runAgent(HandshakeMessage message, Channel channel, BasicProperties property) throws IOException {
-		Agent agent = dealer.runAgent(message);
+		AID agent = dealer.runAgent(message);
 		HandshakeMessage msg = new HandshakeMessage();
-		msg.setAgent(agent);
+		msg.setAid(agent);
 		ObjectMapper mapper = new ObjectMapper();
 		String data = mapper.writeValueAsString(msg);
 		channel.basicPublish("", property.getReplyTo(), new BasicProperties().builder().build(), data.getBytes());
@@ -100,9 +103,9 @@ public class ResponseOperations implements ResponseOperationsLocal{
 
 	@Override
 	public void stopAgent(HandshakeMessage message, Channel channel, BasicProperties property) throws IOException {
-		Agent agent = dealer.stopAgent(message);
+		AID agent = dealer.stopAgent(message);
 		HandshakeMessage msg = new HandshakeMessage();
-		msg.setAgent(agent);
+		msg.setAid(agent);
 		ObjectMapper mapper = new ObjectMapper();
 		String data = mapper.writeValueAsString(agent);
 		channel.basicPublish("", property.getReplyTo(), new BasicProperties().builder().build(), data.getBytes());

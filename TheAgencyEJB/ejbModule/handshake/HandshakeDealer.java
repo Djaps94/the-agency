@@ -19,7 +19,7 @@ import beans.NetworkManagmentLocal;
 import exceptions.ConnectionException;
 import exceptions.NodeExistsException;
 import exceptions.RegisterSlaveException;
-import model.Agent;
+import model.AID;
 import model.AgentCenter;
 import model.AgentType;
 import model.HandshakeMessage;
@@ -103,38 +103,38 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 		manager.getRunningAgents().removeAll(message.getRunningAgents());
 	}
 	
-	public Map<String,List<Agent>> getRunningAgents(){
-		Map<String,List<Agent>> agents = new HashMap<String, List<Agent>>();
+	public Map<String,List<AID>> getRunningAgents(){
+		Map<String,List<AID>> agents = new HashMap<String, List<AID>>();
 		agents.put(registry.getThisCenter().getAlias(), manager.getRunningAgents());
 		return agents;
 	}
 
 	@Override
 	public void deleteAgent(HandshakeMessage message) {
-		manager.getCenterAgents().get(message.getCenter().getAlias()).remove(message.getAgent());
+		manager.getCenterAgents().get(message.getCenter().getAlias()).remove(message.getAid());
 		//TODO: ws
 	}
 
 	@Override
 	public void addAgent(HandshakeMessage message) {
 		if(manager.getCenterAgents().containsKey(message.getCenter().getAlias())){
-			manager.getCenterAgents().get(message.getCenter().getAlias()).add(message.getAgent());
+			manager.getCenterAgents().get(message.getCenter().getAlias()).add(message.getAid());
 		}else{
-			List<Agent> list = new ArrayList<>();
-			list.add(message.getAgent());
+			List<AID> list = new ArrayList<>();
+			list.add(message.getAid());
 			manager.getCenterAgents().put(message.getCenter().getAlias(), list);
 		}
 		//TODO: ws
 	}
 
 	@Override
-	public Agent runAgent(HandshakeMessage message) {
-		return agentManager.startAgent(message.getAgent(), message.getMessage(), message.getAgentType(), message.getAgentName());
+	public AID runAgent(HandshakeMessage message) {
+		return agentManager.startAgent(message.getAid());
 		//TODO: ws
 	}
 	
-	public Agent stopAgent(HandshakeMessage message){
-		return agentManager.stopAgent(message.getAgent());
+	public AID stopAgent(HandshakeMessage message){
+		return agentManager.stopAgent(message.getAid());
 		
 	}
 	

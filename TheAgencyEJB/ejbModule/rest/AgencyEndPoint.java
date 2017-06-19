@@ -16,7 +16,6 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -31,7 +30,6 @@ import intercommunication.MessageDispatcherLocal;
 import model.ACLMessage;
 import model.ACLMessage.Performative;
 import model.AID;
-import model.Agent;
 import model.AgentCenter;
 import model.AgentType;
 import model.HandshakeMessage;
@@ -72,10 +70,14 @@ public class AgencyEndPoint {
 	@GET
 	@Path("/agents/running")
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<Agent> getRunningAgents(){
-		List<Agent> agents = new ArrayList<Agent>();
-		agents.addAll(manager.getRunningAgents());
-		agents.addAll(manager.getCenterAgents().get(registry.getThisCenter().getAlias()));
+	public List<AID> getRunningAgents(){
+		List<AID> agents = new ArrayList<AID>();
+		if(!manager.getRunningAgents().isEmpty())
+			agents.addAll(manager.getRunningAgents());
+		if(!manager.getCenterAgents().isEmpty()){
+			for(Entry<String, List<AID>> entry : manager.getCenterAgents().entrySet())
+				agents.addAll(entry.getValue());
+		}
 		return agents;
 	}
 	
@@ -94,7 +96,7 @@ public class AgencyEndPoint {
 			if(aid.getHost().getAlias().equals(registry.getThisCenter().getAlias())){
 				dispatcher.sendMesssage(message, aid.getName());
 			}else{
-				for(Entry<String, List<Agent>> entry : manager.getCenterAgents().entrySet()){
+				for(Entry<String, List<AID>> entry : manager.getCenterAgents().entrySet()){
 					if(entry.getKey().equals(aid.getHost().getAlias())){
 						// Send message via Rest or RabbitMQ
 					}
@@ -102,28 +104,29 @@ public class AgencyEndPoint {
 			}
 		}
 	}
-	@PUT
+	@GET
 	@Path("/agents/running/{type}/{name}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Agent runAgent(@PathParam("type") String type, @PathParam("name") String name){
-		if(manager.getRunningAgents().stream().anyMatch(agent -> agent.getId().getName().equals(name)))
+	public AID runAgent(@PathParam("type") String type, @PathParam("name") String name){
+		if(manager.getRunningAgents().stream().anyMatch(agent -> agent.getName().equals(name)))
 			return null;
 		
 		String[] typesPart = type.split(":");
-		Agent agent = null;
+		AID agent = new AID();
 		AgentType t = new AgentType(typesPart[1].trim(), typesPart[0].trim());
+		agent.setType(t); agent.setName(name); agent.setHost(registry.getThisCenter());
 		if(manager.getSupportedTypes().contains(t)){
-			return agentManager.startAgent(agent, typesPart, t, name);
+			return agentManager.startAgent(agent);
 		}else{
 			for(Entry<String, Set<AgentType>> entry : manager.getOtherSupportedTypes().entrySet()){
 				if(entry.getValue().contains(t)){
 					Optional<AgentCenter> center = registry.getCenters().stream().filter(cent -> cent.getAlias().equals(entry.getKey())).findFirst();
 					HandshakeMessage message = new HandshakeMessage(handshakeType.RUN_AGENT);
-					message.setMessage(typesPart); message.setAgent(agent); message.setAgentType(t); message.setCenter(center.get()); message.setAgentName(name);
+					message.setAid(agent);
 					if(center.isPresent())
 						try {
 							HandshakeMessage msg = requester.sendMessage(center.get().getAddress(), message);
-							return msg.getAgent();
+							return msg.getAid();
 						} catch (ConnectionException | IOException | TimeoutException | InterruptedException e) {
 							System.out.println("Could not initialise agent");
 							return null;
@@ -139,23 +142,18 @@ public class AgencyEndPoint {
 	@Path("/agents/running")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Agent deleteAgent(AID agentID){
+	public AID deleteAgent(AID agentID){
 		if(agentID.getHost().equals(registry.getThisCenter())){
-			Optional<Agent> agent = manager.getRunningAgents().stream()
-															  .filter(ag -> ag.getId().equals(agentID))
-															  .findFirst();
-			if(agent.isPresent())
-				return agentManager.stopAgent(agent.get());
+			return agentManager.stopAgent(agentID);
 		}else{
 			HandshakeMessage message = new HandshakeMessage(handshakeType.STOP_AGENT);
 			message.setAid(agentID);
 			try {
 				HandshakeMessage msg = requester.sendMessage(agentID.getHost().getAddress(), message);
-				return msg.getAgent();
+				return msg.getAid();
 			} catch (ConnectionException | IOException | TimeoutException | InterruptedException e) {
 				return null;
 			}
 		}
-		return null;
 	}
 }

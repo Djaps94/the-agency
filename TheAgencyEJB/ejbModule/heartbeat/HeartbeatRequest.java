@@ -3,7 +3,6 @@ package heartbeat;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -26,7 +25,6 @@ import com.rabbitmq.client.ConnectionFactory;
 
 import beans.AgencyManagerLocal;
 import beans.AgencyRegistryLocal;
-import model.Agent;
 import model.AgentCenter;
 import util.HeartbeatConsumer;
 
@@ -83,16 +81,15 @@ public class HeartbeatRequest implements HeartbeatRequestLocal {
 			String data = checkPulse(center);
 			System.out.println(data);
 			if(data == null){
-				System.out.println("ONE MORE TIME");
 				String temp = checkPulse(center);
 				if(temp == null){
 					deadList.add(center);
 				}
 			}
 		}
+			System.out.println("Heart tick...");
 			if(!deadList.isEmpty())
 				removeDeadCenter(deadList);
-		System.out.println("I am here :D");
 	}
 	
 	private String checkPulse(AgentCenter center){
@@ -103,7 +100,7 @@ public class HeartbeatRequest implements HeartbeatRequestLocal {
 											 .correlationId(center.getAlias())
 											 .build();
 			
-			channel.basicPublish("", RequestQueueName, properties, "Check pulse".getBytes());
+			channel.basicPublish("", RequestQueueName+center.getAlias(), properties, "Check pulse".getBytes());
 			HeartbeatConsumer consumer = new HeartbeatConsumer(channel, center.getAlias(), response);
 			channel.basicConsume(ReplyQueueName, true, consumer );
 			return response.poll(5, TimeUnit.SECONDS);
@@ -117,11 +114,8 @@ public class HeartbeatRequest implements HeartbeatRequestLocal {
 		for(AgentCenter center : centers){
 			registry.deleteCenter(center);
 			manager.deleteOtherTypes(center.getAlias());
-			Optional<Agent> deleteAgent =  manager.getRunningAgents().stream()
-									  						  .filter(agent -> agent.getId().getHost().getAddress().equals(center.getAddress()))
-									  						  .findFirst();
-			if(deleteAgent.isPresent())
-				manager.getRunningAgents().remove(deleteAgent.get());
+			if(!manager.getCenterAgents().isEmpty())
+				manager.getCenterAgents().remove(center.getAlias());
 		}
 	}
 }

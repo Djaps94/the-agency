@@ -11,6 +11,7 @@ import javax.ejb.Local;
 import exceptions.ConnectionException;
 import exceptions.NodeExistsException;
 import exceptions.RegisterSlaveException;
+import model.AID;
 import model.Agent;
 import model.AgentCenter;
 import model.AgentType;
@@ -23,9 +24,9 @@ public interface HandshakeDealerLocal {
 	public Map<String, Set<AgentType>> registerAgentTypes(HandshakeMessage message) throws ConnectionException, IOException, TimeoutException, InterruptedException;
 	public void addTypes(HandshakeMessage message);
 	public void rollback(HandshakeMessage message) throws ConnectionException, IOException, TimeoutException, InterruptedException;
-	public Map<String,List<Agent>> getRunningAgents();
+	public Map<String,List<AID>> getRunningAgents();
 	public void deleteAgent(HandshakeMessage message);
 	public void addAgent(HandshakeMessage message);
-	public Agent runAgent(HandshakeMessage message);
-	public Agent stopAgent(HandshakeMessage message);
+	public AID runAgent(HandshakeMessage message);
+	public AID stopAgent(HandshakeMessage message);
 }

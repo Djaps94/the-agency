@@ -53,9 +53,9 @@ public class HeartbeatResponse implements HeartBeatResponseLocal{
     
     public void pulseTick(){
     	try {
-			channel.queueDeclare(queueName, false, false, false, null);
+			channel.queueDeclare(queueName+registry.getThisCenter().getAlias(), false, false, false, null);
 			channel.basicQos(1);
-			channel.basicConsume(queueName, false, new DefaultConsumer(channel){
+			channel.basicConsume(queueName+registry.getThisCenter().getAlias(), false, new DefaultConsumer(channel){
 				@Override
 				public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body) throws IOException {
 					BasicProperties replyProperty = new BasicProperties()

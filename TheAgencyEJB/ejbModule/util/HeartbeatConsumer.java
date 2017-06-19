@@ -23,7 +23,7 @@ public class HeartbeatConsumer extends DefaultConsumer{
 	@Override
 	public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body) throws IOException {
 		if(properties.getCorrelationId().equals(correlationId)){
-			response.offer(body.toString());
+			response.offer(new String(body));
 		}
 	}
 

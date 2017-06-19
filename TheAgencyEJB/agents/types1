@@ -1,2 +1,2 @@
-ejbModule.agents.PingAgent PingInterface
+ejbModule.agents PongAgent 
 ejbModule.agents MapReduceMaster

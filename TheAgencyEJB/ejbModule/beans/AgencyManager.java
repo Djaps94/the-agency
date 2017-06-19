@@ -1,8 +1,8 @@
 package beans;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -11,14 +11,14 @@ import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
 
 import model.ACLMessage.Performative;
-import model.Agent;
+import model.AID;
 import model.AgentType;
 
 @Singleton
 public class AgencyManager implements AgencyManagerLocal {
 
-	private List<Agent> runningAgents;
-	private Map<String, List<Agent>> centerAgents;
+	private List<AID> runningAgents;
+	private Map<String, List<AID>> centerAgents;
 	private Set<AgentType> supportedTypes; 
 	private Map<String,Set<AgentType>> otherSupportedTypes;
 	private Performative performative;
@@ -27,9 +27,10 @@ public class AgencyManager implements AgencyManagerLocal {
 	
 	@PostConstruct
 	public void initialise(){
-		this.runningAgents  = new LinkedList<Agent>();
+		this.runningAgents  = new ArrayList<AID>();
 		this.supportedTypes = new HashSet<AgentType>();
 		this.otherSupportedTypes = new HashMap<String, Set<AgentType>>();
+		this.centerAgents = new HashMap<String, List<AID>>();
 	}
 	
 	public Performative getPerformative(){
@@ -44,11 +45,11 @@ public class AgencyManager implements AgencyManagerLocal {
 		this.supportedTypes = supportedTypes;
 	}
 
-	public List<Agent> getRunningAgents() {
+	public List<AID> getRunningAgents() {
 		return runningAgents;
 	}
 
-	public void setRunningAgents(List<Agent> runningAgents) {
+	public void setRunningAgents(List<AID> runningAgents) {
 		this.runningAgents = runningAgents;
 	}
 
@@ -75,11 +76,11 @@ public class AgencyManager implements AgencyManagerLocal {
 		otherSupportedTypes.remove(alias);
 	}
 
-	public Map<String, List<Agent>> getCenterAgents() {
+	public Map<String, List<AID>> getCenterAgents() {
 		return centerAgents;
 	}
 
-	public void setCenterAgents(Map<String, List<Agent>> centerAgents) {
+	public void setCenterAgents(Map<String, List<AID>> centerAgents) {
 		this.centerAgents = centerAgents;
 	}
 	
