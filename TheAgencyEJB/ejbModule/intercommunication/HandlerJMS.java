@@ -27,12 +27,15 @@ import model.Agent;
 				propertyName = "destination", propertyValue = "java:/jms/queue/Handler"
 									 )
 		})
-public class Handler implements MessageListener {
+public class HandlerJMS implements MessageListener {
 
 	@EJB
 	private AgencyManagerLocal manager;
 	
-    public Handler() {
+	@EJB
+	private RabbitDispatcherLocal rabbit;
+	
+    public HandlerJMS() {
 
     }
 	
@@ -52,7 +55,12 @@ public class Handler implements MessageListener {
 			else{
 				for(Entry<String, List<AID>> entry : manager.getCenterAgents().entrySet()){
 					if(entry.getValue().stream().anyMatch(element -> element.getName().equals(name))){
-						//Send message to entry.key() via Rest or RabbitMQ
+						AID aid = entry.getValue().stream()
+												  .filter(id -> id.getName().equals(name))
+												  .findFirst()
+												  .get();
+						
+						rabbit.notifyCenter(msg, aid.getName());
 					}
 				}
 			}
