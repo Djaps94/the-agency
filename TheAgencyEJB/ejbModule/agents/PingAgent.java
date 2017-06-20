@@ -1,10 +1,16 @@
 package agents;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ejb.EJB;
 import javax.ejb.Stateful;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
+import intercommunication.MessageDispatcherLocal;
 import model.ACLMessage;
+import model.ACLMessage.Performative;
 import model.AID;
 import model.Agent;
 
@@ -13,6 +19,9 @@ import model.Agent;
 @JsonTypeName("Ping")
 public class PingAgent extends Agent {
 
+	@EJB
+	private MessageDispatcherLocal dispatcher;
+	
 	@Override
 	public void handleMessage(ACLMessage message) {
 		switch(message.getPerformative()){
@@ -30,7 +39,10 @@ public class PingAgent extends Agent {
 			break;
 		case FAILURE:
 			break;
-		case INFORM:
+		case INFORM: {
+			System.out.println("Message recieved from: "+message.getSender().getName());
+			System.out.println("Message content: "+message.getContent());
+		}
 			break;
 		case INFORM_IF:
 			break;
@@ -52,7 +64,20 @@ public class PingAgent extends Agent {
 			break;
 		case REJECT_PROPOSAL:
 			break;
-		case REQUEST:
+		case REQUEST: {
+			System.out.println("Request message recieved from: "+message.getSender().getName());
+			System.out.println("Message content: "+message.getContent());
+			ACLMessage responseMessage = new ACLMessage();
+			List<AID> recievers = new ArrayList<AID>();
+			recievers.add(message.getReplyTo());
+			responseMessage.setPerformative(Performative.REQUEST);
+			responseMessage.setRecievers(recievers);
+			responseMessage.setSender(getId());
+			responseMessage.setReplyTo(getId());
+			responseMessage.setContent("Ping is sending warm welcome message");
+			
+			dispatcher.sendMesssage(responseMessage, message.getReplyTo().getName());
+		}
 			break;
 		case REQUEST_WHEN:
 			break;

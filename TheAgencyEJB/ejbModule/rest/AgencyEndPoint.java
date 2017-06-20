@@ -28,6 +28,7 @@ import beans.AgentManagerLocal;
 import exceptions.ConnectionException;
 import handshake.HandshakeRequesterLocal;
 import intercommunication.MessageDispatcherLocal;
+import intercommunication.RabbitDispatcherLocal;
 import model.ACLMessage;
 import model.ACLMessage.Performative;
 import model.AID;
@@ -54,6 +55,9 @@ public class AgencyEndPoint {
 	
 	@EJB
 	private MessageDispatcherLocal dispatcher;
+	
+	@EJB
+	private RabbitDispatcherLocal rabbit;
 
 	@GET
 	@Path("/agents/classes")
@@ -99,11 +103,16 @@ public class AgencyEndPoint {
 			}else{
 				for(Entry<String, List<AID>> entry : manager.getCenterAgents().entrySet()){
 					if(entry.getKey().equals(aid.getHost().getAlias())){
-						// Send message via Rest or RabbitMQ
+						AID a = entry.getValue().stream()
+												  .filter(id -> id.equals(aid))
+												  .findFirst()
+												  .get();
+						
+						rabbit.notifyCenter(message, a.getName());
+						}
 					}
 				}
 			}
-		}
 	}
 	
 	@PUT

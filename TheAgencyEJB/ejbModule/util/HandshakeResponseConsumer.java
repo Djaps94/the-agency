@@ -32,9 +32,9 @@ public class HandshakeResponseConsumer extends DefaultConsumer{
 		super(channel);
 		this.channel 		= channel;
 		this.mapper 		= mapper;
-		this.nodesManagment = nodesManagment;
 		this.requester 		= requester;
 		this.operations 	= operations;
+		this.nodesManagment = nodesManagment;
 	}
 	
 	@Override
@@ -96,7 +96,7 @@ public class HandshakeResponseConsumer extends DefaultConsumer{
 			}
 		}
 		break;
-		case 	ROLLBACK: operations.rollback(message, channel, mapper, properties); 
+		case 	 ROLLBACK: operations.rollback(message, channel, mapper, properties); 
 		break;
 		case DELETE_AGENT: operations.deleteRunningAgent(message, channel, properties);
 		break;

@@ -49,13 +49,13 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 		if(nodesManagment.isMaster()){
 			
 			for(AgentCenter center : registry.getCenters())
-						requester.sendMessage(center.getAddress(), message);
+				requester.sendMessage(center.getAddress(), message);
 			
 			registry.addCenter(message.getCenter());
 			List<AgentCenter> list = registry.getCenters()
-											 .stream()
-											 .filter(center -> !center.getAlias().equals(message.getCenter().getAlias()))
-											 .collect(Collectors.toList());
+											.stream()
+											.filter(center -> !center.getAlias().equals(message.getCenter().getAlias()))
+											.collect(Collectors.toList());
 			
 			list.add(registry.getThisCenter());									
 			return list;
@@ -73,7 +73,7 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 				manager.getOtherSupportedTypes().entrySet()
 												.stream()
 												.forEach(entrySet -> returnSet.put(entrySet.getKey(), entrySet.getValue()));
-				
+
 			manager.addOtherTypes(message.getCenter().getAlias(), message.getAgentTypes());
 			message.setType(handshakeType.DELIVER_TYPES);
 			for(AgentCenter center : registry.getCenters()){

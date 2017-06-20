@@ -1,10 +1,17 @@
 package agents;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ejb.EJB;
 import javax.ejb.Stateful;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
+import intercommunication.MessageDispatcherLocal;
 import model.ACLMessage;
+import model.ACLMessage.Performative;
+import model.AID;
 import model.Agent;
 
 @SuppressWarnings("serial")
@@ -12,6 +19,9 @@ import model.Agent;
 @JsonTypeName("Pong")
 public class PongAgent extends Agent {
 
+	@EJB
+	private MessageDispatcherLocal dispatcher;
+	
 	@Override
 	public void handleMessage(ACLMessage message) {
 		switch(message.getPerformative()){
@@ -51,7 +61,18 @@ public class PongAgent extends Agent {
 			break;
 		case REJECT_PROPOSAL:
 			break;
-		case REQUEST:
+		case REQUEST: {
+			System.out.println("Message recieved from: "+message.getSender().getName());
+			System.out.println("Message content: "+message.getContent());
+			ACLMessage msg = new ACLMessage();
+			msg.setPerformative(Performative.INFORM);
+			msg.setContent("Regards from buddy Pong.");
+			List<AID> recievers = new ArrayList<AID>();
+			recievers.add(message.getReplyTo());
+			msg.setRecievers(recievers);
+			msg.setSender(getId());
+			dispatcher.sendMesssage(message, message.getReplyTo().getName());
+		}
 			break;
 		case REQUEST_WHEN:
 			break;

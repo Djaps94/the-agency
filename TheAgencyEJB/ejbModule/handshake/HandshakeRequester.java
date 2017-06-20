@@ -3,6 +3,7 @@ package handshake;
 import java.io.IOException;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import javax.ejb.Stateless;
@@ -25,8 +26,8 @@ public class HandshakeRequester implements HandshakeRequesterLocal {
 	public HandshakeMessage sendMessage(String destination, HandshakeMessage message) throws ConnectionException, IOException, TimeoutException, InterruptedException{
 		ConnectionFactory factory = new ConnectionFactory();
 	  	factory.setHost("127.0.0.1");
-    	factory.setPort(5672);
-    	factory.setVirtualHost("/");
+	  	factory.setPort(5672);
+	  	factory.setVirtualHost("/");
 		Connection connection = factory.newConnection();
 		Channel channel = connection.createChannel();
 		String ReplyQueueName = channel.queueDeclare().getQueue();
@@ -37,7 +38,7 @@ public class HandshakeRequester implements HandshakeRequesterLocal {
 	
 		channel.basicPublish("", destination, props, msg.getBytes());
 		channel.basicConsume(ReplyQueueName, true, new HandshakeConsumer(channel, mapper, response));
-		return response.take();
+		return response.poll(5, TimeUnit.SECONDS);
 	}
 	
 }

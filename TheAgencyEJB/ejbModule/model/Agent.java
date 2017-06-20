@@ -19,6 +19,10 @@ public abstract class Agent implements Serializable{
 	
 	public abstract void handleMessage(ACLMessage message);
 	
+	public void notSupportedMethod(){
+		System.out.println("This agent does not support this kind of a message");
+	}
+	
 	public AID getId() {
 		return id;
 	}
