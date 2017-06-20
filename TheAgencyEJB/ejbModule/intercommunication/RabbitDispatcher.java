@@ -17,7 +17,7 @@ import beans.AgencyRegistryLocal;
 import model.ACLMessage;
 
 @Singleton
-public class RabbitDispatcher {
+public class RabbitDispatcher implements RabbitDispatcherLocal{
 	
 	@EJB
 	private AgencyRegistryLocal registry;

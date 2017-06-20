@@ -1,0 +1,21 @@
+@CHARSET "UTF-8";
+
+html {
+	margin: 0px;
+	height: 100%;
+	width: 100%;
+}
+
+body {
+	margin: 0px;
+	min-height: 100%;
+	width: 100%;
+}
+
+.responsive-image {
+	background-image:url('../images/agency.jpg');
+	background-repeat:no-repeat;
+	background-size:cover;
+	width: 100%; 
+	height: 100%;
+}
