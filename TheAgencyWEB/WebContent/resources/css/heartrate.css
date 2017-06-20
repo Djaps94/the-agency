@@ -11,7 +11,6 @@
   position: absolute;
   width: 100%;
   height: 100%;
-  background-color: #FFFFFF;
   top: 0;
   right: 0;
   animation: heartRateIn 2.5s linear infinite;
@@ -24,12 +23,6 @@
   top: 0;
   left: -120%;
   animation: heartRateOut 2.5s linear infinite;
-  background: rgba(255, 255, 255, 1);
-  background: -moz-linear-gradient(left, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 0) 100%);
-  background: -webkit-linear-gradient(left, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 0) 100%);
-  background: -o-linear-gradient(left, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 0) 100%);
-  background: -ms-linear-gradient(left, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 1) 50%, rgba(255, 255, 255, 0) 100%);
-  background: linear-gradient(to right, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 1) 80%, rgba(255, 255, 255, 0) 100%);
 }
 
 @keyframes heartRateIn {
