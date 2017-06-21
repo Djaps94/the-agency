@@ -29,7 +29,7 @@ public class HandshakeConsumer extends DefaultConsumer{
 		try {
 			msg = mapper.readValue(data, HandshakeMessage.class);
 		} catch (IOException e) {
-			
+			msg = new HandshakeMessage();
 		}
 		response.offer(msg);
 	}

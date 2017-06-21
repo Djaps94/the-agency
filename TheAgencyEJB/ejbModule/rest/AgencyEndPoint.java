@@ -22,6 +22,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import beans.AgencyManagerLocal;
 import beans.AgencyRegistryLocal;
 import beans.AgentManagerLocal;
@@ -154,7 +156,7 @@ public class AgencyEndPoint {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public AID deleteAgent(AID agentID){
-		if(agentID.getHost().equals(registry.getThisCenter())){
+		if(agentID.getHost().getAddress().equals(registry.getThisCenter().getAddress())){
 			return agentManager.stopAgent(agentID);
 		}else{
 			HandshakeMessage message = new HandshakeMessage(handshakeType.STOP_AGENT);

@@ -40,15 +40,27 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 			$scope.agentInfo.run = true;
 	}
 	
-	$scope.startAgent = function(typeModule, typeName){
-		console.log(typeModule +" "+typeName);
+	var checkRunningAgents = function(array, el){
+		for(x in array){
+			if(array[x].name === el.name &&
+			   array[x].host.alias === el.host.alias &&
+			   array[x].type.module === el.type.module &&
+			   array[x].type.name === el.type.name)
+			return true;
+		}
+		return false;
 	}
-	
+		
+	//Get all agent types
 	$scope.getTypes = function(){
 		if($rootScope.action.valueREST){
 			$http.get('/TheAgency/rest/agency/agents/classes').then(function(response){
 				response.data.forEach(function(el){
-					if($scope.agentCollections.agentTypes.indexOf(el) == -1)
+					for(x in $scope.agentCollections.agentTypes){
+						if($scope.agentCollections.agentTypes[x].name === el.name && 
+						   $scope.agentCollections.agentTypes[x].module === el.module)
+							return;
+					}
 						$scope.agentCollections.agentTypes.push(el);
 				});
 			});
@@ -57,16 +69,68 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 		}
 	};
 	
+	//Get all running agents
 	$scope.getRunning = function(){
 		if($rootScope.action.valueREST){
 			$http.get('/TheAgency/rest/agency/agents/running').then(function(response){
 				response.data.forEach(function(el){
-					if($scope.agentCollections.runningAgents.indexOf(el) == -1)
-						$scope.agentCollections.runningAgents.push(el);
+					if(checkRunningAgents($scope.agentCollections.runningAgents, el))
+						return;
+					$scope.agentCollections.runningAgents.push(el);
 				});
 			});
 		}else if($rootScope.action.valueSocket){
 			//ws message
+		}
+	};
+	
+	//startAgent
+	$scope.startAgent = function(typeModule, typeName){
+		if($rootScope.action.valueREST){
+			$http.put('/TheAgency/rest/agency/agents/running/'+typeModule+":"+typeName+"/"+$scope.agentInfo.name)
+				.then(function(response){
+					var aid = response.data;
+					if(aid === undefined || aid === null || aid === ""){
+						alert("Agent can't be started. Possibly the same name or some other error.");
+						return;
+					}
+					if(checkRunningAgents($scope.agentCollections.runningAgents, aid))
+						return;
+					$scope.agentCollections.runningAgents.push(aid);
+					$scope.agentInfo.name = "";
+				 });
+			}else if($rootScope.action.valueSocket){
+				//ws
+			}
+		};
+		
+	$scope.stopAgent = function(AID){
+		if($rootScope.action.valueREST){
+			var data = angular.toJson(AID);
+			$http({
+				method: 'DELETE',
+				url: '/TheAgency/rest/agency/agents/running',
+				data: data,
+				headers: {
+					'Content-type': 'application/json;charset=utf-8'
+				}
+			})
+				 .then(function(response){
+					 var res = response.data;
+					 if(res === undefined || res === null || res === ""){
+						 alert("Agent can't be stopped.");
+						 return;
+					 }
+					 var index = -1;
+					 for(x = 0; x < $scope.agentCollections.runningAgents.length; x++){
+						 if($scope.agentCollections.runningAgents[x].name === res.name)
+							 index = x;
+					 }
+					 if(index > -1)
+						 $scope.agentCollections.runningAgents.splice(index, 1);
+				 });
+		}else if($rootScope.action.valueSocket){
+			//ws
 		}
 	};
 	
