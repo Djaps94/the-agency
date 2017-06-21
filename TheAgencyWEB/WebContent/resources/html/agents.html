@@ -1,31 +1,43 @@
-<div style="float: left; width:25%; height: 95%; background-color: white; border: 0.5px solid #6B0000">
-	<h6 style="text-align: center; padding-top:15%;">Agent types</h6>
-	<hr>
-	<ul class="list-group" style="padding-top: 15%; padding-right: 10%; padding-left: 10%;">
-  		<li class="list-group-item">Cras justo odio</li>
-	</ul>
-	<hr>
-	<button class="btn btn-sm btn-info" style="margin-left: 7%;">Refresh</button>
-</div>
-<div style="position:relative; float: left; width: 50%; height: 95%; background-color: white; border-bottom: 0.5px solid #6B0000; border-top: 0.5px solid #6B0000">
-	<h6 style="margin: 5.5%;float:left;">Actions via: </h6>
-	<div class="checkbox" style="float:left;margin:5%;">
-		<label><input type="checkbox" value=""/>REST</label>
+<div ng-controller="agentController" style="height: 95%; width: 100%;">
+	<div  style="float: left; width:25%; height: 95%; background-color: white; border: 0.5px solid #6B0000">
+		<h6 style="text-align: center; padding-top:15%;">Agent types</h6>
+		<hr>
+		<ul class="list-group" style="padding-top: 15%; padding-right: 10%; padding-left: 10%;" ng-repeat="type in agentCollections.agentTypes">
+	  		<li class="list-group-item">
+	  			<label>Module: </label><label>{{ type.module }}</label>
+	  			<label>Name: </label><label>{{ type.name }}</label>
+	  		</li>
+		</ul>
+		<hr>
+		<button class="btn btn-sm btn-info" ng-click="getTypes()" style="margin-left: 7%;">Refresh</button>
 	</div>
-	<div class="checkbox" style="margin: 5%;float:left;">
-		<label><input type="checkbox" value=""/>Websockets</label>
+	<div style="position:relative; float: left; width: 50%; height: 95%; background-color: white; border-bottom: 0.5px solid #6B0000; border-top: 0.5px solid #6B0000">
+		<h6 style="margin: 5.5%;float:left;">Actions via: </h6>
+		<div class="checkbox" style="float:left;margin:5%;">
+			<label><input type="checkbox" ng-model="action.valueREST" value=""/>REST</label>
+		</div>
+		<div class="checkbox" style="margin: 5%;float:left;">
+			<label><input type="checkbox" ng-model="action.valueSocket" value=""/>Websockets</label>
+		</div>
+		<div>
+			<button class="btn btn-sm btn-info" ng-click="showChat()">{{ Console.buttonChat }}</button>	
+		</div>
+		<h6 ng-show = "Console.show" style="position: absolute; bottom: 35%;text-align: center; width: 100%;">Follow communication between agents:</h6>
+		<div ng-show = "Console.show" style="position:absolute; bottom: 0; height: 30%; width:95%; margin: 3%; border: 0.7px solid; border-radius: 5px;">
+			
+		</div>
 	</div>
-	<h6 style="position: absolute; bottom: 35%;text-align: center; width: 100%;">Follow communication between agents:</h6>
-	<div style="position:absolute; bottom: 0; height: 30%; width:95%; margin: 3%; border: 0.7px solid; border-radius: 5px;">
-		
+	<div style="float: left; width: 25%; height: 95%; background-color: white;border: 0.5px solid #6B0000">
+		<h6 style="text-align: center; margin-top:15%;">Active agents</h6>
+		<hr>
+		<ul class="list-group" style="padding-top: 15%;padding-right: 10%; padding-left: 10%;" ng-repeat="aid in agentCollections.runningAgents">
+			<li class="list-group-item">
+				<label>Agent name: </label><label>{{ aid.name }}</label>
+				<label>Agent type: </label><label>{{ aid.type.name }}</label>
+				<label>Agent center:</label><label>{{ aid.host.alias }}</label>
+			</li>
+		</ul>
+		<hr>
+		<button class="btn btn-sm btn-info" ng-click="getRunning()" style="float: right;margin-right: 7%;">Refresh</button>
 	</div>
-</div>
-<div style="float: left; width: 25%; height: 95%; background-color: white;border: 0.5px solid #6B0000">
-	<h6 style="text-align: center; margin-top:15%;">Active agents</h6>
-	<hr>
-	<ul class="list-group" style="padding-top: 15%;padding-right: 10%; padding-left: 10%;">
-		<li class="list-group-item">Agent1</li>
-	</ul>
-	<hr>
-	<button class="btn btn-sm btn-info" style="float: right;margin-right: 7%;">Refresh</button>
 </div>
