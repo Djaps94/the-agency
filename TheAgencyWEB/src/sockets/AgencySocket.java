@@ -2,8 +2,10 @@ package sockets;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.EJB;
@@ -16,12 +18,12 @@ import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import beans.AgencyManagerLocal;
 import beans.SessionHolderLocal;
 import model.AID;
+import model.AgentType;
 import util.SocketMessage;
 
 @ServerEndpoint(value = "/socket/agents")
@@ -55,8 +57,7 @@ public class AgencySocket implements MessageListener{
 				SocketMessage msg = mapper.readValue(message, SocketMessage.class);
 				switch(msg.getMsgType()){
 				case GET_AGENTS: getRunningAgents(session, mapper); break;
-				case GET_TYPES:
-					break;
+				case  GET_TYPES: getAgentTypes(session, mapper); break;
 				default:
 					break;
 				}
@@ -78,6 +79,14 @@ public class AgencySocket implements MessageListener{
 			runningAgents.addAll(entry.getValue());
 		}
 		String output = mapper.writeValueAsString(runningAgents);
+		session.getBasicRemote().sendText(output);
+	}
+	
+	private void getAgentTypes(Session session, ObjectMapper mapper) throws IOException{
+		Set<AgentType> type = new HashSet<AgentType>();
+		type.addAll(agency.getSupportedTypes());
+		agency.getOtherSupportedTypes().entrySet().stream().forEach(entry -> type.addAll(entry.getValue()));
+		String output = mapper.writeValueAsString(type);
 		session.getBasicRemote().sendText(output);
 	}
 

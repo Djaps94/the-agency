@@ -7,6 +7,40 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 			valueSocket : false
 	};
 	
+	//Opening socket
+	var url = window.location;
+	var wsadress = "ws://"+url.hostname+":"+url.port+"/TheAgency/socket/agents";
+	
+	
+	try{
+		var socket = WebSocket(wsadress);
+		
+		socket.onopen = function(){
+			console.log("Socket towards agents opened.");
+		}
+		
+		socket.onclose = function(){
+			socket.close();
+			console.log("Socket closed.");
+		}
+		
+		socket.onmessage = function(message){
+			if($rootScope.action.valueSocket){
+				var socketMessage = JSON.parse(message);
+				switch(socketMessage.msgType){
+				case 'ADD_TYPE'  : break;
+				case 'ADD_AGENT' : break;
+				case 'SEND_MESSAGE' : break;
+				case 'REMOVE_TYPE': break;
+				case 'REMOVE_AGENT' : break;
+				}
+			}
+		}
+		
+	}catch(exception){
+		console.log("exception");
+	}
+	
 	$scope.agentCollections = {
 			agentTypes : [],
 			runningAgents : [],
@@ -65,7 +99,7 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 				});
 			});
 		}else if($rootScope.action.valueSocket){
-			//ws message
+			
 		}
 	};
 	
