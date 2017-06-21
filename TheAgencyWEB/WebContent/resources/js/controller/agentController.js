@@ -13,6 +13,11 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 			messages : []
 	};
 	
+	$scope.agentInfo = {
+			name : "",
+			run : false,
+	}
+	
 	$scope.Console = {
 			buttonChat : "Show comm. chat",
 			show : false
@@ -27,6 +32,17 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 			$scope.Console.buttonChat = "Show comm. chat";
 		}
 	};
+	
+	$scope.showRunOptions = function(){
+		if($scope.agentInfo.run)
+			$scope.agentInfo.run = false;
+		else
+			$scope.agentInfo.run = true;
+	}
+	
+	$scope.startAgent = function(typeModule, typeName){
+		console.log(typeModule +" "+typeName);
+	}
 	
 	$scope.getTypes = function(){
 		if($rootScope.action.valueREST){

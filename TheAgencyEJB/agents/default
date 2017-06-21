@@ -1,1 +1,2 @@
 ejbModule.agents PingAgent
+ejbModule.agents ContractNetMaster
