@@ -7,7 +7,34 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 			valueSocket : false
 	};
 	
-	$scope.showModal = function(){
+	$scope.modalRunningAgents = [];
+	$scope.modalPerformative = [];
+	
+	$scope.ACLMessage = {
+		performative : "",
+		sender : null,
+		recievers : [],
+		replyTo : null,
+		content : "",
+		language : "",
+		encoding : "",
+		protocol : "",
+		ontology : "",
+		replyWith : "",
+		inReplyTo : ""
+	};
+	
+	$scope.fillModal = function(){
+		$http.get('/TheAgency/rest/agency/agents/running').then(function(response){
+			response.data.forEach(function(el){
+				if(!checkRunningAgents($scope.modalRunningAgents, el))
+					$scope.modalRunningAgents.push(el);
+			});
+		});
+		$http.get('/TheAgency/rest/agency/messages').then(function(response){
+			$scope.modalPerformative = response.data;
+		});
+		
 	};
 	
 	//Opening socket
@@ -96,7 +123,7 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 					for(x in $scope.agentCollections.agentTypes){
 						if($scope.agentCollections.agentTypes[x].name === el.name && 
 						   $scope.agentCollections.agentTypes[x].module === el.module)
-							return;
+							continue;
 					}
 						$scope.agentCollections.agentTypes.push(el);
 				});
@@ -115,7 +142,7 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 			for(x in $scope.agentCollections.agentTypes){
 				if($scope.agentCollections.agentTypes[x].name === el.name && 
 				   $scope.agentCollections.agentTypes[x].module === el.module)
-					return;
+					continue;
 			}
 				$rootScope.$apply(function(){
 					$scope.agentCollections.agentTypes.push(el);
@@ -128,9 +155,8 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 		if($rootScope.action.valueREST){
 			$http.get('/TheAgency/rest/agency/agents/running').then(function(response){
 				response.data.forEach(function(el){
-					if(checkRunningAgents($scope.agentCollections.runningAgents, el))
-						return;
-					$scope.agentCollections.runningAgents.push(el);
+					if(!checkRunningAgents($scope.agentCollections.runningAgents, el))
+						$scope.agentCollections.runningAgents.push(el);
 				});
 			});
 		}else if($rootScope.action.valueSocket){
@@ -144,11 +170,10 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 	//get all running agents via socket
 	var socketRunningAgents = function(socketMessage){
 		socketMessage.runningAgents.forEach(function(el){
-			if(checkRunningAgents($scope.agentCollections.runningAgents, el))
-				return;
-			$scope.$apply(function(){
-				$scope.agentCollections.runningAgents.push(el);
-			});
+			if(!checkRunningAgents($scope.agentCollections.runningAgents, el))
+				$scope.$apply(function(){
+					$scope.agentCollections.runningAgents.push(el);
+				});
 		});	
 	}
 	
@@ -233,6 +258,22 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 			 $scope.$apply(function(){
 				 $scope.agentCollections.runningAgents.splice(index, 1);
 			 });
+	}
+	
+	$scope.sendMessage = function(){
+		var data = angular.toJson($scope.ACLMessage);
+		if($rootScope.action.valueREST){
+			$http({
+				method : 'POST',
+				url: '/TheAgency/rest/agency/messages',
+				data: data,
+				headers: {
+					'Content-type' : 'application/json;charset=utf-8'
+				}
+			});
+		}else if($rootScope.action.valueSocket){
+			
+		}
 	}
 	
 }]);

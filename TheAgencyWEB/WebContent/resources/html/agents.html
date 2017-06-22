@@ -28,7 +28,7 @@
 			<button class="btn btn-sm btn-info" ng-click="showChat()">{{ Console.buttonChat }}</button>	
 		</div>
 		<div>
-			<button class="btn btn-sm btn-info" data-toggle="modal" data-target="#messageModal">Send message</button>
+			<button class="btn btn-sm btn-info" data-toggle="modal" data-target="#messageModal" ng-click=fillModal()>Send message</button>
 		</div>
 		<h6 ng-show = "Console.show" style="position: absolute; bottom: 35%;text-align: center; width: 100%;">Follow communication between agents:</h6>
 		<div ng-show = "Console.show" style="position:absolute; overflow-y: auto; bottom: 0; height: 30%; width:95%; margin: 3%; border: 0.7px solid; border-radius: 5px;">
@@ -67,53 +67,57 @@
       	<form>
    			<div class="form-group">
    				<label>Performative:</label>
-				<select class="form-control"></select>
+				<select class="form-control" ng-model="ACLMessage.performative" ng-options="perform for perform in modalPerformative">
+				</select>
 			</div>
    			<div class="form-group">
    				<label>Sender:</label>
-				<select class="form-control"></select>
+				<select class="form-control" ng-model="ACLMessage.sender" ng-options="aid.name for aid in modalRunningAgents">
+				</select>
 			</div>
    			<div class="form-group">
    				<label>Recievers:</label>
-				<select multiple class="form-control"></select>
+				<select multiple class="form-control" ng-model="ACLMessage.recievers" ng-options="aid.name for aid in modalRunningAgents">
+				</select>
 			</div>
    			<div class="form-group">
    				<label>Reply to:</label>
-				<select class="form-control"></select>
+				<select class="form-control" ng-model="ACLMessage.replyTo" ng-options="aid.name for aid in modalRunningAgents">
+				</select>
 			</div>
 			<div class="form-group">
 				<label>Content:</label>
-				<input type="text"/>
+				<input type="text" ng-model="ACLMessage.content"/>
 			</div>
 			<div class="form-group">
 				<label>Language:</label>
-				<input type="text" />
+				<input type="text" ng-model="ACLMessage.language" />
 			</div>
 			<div class="form-group">
 				<label>Encoding:</label>
-				<input type="text" />
+				<input type="text" ng-model="ACLMessage.encoding" />
 			</div>
 			<div class="form-group">
 				<label>Protocol:</label>
-				<input type="text" />
+				<input type="text" ng-model="ACLMessage.protocol" />
 			</div>
 			<div class="form-group">
 				<label>Ontology:</label>
-				<input type="text" />
+				<input type="text" ng-model="ACLMessage.ontology" />
 			</div>
 			<div class="form-group">
 				<label>Reply With:</label>
-				<input type="text" />
+				<input type="text" ng-model="ACLMessage.replyWith" />
 			</div>
 			<div class="form-group">
 				<label>In reply to:</label>
-				<input type="text" />
+				<input type="text" ng-model="ACLMessage.inReplyTo" />
 			</div>
       	</form>	
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary">Send</button>
+        <button type="button" class="btn btn-primary" ng-click="sendMessage()">Send</button>
       </div>
     </div>
   </div>
