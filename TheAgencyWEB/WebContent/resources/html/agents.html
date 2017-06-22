@@ -24,8 +24,11 @@
 		<div class="checkbox" style="margin: 5%;float:left;">
 			<label><input type="checkbox" ng-model="action.valueSocket" value=""/>Websockets</label>
 		</div>
-		<div>
+		<div style="float: left;">
 			<button class="btn btn-sm btn-info" ng-click="showChat()">{{ Console.buttonChat }}</button>	
+		</div>
+		<div>
+			<button class="btn btn-sm btn-info" data-toggle="modal" data-target="#messageModal">Send message</button>
 		</div>
 		<h6 ng-show = "Console.show" style="position: absolute; bottom: 35%;text-align: center; width: 100%;">Follow communication between agents:</h6>
 		<div ng-show = "Console.show" style="position:absolute; overflow-y: auto; bottom: 0; height: 30%; width:95%; margin: 3%; border: 0.7px solid; border-radius: 5px;">
@@ -43,11 +46,76 @@
 			</li>
 			<li ng-if="turn" class="list-group-item" style="margin-top: 1%;">
 				<div>
-					<button class="btn btn-sm btn-danger" ng-click="stopAgent(aid)">Stop</button> <button class="btn btn-sm btn-info">Send message</button>
+					<button class="btn btn-sm btn-danger" ng-click="stopAgent(aid)">Stop</button>
 				</div>
 			</li>
 		</ul>
 		<hr>
 		<button class="btn btn-sm btn-info" ng-click="getRunning()" style="float: right;margin-right: 7%;">Refresh</button>
 	</div>
+<!-- MODAL -->	
+<div class="modal fade" id="messageModal" tabindex="-1" role="dialog"  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Send ALC message</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+      	<form>
+   			<div class="form-group">
+   				<label>Performative:</label>
+				<select class="form-control"></select>
+			</div>
+   			<div class="form-group">
+   				<label>Sender:</label>
+				<select class="form-control"></select>
+			</div>
+   			<div class="form-group">
+   				<label>Recievers:</label>
+				<select multiple class="form-control"></select>
+			</div>
+   			<div class="form-group">
+   				<label>Reply to:</label>
+				<select class="form-control"></select>
+			</div>
+			<div class="form-group">
+				<label>Content:</label>
+				<input type="text"/>
+			</div>
+			<div class="form-group">
+				<label>Language:</label>
+				<input type="text" />
+			</div>
+			<div class="form-group">
+				<label>Encoding:</label>
+				<input type="text" />
+			</div>
+			<div class="form-group">
+				<label>Protocol:</label>
+				<input type="text" />
+			</div>
+			<div class="form-group">
+				<label>Ontology:</label>
+				<input type="text" />
+			</div>
+			<div class="form-group">
+				<label>Reply With:</label>
+				<input type="text" />
+			</div>
+			<div class="form-group">
+				<label>In reply to:</label>
+				<input type="text" />
+			</div>
+      	</form>	
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Send</button>
+      </div>
+    </div>
+  </div>
+</div>
 </div>

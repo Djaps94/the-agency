@@ -7,6 +7,9 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 			valueSocket : false
 	};
 	
+	$scope.showModal = function(){
+	};
+	
 	//Opening socket
 	var url = window.location;
 	var wsadress = "ws://"+url.hostname+":"+url.port+"/TheAgency/agents";
