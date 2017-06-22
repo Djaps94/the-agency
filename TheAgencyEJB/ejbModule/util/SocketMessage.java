@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 
+import model.ACLMessage;
 import model.AID;
 import model.AgentType;
 
@@ -26,6 +27,7 @@ public class SocketMessage implements Serializable{
 	private String typeModule;
 	private String typeName;
 	private messageType msgType;
+	private ACLMessage message;
 	
 	
 	public SocketMessage() { }
@@ -108,5 +110,15 @@ public class SocketMessage implements Serializable{
 
 	public void setTypeName(String typeName) {
 		this.typeName = typeName;
+	}
+
+
+	public ACLMessage getMessage() {
+		return message;
+	}
+
+
+	public void setMessage(ACLMessage message) {
+		this.message = message;
 	}
 }

@@ -272,7 +272,13 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 				}
 			});
 		}else if($rootScope.action.valueSocket){
+			var acl = JSON.parse(data);
+			var socketMessage = {
+				msgType : 'SEND_MESSAGE',
+				message : acl
+			};
 			
+			socket.send(JSON.stringify(socketMessage));
 		}
 	}
 	

@@ -17,17 +17,19 @@
 		<button class="btn btn-sm btn-info" ng-click="getTypes()" style="margin-left: 7%;">Refresh</button>
 	</div>
 	<div style="position:relative; float: left; width: 50%; height: 95%; background-color: white; border-bottom: 0.5px solid #6B0000; border-top: 0.5px solid #6B0000">
-		<h6 style="margin: 5.5%;float:left;">Actions via: </h6>
-		<div class="checkbox" style="float:left;margin:5%;">
-			<label><input type="checkbox" ng-model="action.valueREST" value=""/>REST</label>
+		<div style="width: 100%; position:absolute;">
+			<h6 style="margin: 5.5%;float:left;">Actions via: </h6>
+			<div class="checkbox" style="float:left;margin:5%;">
+				<label><input type="checkbox" ng-model="action.valueREST" value=""/>REST</label>
+			</div>
+			<div class="checkbox" style="margin: 5%;float:left;">
+				<label><input type="checkbox" ng-model="action.valueSocket" value=""/>Websockets</label>
+			</div>
 		</div>
-		<div class="checkbox" style="margin: 5%;float:left;">
-			<label><input type="checkbox" ng-model="action.valueSocket" value=""/>Websockets</label>
-		</div>
-		<div style="float: left;">
+		<div style="position:absolute;top:20%; margin-left:2%;">
 			<button class="btn btn-sm btn-info" ng-click="showChat()">{{ Console.buttonChat }}</button>	
 		</div>
-		<div>
+		<div style="position:absolute; top:20%; margin-left:30%;">
 			<button class="btn btn-sm btn-info" data-toggle="modal" data-target="#messageModal" ng-click=fillModal()>Send message</button>
 		</div>
 		<h6 ng-show = "Console.show" style="position: absolute; bottom: 35%;text-align: center; width: 100%;">Follow communication between agents:</h6>

@@ -30,6 +30,9 @@ import beans.AgentManagerLocal;
 import beans.SessionHolderLocal;
 import exceptions.ConnectionException;
 import handshake.HandshakeRequesterLocal;
+import intercommunication.MessageDispatcherLocal;
+import intercommunication.RabbitDispatcherLocal;
+import model.ACLMessage;
 import model.AID;
 import model.AgentCenter;
 import model.AgentType;
@@ -60,6 +63,12 @@ public class AgencySocket implements MessageListener{
 	@EJB
 	private AgentManagerLocal agentManager;
 	
+	@EJB
+	private MessageDispatcherLocal dispatcher;
+	
+	@EJB
+	private RabbitDispatcherLocal rabbit;
+	
 	@OnOpen
 	public void onOpen(Session session){
 		sessionHolder.addSession(session.getId(), session);
@@ -78,10 +87,11 @@ public class AgencySocket implements MessageListener{
 			try {
 				SocketMessage msg = mapper.readValue(message, SocketMessage.class);
 				switch(msg.getMsgType()){
-				case  GET_AGENTS: getRunningAgents(session, mapper); break;
-				case   GET_TYPES: getAgentTypes(session, mapper); break;
-				case START_AGENT: startAgent(session, mapper, msg);
-				case  STOP_AGENT: stopAgent(session, mapper, msg.getAid());
+				case   GET_AGENTS: getRunningAgents(session, mapper); break;
+				case    GET_TYPES: getAgentTypes(session, mapper); break;
+				case  START_AGENT: startAgent(session, mapper, msg);
+				case   STOP_AGENT: stopAgent(session, mapper, msg.getAid());
+				case SEND_MESSAGE: sendMessage(session, mapper, msg.getMessage()); 
 				default:
 					break;
 				}
@@ -169,6 +179,25 @@ public class AgencySocket implements MessageListener{
 				return;
 			}
 		}
+	}
+	
+	private void sendMessage(Session session, ObjectMapper mapper, ACLMessage message){
+		for(AID aid : message.getRecievers()){
+			if(aid.getHost().getAlias().equals(registry.getThisCenter().getAlias())){
+				dispatcher.sendMesssage(message, aid.getName());
+			}else{
+				for(Entry<String, List<AID>> entry : agency.getCenterAgents().entrySet()){
+					if(entry.getKey().equals(aid.getHost().getAlias())){
+						AID a = entry.getValue().stream()
+												  .filter(id -> id.equals(aid))
+												  .findFirst()
+												  .get();
+						
+						rabbit.notifyCenter(message, a.getName());
+						}
+					}
+				}
+			}
 	}
 
 }
