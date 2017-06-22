@@ -22,6 +22,9 @@ public class SocketMessage implements Serializable{
 	private AgentType type;
 	private List<AID> runningAgents;
 	private Set<AgentType> agentTypes;
+	private String agentName;
+	private String typeModule;
+	private String typeName;
 	private messageType msgType;
 	
 	
@@ -75,5 +78,35 @@ public class SocketMessage implements Serializable{
 
 	public void setMsgType(messageType msgType) {
 		this.msgType = msgType;
+	}
+
+
+	public String getAgentName() {
+		return agentName;
+	}
+
+
+	public void setAgentName(String agentName) {
+		this.agentName = agentName;
+	}
+
+
+	public String getTypeModule() {
+		return typeModule;
+	}
+
+
+	public void setTypeModule(String typeModule) {
+		this.typeModule = typeModule;
+	}
+
+
+	public String getTypeName() {
+		return typeName;
+	}
+
+
+	public void setTypeName(String typeName) {
+		this.typeName = typeName;
 	}
 }

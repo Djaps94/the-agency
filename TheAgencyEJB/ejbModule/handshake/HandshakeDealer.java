@@ -138,21 +138,11 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 
 	@Override
 	public AID runAgent(HandshakeMessage message) {
-		AID aid = agentManager.startAgent(message.getAid());
-		SocketMessage msg = new SocketMessage();
-		msg.setMsgType(messageType.START_AGENT);
-		msg.setAid(aid);
-		socketSender.socketSend(msg);
-		return aid;
+		return agentManager.startAgent(message.getAid());
 	}
 	
 	public AID stopAgent(HandshakeMessage message){
-		AID aid = agentManager.stopAgent(message.getAid());
-		SocketMessage msg = new SocketMessage();
-		msg.setMsgType(messageType.STOP_AGENT);
-		msg.setAid(aid);
-		socketSender.socketSend(msg);
-		return aid;
+		return agentManager.stopAgent(message.getAid());
 	}
 	
 }

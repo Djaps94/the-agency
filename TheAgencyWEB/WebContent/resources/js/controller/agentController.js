@@ -28,11 +28,11 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 			var socketMessage = JSON.parse(message.data);
 			if($rootScope.action.valueSocket){
 				switch(socketMessage.msgType){
-				case 'ADD_TYPE'   : socketAgentTypes(socketMessage); break;
-				case 'GET_TYPES'  : socketAgentTypes(socketMessage); break;
+				case 'ADD_TYPE'   : socketAgentTypes(socketMessage);	break;
+				case 'GET_TYPES'  : socketAgentTypes(socketMessage);	break;
 				case 'GET_AGENTS' : socketRunningAgents(socketMessage); break;
-				case 'START_AGENT': socketStartAgents(socketMessage); break;
-				case 'STOP_AGENT' : break;
+				case 'START_AGENT': socketStartAgents(socketMessage);	break;
+				case 'STOP_AGENT' : socketStopAgents(socketMessage);	break;
 				}
 			}
 		}
@@ -167,8 +167,11 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 			}else if($rootScope.action.valueSocket){
 				var socketMessage = {
 						msgType : 'START_AGENT',
-						
+						agentName : $scope.agentInfo.name,
+						typeName : typeName,
+						typeModule : typeModule
 				};
+				socket.send(JSON.stringify(socketMessage));
 			}
 		};
 	
@@ -178,6 +181,7 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 			return;
 		$scope.$apply(function(){
 			$scope.agentCollections.runningAgents.push(socketMessage.aid);
+			$scope.agentInfo.name = "";
 		});
 	}
 		
@@ -207,8 +211,25 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 						 $scope.agentCollections.runningAgents.splice(index, 1);
 				 });
 		}else if($rootScope.action.valueSocket){
-			//ws
+			var Aid = JSON.parse(angular.toJson(AID));
+			var socketMessage = {
+				msgType : 'STOP_AGENT',
+				aid : Aid	
+			};
+			socket.send(JSON.stringify(socketMessage));
 		}
 	};
+	
+	var socketStopAgents = function(socketMessage){
+		 var index = -1;
+		 for(x = 0; x < $scope.agentCollections.runningAgents.length; x++){
+			 if($scope.agentCollections.runningAgents[x].name === socketMessage.aid.name)
+				 index = x;
+		 }
+		 if(index > -1)
+			 $scope.$apply(function(){
+				 $scope.agentCollections.runningAgents.splice(index, 1);
+			 });
+	}
 	
 }]);

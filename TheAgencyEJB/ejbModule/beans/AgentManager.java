@@ -12,6 +12,8 @@ import handshake.HandshakeRequesterLocal;
 import model.AID;
 import model.HandshakeMessage;
 import model.HandshakeMessage.handshakeType;
+import util.SocketMessage;
+import util.SocketMessage.messageType;
 
 @Stateless
 @LocalBean
@@ -25,6 +27,9 @@ public class AgentManager implements AgentManagerLocal {
 	
 	@EJB
 	private HandshakeRequesterLocal requester;
+	
+	@EJB
+	private SocketSenderLocal socketSender;
 
     public AgentManager() {
     
@@ -44,7 +49,10 @@ public class AgentManager implements AgentManagerLocal {
 				System.out.println("Can't send agent to other centers");
 			}
 		});
-		
+		SocketMessage msg = new SocketMessage();
+		msg.setMsgType(messageType.START_AGENT);
+		msg.setAid(aid);
+		socketSender.socketSend(msg);
 		return aid;
 	}
 
@@ -60,6 +68,10 @@ public class AgentManager implements AgentManagerLocal {
 			} catch (ConnectionException | IOException | TimeoutException | InterruptedException e) {
 			}
 		});
+		SocketMessage msg = new SocketMessage();
+		msg.setMsgType(messageType.STOP_AGENT);
+		msg.setAid(agent);
+		socketSender.socketSend(msg);
 		return agent;
 	}
 
