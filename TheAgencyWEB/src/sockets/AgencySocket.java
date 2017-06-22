@@ -10,8 +10,10 @@ import java.util.Set;
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.EJB;
 import javax.ejb.MessageDriven;
+import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
+import javax.jms.ObjectMessage;
 import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
@@ -25,8 +27,9 @@ import beans.SessionHolderLocal;
 import model.AID;
 import model.AgentType;
 import util.SocketMessage;
+import util.SocketMessage.messageType;
 
-@ServerEndpoint(value = "/socket/agents")
+@ServerEndpoint(value = "/agents")
 @MessageDriven(activationConfig = {
 		@ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
 		@ActivationConfigProperty(propertyName = "destination", propertyValue = "java:/jms/queue/SocketQueue")
@@ -69,7 +72,15 @@ public class AgencySocket implements MessageListener{
 
 	@Override
 	public void onMessage(Message message) {
-		
+		try {
+			SocketMessage msg   = (SocketMessage) ((ObjectMessage)message).getObject();
+			ObjectMapper mapper = new ObjectMapper();
+			String data = mapper.writeValueAsString(msg);
+			for(Entry<String, Session> entry : sessionHolder.getEntry())
+				entry.getValue().getBasicRemote().sendText(data);
+		} catch (JMSException | IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private void getRunningAgents(Session session, ObjectMapper mapper) throws IOException{
@@ -78,7 +89,10 @@ public class AgencySocket implements MessageListener{
 		for(Entry<String, List<AID>> entry : agency.getCenterAgents().entrySet()){
 			runningAgents.addAll(entry.getValue());
 		}
-		String output = mapper.writeValueAsString(runningAgents);
+		SocketMessage msg = new SocketMessage();
+		msg.setMsgType(messageType.GET_AGENTS);
+		msg.setRunningAgents(runningAgents);
+		String output = mapper.writeValueAsString(msg);
 		session.getBasicRemote().sendText(output);
 	}
 	
@@ -86,8 +100,15 @@ public class AgencySocket implements MessageListener{
 		Set<AgentType> type = new HashSet<AgentType>();
 		type.addAll(agency.getSupportedTypes());
 		agency.getOtherSupportedTypes().entrySet().stream().forEach(entry -> type.addAll(entry.getValue()));
-		String output = mapper.writeValueAsString(type);
+		SocketMessage msg = new SocketMessage();
+		msg.setMsgType(messageType.GET_TYPES);
+		msg.setAgentTypes(type);
+		String output = mapper.writeValueAsString(msg);
 		session.getBasicRemote().sendText(output);
+	}
+	
+	private void startAgent(Session session, ObjectMapper mapper, AID aid){
+		
 	}
 
 }

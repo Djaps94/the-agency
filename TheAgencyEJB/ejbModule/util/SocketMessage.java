@@ -2,6 +2,7 @@ package util;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 
 import model.AID;
 import model.AgentType;
@@ -12,14 +13,15 @@ public class SocketMessage implements Serializable{
 	public enum messageType { GET_TYPES,
 							  GET_AGENTS,
 							  ADD_TYPE,
-							  ADD_AGENT,
-							  SEND_MESSAGE
+							  SEND_MESSAGE,
+							  START_AGENT,
+							  STOP_AGENT
 	};
 	
 	private AID aid;
 	private AgentType type;
 	private List<AID> runningAgents;
-	private List<AgentType> agentTypes;
+	private Set<AgentType> agentTypes;
 	private messageType msgType;
 	
 	
@@ -56,12 +58,12 @@ public class SocketMessage implements Serializable{
 	}
 
 
-	public List<AgentType> getAgentTypes() {
+	public Set<AgentType> getAgentTypes() {
 		return agentTypes;
 	}
 
 
-	public void setAgentTypes(List<AgentType> agentTypes) {
+	public void setAgentTypes(Set<AgentType> agentTypes) {
 		this.agentTypes = agentTypes;
 	}
 

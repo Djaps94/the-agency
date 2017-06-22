@@ -2,6 +2,8 @@ package beans;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.LocalBean;
@@ -36,6 +38,10 @@ public class SessionHolder implements SessionHolderLocal {
     
     public boolean isContained(String id){
     	return sessionMap.containsKey(id);
+    }
+    
+    public Set<Entry<String, Session>> getEntry(){
+    	return sessionMap.entrySet();
     }
 
 }

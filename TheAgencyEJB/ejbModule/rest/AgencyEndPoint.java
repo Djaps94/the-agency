@@ -127,7 +127,7 @@ public class AgencyEndPoint {
 		String[] typesPart = type.split(":");
 		AID agent = new AID();
 		AgentType t = new AgentType(typesPart[1].trim(), typesPart[0].trim());
-		agent.setType(t); agent.setName(name); agent.setHost(registry.getThisCenter());
+		agent.setType(t); agent.setName(name);
 		if(manager.getSupportedTypes().contains(t)){
 			return agentManager.startAgent(agent);
 		}else{

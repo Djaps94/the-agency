@@ -32,6 +32,7 @@ public class AgentManager implements AgentManagerLocal {
 
 	@Override
 	public AID startAgent(AID aid) {
+		aid.setHost(registry.getThisCenter());
 		manager.getRunningAgents().add(aid);
 		HandshakeMessage message = new HandshakeMessage(handshakeType.ADD_AGENT);
 		message.setAid(aid);

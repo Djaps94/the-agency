@@ -9,11 +9,11 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 	
 	//Opening socket
 	var url = window.location;
-	var wsadress = "ws://"+url.hostname+":"+url.port+"/TheAgency/socket/agents";
+	var wsadress = "ws://"+url.hostname+":"+url.port+"/TheAgency/agents";
 	
 	
 	try{
-		var socket = WebSocket(wsadress);
+		socket = new WebSocket(wsadress);
 		
 		socket.onopen = function(){
 			console.log("Socket towards agents opened.");
@@ -25,14 +25,14 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 		}
 		
 		socket.onmessage = function(message){
+			var socketMessage = JSON.parse(message.data);
 			if($rootScope.action.valueSocket){
-				var socketMessage = JSON.parse(message);
 				switch(socketMessage.msgType){
-				case 'ADD_TYPE'  : break;
-				case 'ADD_AGENT' : break;
-				case 'SEND_MESSAGE' : break;
-				case 'REMOVE_TYPE': break;
-				case 'REMOVE_AGENT' : break;
+				case 'ADD_TYPE'   : socketAgentTypes(socketMessage); break;
+				case 'GET_TYPES'  : socketAgentTypes(socketMessage); break;
+				case 'GET_AGENTS' : socketRunningAgents(socketMessage); break;
+				case 'START_AGENT': socketStartAgents(socketMessage); break;
+				case 'STOP_AGENT' : break;
 				}
 			}
 		}
@@ -99,9 +99,26 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 				});
 			});
 		}else if($rootScope.action.valueSocket){
-			
+			var socketMessage = {
+					msgType : 'GET_TYPES'
+			};
+			socket.send(JSON.stringify(socketMessage));
 		}
 	};
+	
+	//get all agent types via socket
+	var socketAgentTypes = function(socketMessage){
+		socketMessage.agentTypes.forEach(function(el){
+			for(x in $scope.agentCollections.agentTypes){
+				if($scope.agentCollections.agentTypes[x].name === el.name && 
+				   $scope.agentCollections.agentTypes[x].module === el.module)
+					return;
+			}
+				$rootScope.$apply(function(){
+					$scope.agentCollections.agentTypes.push(el);
+				});
+		});
+	}
 	
 	//Get all running agents
 	$scope.getRunning = function(){
@@ -114,9 +131,23 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 				});
 			});
 		}else if($rootScope.action.valueSocket){
-			//ws message
+			var socketMessage = {
+					msgType : 'GET_AGENTS'
+			};
+			socket.send(JSON.stringify(socketMessage));
 		}
 	};
+	
+	//get all running agents via socket
+	var socketRunningAgents = function(socketMessage){
+		socketMessage.runningAgents.forEach(function(el){
+			if(checkRunningAgents($scope.agentCollections.runningAgents, el))
+				return;
+			$scope.$apply(function(){
+				$scope.agentCollections.runningAgents.push(el);
+			});
+		});	
+	}
 	
 	//startAgent
 	$scope.startAgent = function(typeModule, typeName){
@@ -134,9 +165,21 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 					$scope.agentInfo.name = "";
 				 });
 			}else if($rootScope.action.valueSocket){
-				//ws
+				var socketMessage = {
+						msgType : 'START_AGENT',
+						
+				};
 			}
 		};
+	
+	//start agents via socket
+	var socketStartAgents = function(socketMessage){
+		if(checkRunningAgents($scope.agentCollections.runningAgents, socketMessage.aid))
+			return;
+		$scope.$apply(function(){
+			$scope.agentCollections.runningAgents.push(socketMessage.aid);
+		});
+	}
 		
 	$scope.stopAgent = function(AID){
 		if($rootScope.action.valueREST){

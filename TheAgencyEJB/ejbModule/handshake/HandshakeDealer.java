@@ -16,6 +16,7 @@ import beans.AgencyManagerLocal;
 import beans.AgencyRegistryLocal;
 import beans.AgentManagerLocal;
 import beans.NetworkManagmentLocal;
+import beans.SocketSenderLocal;
 import exceptions.ConnectionException;
 import exceptions.NodeExistsException;
 import exceptions.RegisterSlaveException;
@@ -24,6 +25,8 @@ import model.AgentCenter;
 import model.AgentType;
 import model.HandshakeMessage;
 import model.HandshakeMessage.handshakeType;
+import util.SocketMessage;
+import util.SocketMessage.messageType;
 
 @Stateless
 public class HandshakeDealer implements HandshakeDealerLocal{
@@ -42,6 +45,9 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 	
 	@EJB
 	private AgentManagerLocal agentManager;
+	
+	@EJB
+	private SocketSenderLocal socketSender;
 	
 	public HandshakeDealer() { }
 	
@@ -80,6 +86,10 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 				if(!center.getAlias().equals(message.getCenter().getAlias()))
 						requester.sendMessage(center.getAddress(), message);
 			}
+			SocketMessage msg = new SocketMessage();
+			msg.setMsgType(messageType.ADD_TYPE);
+			msg.setAgentTypes(message.getAgentTypes());
+			socketSender.socketSend(msg);
 			return returnSet;
 		}	
 		return returnSet;
@@ -101,6 +111,7 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 		registry.deleteCenter(message.getCenter());
 		manager.deleteOtherTypes(message.getCenter().getAlias());
 		manager.getRunningAgents().removeAll(message.getRunningAgents());
+		//TODO: ws
 	}
 	
 	public Map<String,List<AID>> getRunningAgents(){
@@ -112,7 +123,6 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 	@Override
 	public void deleteAgent(HandshakeMessage message) {
 		manager.getCenterAgents().get(message.getCenter().getAlias()).remove(message.getAid());
-		//TODO: ws
 	}
 
 	@Override
@@ -124,18 +134,25 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 			list.add(message.getAid());
 			manager.getCenterAgents().put(message.getCenter().getAlias(), list);
 		}
-		//TODO: ws
 	}
 
 	@Override
 	public AID runAgent(HandshakeMessage message) {
-		return agentManager.startAgent(message.getAid());
-		//TODO: ws
+		AID aid = agentManager.startAgent(message.getAid());
+		SocketMessage msg = new SocketMessage();
+		msg.setMsgType(messageType.START_AGENT);
+		msg.setAid(aid);
+		socketSender.socketSend(msg);
+		return aid;
 	}
 	
 	public AID stopAgent(HandshakeMessage message){
-		return agentManager.stopAgent(message.getAid());
-		
+		AID aid = agentManager.stopAgent(message.getAid());
+		SocketMessage msg = new SocketMessage();
+		msg.setMsgType(messageType.STOP_AGENT);
+		msg.setAid(aid);
+		socketSender.socketSend(msg);
+		return aid;
 	}
 	
 }
