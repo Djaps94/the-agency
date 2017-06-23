@@ -16,7 +16,9 @@ public class SocketMessage implements Serializable{
 							  ADD_TYPE,
 							  SEND_MESSAGE,
 							  START_AGENT,
-							  STOP_AGENT
+							  STOP_AGENT,
+							  REMOVE_AGENTS,
+							  REMOVE_TYPES
 	};
 	
 	private AID aid;

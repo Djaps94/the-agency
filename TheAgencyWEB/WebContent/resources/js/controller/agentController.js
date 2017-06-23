@@ -63,6 +63,8 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 				case 'GET_AGENTS' : socketRunningAgents(socketMessage); break;
 				case 'START_AGENT': socketStartAgents(socketMessage);	break;
 				case 'STOP_AGENT' : socketStopAgents(socketMessage);	break;
+				case 'REMOVE_AGENTS': socketRemoveAgents(socketMessage);break;
+				case 'REMOVE_TYPES': socketRemoveTypes(socketMessage); break;
 				}
 			}
 		}
@@ -123,7 +125,7 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 					for(x in $scope.agentCollections.agentTypes){
 						if($scope.agentCollections.agentTypes[x].name === el.name && 
 						   $scope.agentCollections.agentTypes[x].module === el.module)
-							continue;
+							break;
 					}
 						$scope.agentCollections.agentTypes.push(el);
 				});
@@ -290,6 +292,38 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 			$scope.ACLMessage.recievers = [];
 			$scope.ACLMessage.replyTo = null;
 			$scope.ACLMessage.performative = "";
+		}
+	}
+	
+	var socketRemoveTypes = function(socketMessage){
+		var index = -1;
+		for(y in socketMessage.agentTypes){
+			for(x = 0; x < $scope.agentCollections.agentTypes.length; x++){
+				if($scope.agentCollections.agentTypes[x].name === socketMessage.agentTypes[y].name){
+					index = x;
+					break;
+				}
+			 }
+			if(index > -1)
+				$scope.$apply(function(){
+					$scope.agentCollections.agentTypes.splice(index, 1);
+				});
+		}
+	}
+	
+	var socketRemoveAgents = function(socketMessage){
+		var index = -1;
+		for(y in socketMessage.runningAgents){
+			for(x = 0; x < $scope.agentCollections.runningAgents.length; x++){
+				if($scope.agentCollections.runningAgents[x].name === socketMessage.runningAgents[y].name){
+					index = x;
+					break;
+				}
+			}
+			if(index > -1)
+				$scope.$apply(function(){
+					$scope.agentCollections.runningAgents.splice(index, 1);
+				});
 		}
 	}
 	

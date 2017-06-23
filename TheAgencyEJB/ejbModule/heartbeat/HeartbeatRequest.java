@@ -3,6 +3,7 @@ package heartbeat;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -25,8 +26,13 @@ import com.rabbitmq.client.ConnectionFactory;
 
 import beans.AgencyManagerLocal;
 import beans.AgencyRegistryLocal;
+import beans.SocketSenderLocal;
+import model.AID;
 import model.AgentCenter;
+import model.AgentType;
 import util.HeartbeatConsumer;
+import util.SocketMessage;
+import util.SocketMessage.messageType;
 
 
 @Singleton
@@ -41,6 +47,9 @@ public class HeartbeatRequest implements HeartbeatRequestLocal {
 	
 	@EJB
 	private AgencyManagerLocal manager;
+	
+	@EJB
+	private SocketSenderLocal socketSender;
 	
 	private ConnectionFactory factory;
 	private Connection connection;
@@ -71,7 +80,7 @@ public class HeartbeatRequest implements HeartbeatRequestLocal {
 
 	@Override
 	public void startTimer() {
-		timer.createIntervalTimer(1000*45, 1000*45, new TimerConfig("Heartbeat", false));
+		timer.createIntervalTimer(1000*30, 1000*30, new TimerConfig("Heartbeat", false));
 	}
 	
 	@Timeout
@@ -113,9 +122,20 @@ public class HeartbeatRequest implements HeartbeatRequestLocal {
 	private void removeDeadCenter(List<AgentCenter> centers){
 		for(AgentCenter center : centers){
 			registry.deleteCenter(center);
+			Set<AgentType> types = manager.getOtherSupportedTypes().get(center.getAlias());
 			manager.deleteOtherTypes(center.getAlias());
-			if(!manager.getCenterAgents().isEmpty())
+			SocketMessage m = new SocketMessage();
+			m.setMsgType(messageType.REMOVE_TYPES);
+			m.setAgentTypes(types);
+			socketSender.socketSend(m);
+			if(!manager.getCenterAgents().isEmpty()){
+				List<AID> list = manager.getCenterAgents().get(center.getAlias());
 				manager.getCenterAgents().remove(center.getAlias());
+				SocketMessage message = new SocketMessage();
+				message.setMsgType(messageType.REMOVE_AGENTS);
+				message.setRunningAgents(list);
+				socketSender.socketSend(message);
+			}
 		}
 	}
 }

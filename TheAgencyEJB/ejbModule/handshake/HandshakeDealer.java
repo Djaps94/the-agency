@@ -102,17 +102,34 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 	public void rollback(HandshakeMessage message) throws ConnectionException, IOException, TimeoutException, InterruptedException{
 		if(nodesManagment.isMaster()){
 			registry.deleteCenter(message.getCenter());
+			Set<AgentType> type = manager.getOtherSupportedTypes().get(message.getCenter().getAlias());
 			manager.deleteOtherTypes(message.getCenter().getAlias());
 			manager.getRunningAgents().removeAll(message.getRunningAgents());
+			SocketMessage msg = new SocketMessage();
+			msg.setMsgType(messageType.REMOVE_AGENTS);
+			msg.setRunningAgents(message.getRunningAgents());
+			socketSender.socketSend(msg);
+			SocketMessage m = new SocketMessage();
+			msg.setMsgType(messageType.REMOVE_TYPES);
+			msg.setAgentTypes(type);
+			socketSender.socketSend(m);
 			for(AgentCenter center : registry.getCenters())
 				requester.sendMessage(center.getAddress(), message);
 			return;
 		}
 		
 		registry.deleteCenter(message.getCenter());
+		Set<AgentType> types = manager.getOtherSupportedTypes().get(message.getCenter().getAlias());
 		manager.deleteOtherTypes(message.getCenter().getAlias());
 		manager.getRunningAgents().removeAll(message.getRunningAgents());
-		//TODO: ws
+		SocketMessage msg = new SocketMessage();
+		msg.setMsgType(messageType.REMOVE_AGENTS);
+		msg.setRunningAgents(message.getRunningAgents());
+		socketSender.socketSend(msg);
+		SocketMessage m = new SocketMessage();
+		msg.setMsgType(messageType.REMOVE_TYPES);
+		msg.setAgentTypes(types);
+		socketSender.socketSend(m);
 	}
 	
 	public Map<String,List<AID>> getRunningAgents(){

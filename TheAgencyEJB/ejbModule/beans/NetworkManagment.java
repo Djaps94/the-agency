@@ -6,6 +6,7 @@ import java.net.UnknownHostException;
 import java.util.concurrent.TimeoutException;
 
 import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.ejb.EJB;
 import javax.ejb.Local;
 import javax.ejb.Singleton;
@@ -189,6 +190,11 @@ public class NetworkManagment implements NetworkManagmentLocal{
 		message.setCenter(slave);
 		message.setRunningAgents(agency.getRunningAgents());
 		return message;
+	}
+	
+	@PreDestroy
+	private void destroy(){
+		
 	}
 	
 	private void shutdownServer(){
