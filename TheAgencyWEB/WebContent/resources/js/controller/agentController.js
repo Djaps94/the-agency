@@ -271,6 +271,12 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 					'Content-type' : 'application/json;charset=utf-8'
 				}
 			});
+			socket.send(JSON.stringify(socketMessage));
+			$scope.ACLMessage.content = "";
+			$scope.ACLMessage.sender = null;
+			$scope.ACLMessage.recievers = [];
+			$scope.ACLMessage.replyTo = null;
+			$scope.ACLMessage.performative = "";
 		}else if($rootScope.action.valueSocket){
 			var acl = JSON.parse(data);
 			var socketMessage = {

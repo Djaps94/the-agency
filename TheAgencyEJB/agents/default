@@ -1,2 +1,2 @@
 ejbModule.agents PongAgent
-ejbModule.agents ContractNetMaster
+ejbModule.agents ContractNetInitiator

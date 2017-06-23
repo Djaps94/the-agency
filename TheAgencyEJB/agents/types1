@@ -1,2 +1,2 @@
 ejbModule.agents PingAgent 
-ejbModule.agents MapReduceMaster
+ejbModule.agents ContractNetParticipant

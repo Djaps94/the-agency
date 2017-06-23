@@ -43,7 +43,6 @@ public class Handler implements HandlerLocal{
 			}else{
 				for(Entry<String, List<AID>> entry : agency.getCenterAgents().entrySet()){
 					if(entry.getKey().equals(aid.getHost().getAlias())){
-						System.out.println("Poruka za: "+aid.getName());
 						rabbit.notifyCenter(message, aid, entry.getKey());
 						break;
 					}
