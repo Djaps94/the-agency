@@ -8,11 +8,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import agents.*;
 
 @SuppressWarnings("serial")
-@JsonTypeInfo(use = JsonTypeInfo.Id.CLASS, include = JsonTypeInfo.As.PROPERTY, property = "type")
-@JsonSubTypes({
-	@JsonSubTypes.Type(value = PingAgent.class, name = "Ping"),
-	@JsonSubTypes.Type(value = PongAgent.class, name = "Pong")
-})
 public abstract class Agent implements Serializable{
 	
 	protected AID id;

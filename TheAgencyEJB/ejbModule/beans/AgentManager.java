@@ -6,10 +6,13 @@ import java.util.concurrent.TimeoutException;
 import javax.ejb.EJB;
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 
 import exceptions.ConnectionException;
 import handshake.HandshakeRequesterLocal;
 import model.AID;
+import model.Agent;
 import model.HandshakeMessage;
 import model.HandshakeMessage.handshakeType;
 import util.SocketMessage;
@@ -38,6 +41,14 @@ public class AgentManager implements AgentManagerLocal {
 	@Override
 	public AID startAgent(AID aid) {
 		aid.setHost(registry.getThisCenter());
+		try {
+			InitialContext context = new InitialContext();
+			Agent agent = (Agent)context.lookup("java:module/"+aid.getType().getName());
+			agent.setId(aid);
+			manager.getStartedAgents().add(agent);
+		} catch (NamingException e1) {
+			e1.printStackTrace();
+		}
 		manager.getRunningAgents().add(aid);
 		HandshakeMessage message = new HandshakeMessage(handshakeType.ADD_AGENT);
 		message.setAid(aid);

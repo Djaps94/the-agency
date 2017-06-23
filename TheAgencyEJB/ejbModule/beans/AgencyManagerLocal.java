@@ -8,6 +8,7 @@ import javax.ejb.Local;
 
 import model.ACLMessage.Performative;
 import model.AID;
+import model.Agent;
 import model.AgentType;
 
 @Local
@@ -25,4 +26,5 @@ public interface AgencyManagerLocal {
 	public Performative getPerformative();
 	public Map<String, List<AID>> getCenterAgents();
 	public void setCenterAgents(Map<String, List<AID>> centerAgents);
+	public List<Agent> getStartedAgents();
 }

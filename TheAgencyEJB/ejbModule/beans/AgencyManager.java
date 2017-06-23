@@ -12,6 +12,7 @@ import javax.ejb.Singleton;
 
 import model.ACLMessage.Performative;
 import model.AID;
+import model.Agent;
 import model.AgentType;
 
 @Singleton
@@ -21,6 +22,7 @@ public class AgencyManager implements AgencyManagerLocal {
 	private Map<String, List<AID>> centerAgents;
 	private Set<AgentType> supportedTypes; 
 	private Map<String,Set<AgentType>> otherSupportedTypes;
+	private List<Agent> startedAgents;
 	private Performative performative;
 	
 	public AgencyManager() { }
@@ -31,6 +33,7 @@ public class AgencyManager implements AgencyManagerLocal {
 		this.supportedTypes = new HashSet<AgentType>();
 		this.otherSupportedTypes = new HashMap<String, Set<AgentType>>();
 		this.centerAgents = new HashMap<String, List<AID>>();
+		startedAgents = new ArrayList<Agent>();
 	}
 	
 	public Performative getPerformative(){
@@ -82,6 +85,14 @@ public class AgencyManager implements AgencyManagerLocal {
 
 	public void setCenterAgents(Map<String, List<AID>> centerAgents) {
 		this.centerAgents = centerAgents;
+	}
+
+	public List<Agent> getStartedAgents() {
+		return startedAgents;
+	}
+
+	public void setStartedAgents(List<Agent> startedAgents) {
+		this.startedAgents = startedAgents;
 	}
 	
 	
