@@ -279,6 +279,11 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 			};
 			
 			socket.send(JSON.stringify(socketMessage));
+			$scope.ACLMessage.content = "";
+			$scope.ACLMessage.sender = null;
+			$scope.ACLMessage.recievers = [];
+			$scope.ACLMessage.replyTo = null;
+			$scope.ACLMessage.performative = "";
 		}
 	}
 	

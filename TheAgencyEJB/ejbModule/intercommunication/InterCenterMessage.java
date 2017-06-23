@@ -3,16 +3,19 @@ package intercommunication;
 import java.io.Serializable;
 
 import model.ACLMessage;
+import model.AID;
 
 @SuppressWarnings("serial")
 public class InterCenterMessage implements Serializable{
 	
 	private ACLMessage message;
-	private String agentName;
+	private AID aid;
 	
-	public InterCenterMessage(ACLMessage message, String name){
+	public InterCenterMessage() { }
+	
+	public InterCenterMessage(ACLMessage message, AID aid){
 		this.message   = message;
-		this.agentName = name;
+		this.aid = aid;
 	}
 	
 	public ACLMessage getMessage() {
@@ -21,11 +24,11 @@ public class InterCenterMessage implements Serializable{
 	public void setMessage(ACLMessage message) {
 		this.message = message;
 	}
-	public String getAgentName() {
-		return agentName;
+	public AID getAid() {
+		return aid;
 	}
-	public void setAgentName(String agentName) {
-		this.agentName = agentName;
+	public void setAid(AID aid) {
+		this.aid = aid;
 	}
 	
 

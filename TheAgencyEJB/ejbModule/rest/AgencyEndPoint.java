@@ -22,13 +22,12 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import beans.AgencyManagerLocal;
 import beans.AgencyRegistryLocal;
 import beans.AgentManagerLocal;
 import exceptions.ConnectionException;
 import handshake.HandshakeRequesterLocal;
+import intercommunication.HandlerLocal;
 import intercommunication.MessageDispatcherLocal;
 import intercommunication.RabbitDispatcherLocal;
 import model.ACLMessage;
@@ -60,6 +59,9 @@ public class AgencyEndPoint {
 	
 	@EJB
 	private RabbitDispatcherLocal rabbit;
+	
+	@EJB
+	private HandlerLocal handler;
 
 	@GET
 	@Path("/agents/classes")
@@ -99,22 +101,7 @@ public class AgencyEndPoint {
 	@Path("/messages")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public void sendMessageToAgent(ACLMessage message){
-		for(AID aid : message.getRecievers()){
-			if(aid.getHost().getAlias().equals(registry.getThisCenter().getAlias())){
-				dispatcher.sendMesssage(message, aid.getName());
-			}else{
-				for(Entry<String, List<AID>> entry : manager.getCenterAgents().entrySet()){
-					if(entry.getKey().equals(aid.getHost().getAlias())){
-						AID a = entry.getValue().stream()
-												  .filter(id -> id.equals(aid))
-												  .findFirst()
-												  .get();
-						
-						rabbit.notifyCenter(message, a.getName());
-						}
-					}
-				}
-			}
+		handler.sendAgentMessage(message);
 	}
 	
 	@PUT

@@ -71,7 +71,7 @@ public class HeartbeatRequest implements HeartbeatRequestLocal {
 
 	@Override
 	public void startTimer() {
-		timer.createIntervalTimer(1000*15, 1000*15, new TimerConfig("Heartbeat", false));
+		timer.createIntervalTimer(1000*45, 1000*45, new TimerConfig("Heartbeat", false));
 	}
 	
 	@Timeout

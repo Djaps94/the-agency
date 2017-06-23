@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Map.Entry;
-import java.util.concurrent.TimeoutException;
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeoutException;
 
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.EJB;
@@ -30,8 +30,7 @@ import beans.AgentManagerLocal;
 import beans.SessionHolderLocal;
 import exceptions.ConnectionException;
 import handshake.HandshakeRequesterLocal;
-import intercommunication.MessageDispatcherLocal;
-import intercommunication.RabbitDispatcherLocal;
+import intercommunication.HandlerLocal;
 import model.ACLMessage;
 import model.AID;
 import model.AgentCenter;
@@ -64,10 +63,7 @@ public class AgencySocket implements MessageListener{
 	private AgentManagerLocal agentManager;
 	
 	@EJB
-	private MessageDispatcherLocal dispatcher;
-	
-	@EJB
-	private RabbitDispatcherLocal rabbit;
+	private HandlerLocal handler;
 	
 	@OnOpen
 	public void onOpen(Session session){
@@ -76,8 +72,7 @@ public class AgencySocket implements MessageListener{
 	
 	@OnClose
 	public void onClose(Session session) throws IOException{
-		sessionHolder.removeSession(session.getId());
-		session.close();
+		//sessionHolder.removeSession(session.getId());
 	}
 	
 	@OnMessage
@@ -91,7 +86,7 @@ public class AgencySocket implements MessageListener{
 				case    GET_TYPES: getAgentTypes(session, mapper); break;
 				case  START_AGENT: startAgent(session, mapper, msg);
 				case   STOP_AGENT: stopAgent(session, mapper, msg.getAid());
-				case SEND_MESSAGE: sendMessage(session, mapper, msg.getMessage()); 
+				case SEND_MESSAGE: sendMessage(msg.getMessage()); 
 				default:
 					break;
 				}
@@ -181,23 +176,8 @@ public class AgencySocket implements MessageListener{
 		}
 	}
 	
-	private void sendMessage(Session session, ObjectMapper mapper, ACLMessage message){
-		for(AID aid : message.getRecievers()){
-			if(aid.getHost().getAlias().equals(registry.getThisCenter().getAlias())){
-				dispatcher.sendMesssage(message, aid.getName());
-			}else{
-				for(Entry<String, List<AID>> entry : agency.getCenterAgents().entrySet()){
-					if(entry.getKey().equals(aid.getHost().getAlias())){
-						AID a = entry.getValue().stream()
-												  .filter(id -> id.equals(aid))
-												  .findFirst()
-												  .get();
-						
-						rabbit.notifyCenter(message, a.getName());
-						}
-					}
-				}
-			}
+	private void sendMessage(ACLMessage message){
+		handler.sendAgentMessage(message);
 	}
 
 }

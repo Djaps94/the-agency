@@ -15,6 +15,7 @@ import com.rabbitmq.client.ConnectionFactory;
 
 import beans.AgencyRegistryLocal;
 import model.ACLMessage;
+import model.AID;
 
 @Singleton
 public class RabbitDispatcher implements RabbitDispatcherLocal{
@@ -43,11 +44,12 @@ public class RabbitDispatcher implements RabbitDispatcherLocal{
 	}
 	
 	
-	public void notifyCenter(ACLMessage message, String name){
+	public void notifyCenter(ACLMessage message, AID aid, String alias){
 		try {
-			InterCenterMessage msg = new InterCenterMessage(message, name);
+			InterCenterMessage msg = new InterCenterMessage(message, aid);
 			String data = mapper.writeValueAsString(msg);
-			channel.basicPublish("", registry.getThisCenter()+"/"+"ACL", new BasicProperties().builder().build(), data.getBytes());
+			BasicProperties props = new BasicProperties().builder().replyTo(alias+"/"+"ACL").build();
+			channel.basicPublish("", alias+"/"+"ACL", props, data.getBytes());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

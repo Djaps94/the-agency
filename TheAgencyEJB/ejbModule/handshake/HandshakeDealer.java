@@ -106,6 +106,7 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 			manager.getRunningAgents().removeAll(message.getRunningAgents());
 			for(AgentCenter center : registry.getCenters())
 				requester.sendMessage(center.getAddress(), message);
+			return;
 		}
 		
 		registry.deleteCenter(message.getCenter());
@@ -123,6 +124,10 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 	@Override
 	public void deleteAgent(HandshakeMessage message) {
 		manager.getCenterAgents().get(message.getCenter().getAlias()).remove(message.getAid());
+		SocketMessage msg = new SocketMessage();
+		msg.setMsgType(messageType.STOP_AGENT);
+		msg.setAid(message.getAid());
+		socketSender.socketSend(msg);
 	}
 
 	@Override
@@ -134,6 +139,10 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 			list.add(message.getAid());
 			manager.getCenterAgents().put(message.getCenter().getAlias(), list);
 		}
+		SocketMessage msg = new SocketMessage();
+		msg.setMsgType(messageType.START_AGENT);
+		msg.setAid(message.getAid());
+		socketSender.socketSend(msg);
 	}
 
 	@Override

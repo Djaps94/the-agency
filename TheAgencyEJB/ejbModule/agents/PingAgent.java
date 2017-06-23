@@ -1,8 +1,5 @@
 package agents;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.ejb.EJB;
 import javax.ejb.Stateful;
 
@@ -10,7 +7,6 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import intercommunication.MessageDispatcherLocal;
 import model.ACLMessage;
-import model.ACLMessage.Performative;
 import model.AID;
 import model.Agent;
 
@@ -65,18 +61,6 @@ public class PingAgent extends Agent {
 		case REJECT_PROPOSAL:
 			break;
 		case REQUEST: {
-			System.out.println("Request message recieved from: "+message.getSender().getName());
-			System.out.println("Message content: "+message.getContent());
-			ACLMessage responseMessage = new ACLMessage();
-			List<AID> recievers = new ArrayList<AID>();
-			recievers.add(message.getReplyTo());
-			responseMessage.setPerformative(Performative.REQUEST);
-			responseMessage.setRecievers(recievers);
-			responseMessage.setSender(getId());
-			responseMessage.setReplyTo(getId());
-			responseMessage.setContent("Ping is sending warm welcome message");
-			
-			dispatcher.sendMesssage(responseMessage, message.getReplyTo().getName());
 		}
 			break;
 		case REQUEST_WHEN:

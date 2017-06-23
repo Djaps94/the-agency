@@ -11,18 +11,26 @@ import com.rabbitmq.client.Envelope;
 public class HandlerConsumer extends DefaultConsumer{
 	
 	private MessageDispatcherLocal dispatcher;
+	private Channel channel;
 
 	public HandlerConsumer(Channel channel, MessageDispatcherLocal dispatcher) {
 		super(channel);
 		this.dispatcher = dispatcher;
+		this.channel = channel;
 	}
 	
 	@Override
-	public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body) throws IOException {
+	public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body){
 		String data = new String(body);
 		ObjectMapper mapper = new ObjectMapper();
-		InterCenterMessage message = (InterCenterMessage) mapper.readValue(data, InterCenterMessage.class);
-		dispatcher.sendMesssage(message.getMessage(), message.getAgentName());
+		try {
+			channel.basicAck(envelope.getDeliveryTag(), false);
+			InterCenterMessage message = (InterCenterMessage) mapper.readValue(data, InterCenterMessage.class);
+			dispatcher.sendMesssage(message.getMessage(), message.getAid());
+			channel.basicPublish("", properties.getReplyTo(), new BasicProperties().builder().build(), "Message delivered".getBytes());
+		} catch (IOException e) {
+			return;
+		};
 	}
 
 }

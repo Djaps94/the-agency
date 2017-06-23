@@ -17,6 +17,7 @@ import handshake.HandshakeRequesterLocal;
 import handshake.HandshakeResponseLocal;
 import heartbeat.HeartBeatResponseLocal;
 import heartbeat.HeartbeatRequestLocal;
+import intercommunication.HandlerRabbitLocal;
 import model.AgentCenter;
 import model.HandshakeMessage;
 import model.HandshakeMessage.handshakeType;
@@ -55,6 +56,9 @@ public class NetworkManagment implements NetworkManagmentLocal{
 	@EJB
 	private HandshakeResponseLocal handshakeResponse;
 	
+	@EJB
+	private HandlerRabbitLocal rabbitHandler;
+	
 	@PostConstruct
 	public void initialise(){		
 		if(System.getProperty(MASTER) == null){
@@ -65,6 +69,7 @@ public class NetworkManagment implements NetworkManagmentLocal{
 				hrequester.startTimer();
 				hresponse.pulseTick();
 				handshakeResponse.waitMessage();
+				rabbitHandler.recieveMessage();
 			} catch (IOException e) {
 				//TODO: shutdown script
 			}
@@ -78,6 +83,7 @@ public class NetworkManagment implements NetworkManagmentLocal{
 			registryBean.setThisCenter(slave);
 			master = false;
 			handshakeResponse.waitMessage();
+			rabbitHandler.recieveMessage();
 			try {
 				HandshakeMessage message = sendMessageToMaster(masterIpAddress, slave);
 				if(message != null){

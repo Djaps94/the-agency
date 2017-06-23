@@ -8,7 +8,7 @@ import javax.ejb.Stateful;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
-import intercommunication.MessageDispatcherLocal;
+import intercommunication.HandlerLocal;
 import model.ACLMessage;
 import model.ACLMessage.Performative;
 import model.AID;
@@ -20,7 +20,7 @@ import model.Agent;
 public class PongAgent extends Agent {
 
 	@EJB
-	private MessageDispatcherLocal dispatcher;
+	private HandlerLocal handler;
 	
 	@Override
 	public void handleMessage(ACLMessage message) {
@@ -71,7 +71,7 @@ public class PongAgent extends Agent {
 			recievers.add(message.getReplyTo());
 			msg.setRecievers(recievers);
 			msg.setSender(getId());
-			dispatcher.sendMesssage(message, message.getReplyTo().getName());
+			handler.sendAgentMessage(msg);
 		}
 			break;
 		case REQUEST_WHEN:

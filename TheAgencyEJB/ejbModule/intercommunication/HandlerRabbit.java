@@ -14,7 +14,7 @@ import com.rabbitmq.client.ConnectionFactory;
 import beans.AgencyRegistryLocal;
 
 @Singleton
-public class HandlerRabbit {
+public class HandlerRabbit implements HandlerRabbitLocal{
 
 	@EJB
 	private AgencyRegistryLocal registry;
@@ -46,7 +46,7 @@ public class HandlerRabbit {
 	
 	public void recieveMessage(){
 		try {
-			channel.queueDeclare(registry.getThisCenter().getAddress()+"/"+"ACL",false, false, false, null);
+			channel.queueDeclare(registry.getThisCenter().getAlias()+"/"+"ACL",false, false, false, null);
 			channel.basicQos(1);
 			HandlerConsumer consumer = new HandlerConsumer(channel, dispatcher);
 			channel.basicConsume(registry.getThisCenter().getAlias()+"/"+"ACL", false, consumer);
