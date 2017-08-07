@@ -12,7 +12,6 @@ import javax.ejb.Singleton;
 import model.AID;
 import model.Agent;
 
-
 @Singleton
 @LocalBean
 public class AgentRegistry implements AgentRegistryLocal {
@@ -20,53 +19,52 @@ public class AgentRegistry implements AgentRegistryLocal {
 	private List<AID> runningAID;
 	private List<Agent> runningAgents;
 
-    public AgentRegistry() {
- 
-    }
-    
-    @PostConstruct
-    private void initialise() {
-    	this.runningAID  = new ArrayList<AID>();
-		this.runningAgents  = new ArrayList<Agent>();
-    }
-    
+	public AgentRegistry() {
+
+	}
+
+	@PostConstruct
+	private void initialise() {
+		this.runningAID = new ArrayList<AID>();
+		this.runningAgents = new ArrayList<Agent>();
+	}
+
 	public Iterator<AID> getRunningAID() {
 		return runningAID.iterator();
 	}
-	
+
 	public Stream<AID> getRunningAIDStream() {
 		return runningAID.stream();
 	}
-	
+
 	public void addRunningAID(AID aid) {
 		runningAID.add(aid);
 	}
-	
+
 	public void removeRunningAID(AID aid) {
 		runningAID.remove(aid);
 	}
-	
+
 	public void removeAllRunningAIDs(Iterator<AID> agents) {
-		while(agents.hasNext())
+		while (agents.hasNext())
 			runningAID.remove(agents.next());
 	}
-	
+
 	public void setRunningAID(List<AID> runningAgents) {
 		this.runningAID = runningAgents;
 	}
-	
 
 	public Iterator<Agent> getRunningAgents() {
 		return runningAgents.iterator();
 	}
-	
+
 	public void addRunningAgent(Agent agent) {
 		this.runningAgents.add(agent);
 	}
-	
+
 	public void removeRunningAgent(AID agent) {
-		for(Agent a : runningAgents){
-			if(a.getId().equals(agent))
+		for (Agent a : runningAgents) {
+			if (a.getId().equals(agent))
 				this.runningAgents.remove(a);
 		}
 	}

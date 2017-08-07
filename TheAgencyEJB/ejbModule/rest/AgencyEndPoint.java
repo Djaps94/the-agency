@@ -89,14 +89,11 @@ public class AgencyEndPoint {
 		List<AID> agents = new ArrayList<AID>();
 		Iterator<AID> agentsIter = agentRegistry.getRunningAID();
 		
-		if(!agentsIter.hasNext())
-			while(agentsIter.hasNext())
-				agents.add(agentsIter.next());
+		while(agentsIter.hasNext())
+			agents.add(agentsIter.next());
 		
-		if(!manager.getCenterAgents().hasNext()){
-			while(manager.getCenterAgents().hasNext())
-				agents.addAll(manager.getCenterAgents().next().getValue());
-		}
+		while(manager.getCenterAgents().hasNext())
+			agents.addAll(manager.getCenterAgents().next().getValue());
 		
 		return agents;
 	}
@@ -127,15 +124,18 @@ public class AgencyEndPoint {
 		AgentType t = new AgentType(typesPart[1].trim(), typesPart[0].trim());
 		agent.setType(t); 
 		agent.setName(name);
+		
 		if(manager.isSupportedContained(t)){
 			return agentManager.startAgent(agent);
 		}else{
 			while(manager.getOtherSupportedTypes().hasNext()){
 				Entry<String, Set<AgentType>> entry = manager.getOtherSupportedTypes().next();
+				
 				if(entry.getValue().contains(t)){
 					Optional<AgentCenter> center = registry.getCenters().filter(cent -> cent.getAlias().equals(entry.getKey())).findFirst();
 					ServiceMessage message = new ServiceMessage(OperationType.RUN_AGENT);
 					message.setAid(agent);
+					
 					if(center.isPresent())
 						try {
 							ServiceMessage msg = request.sendMessage(center.get().getAddress(), message);
@@ -161,6 +161,7 @@ public class AgencyEndPoint {
 		}else{
 			ServiceMessage message = new ServiceMessage(OperationType.STOP_AGENT);
 			message.setAid(agentID);
+			
 			try {
 				ServiceMessage msg = request.sendMessage(agentID.getHost().getAddress(), message);
 				return msg.getAid();

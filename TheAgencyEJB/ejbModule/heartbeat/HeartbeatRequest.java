@@ -62,55 +62,50 @@ public class HeartbeatRequest implements HeartbeatRequestLocal {
 
     }
     
-    @PostConstruct
-    private void initalise(){
-    	
-    	try {
-    		factory  = new ConnectionFactory();
-        	response = new ArrayBlockingQueue<>(1);
-        	factory.setHost("127.0.0.1");
-        	factory.setPort(5672);
-        	factory.setVirtualHost("/");
+	@PostConstruct
+	private void initalise() {
+
+		try {
+			factory = new ConnectionFactory();
+			response = new ArrayBlockingQueue<>(1);
+			factory.setHost("127.0.0.1");
+			factory.setPort(5672);
+			factory.setVirtualHost("/");
 			connection = factory.newConnection();
-			channel    = connection.createChannel();
+			channel = connection.createChannel();
 			ReplyQueueName = channel.queueDeclare().getQueue();
-		} catch (IOException | TimeoutException e) { }
+		} catch (IOException | TimeoutException e) {
+		}
 		RequestQueueName = "Heartbeat";
-    }
+	}
 
 	@Override
 	public void startTimer() {
-		timer.createIntervalTimer(1000*30, 1000*30, new TimerConfig("Heartbeat", false));
+		timer.createIntervalTimer(1000 * 30, 1000 * 30, new TimerConfig("Heartbeat", false));
 	}
-	
+
 	@Timeout
-	private void sendPulse(Timer timer){
+	private void sendPulse(Timer timer) {
 		List<AgentCenter> deadList = new ArrayList<>();
+
 		registry.getCenters().forEach(center -> {
-			String data = checkPulse(center);
-			if(data == null){
-				String temp = checkPulse(center);
-				if(temp == null){
+			if (checkPulse(center) == null) {
+				if (checkPulse(center) == null) {
 					deadList.add(center);
 				}
 			}
 		});
-			System.out.println("Heart tick...");
-			if(!deadList.isEmpty())
-				removeDeadCenter(deadList);
+		System.out.println("Heart tick...");
+		if (!deadList.isEmpty())
+			removeDeadCenter(deadList);
 	}
-	
-	private String checkPulse(AgentCenter center){
+
+	private String checkPulse(AgentCenter center) {
 		try {
-			BasicProperties properties = new BasicProperties()
-											 .builder()
-											 .replyTo(ReplyQueueName)
-											 .correlationId(center.getAlias())
-											 .build();
-			
-			channel.basicPublish("", RequestQueueName+center.getAlias(), properties, "Check pulse".getBytes());
-			HeartbeatConsumer consumer = new HeartbeatConsumer(channel, center.getAlias(), response);
-			channel.basicConsume(ReplyQueueName, true, consumer );
+			BasicProperties properties = new BasicProperties().builder().replyTo(ReplyQueueName).correlationId(center.getAlias()).build();
+
+			channel.basicPublish("", RequestQueueName + center.getAlias(), properties, "Check pulse".getBytes());
+			channel.basicConsume(ReplyQueueName, true, new HeartbeatConsumer(channel, center.getAlias(), response));
 			return response.poll(5, TimeUnit.SECONDS);
 		} catch (IOException | InterruptedException e) {
 			e.printStackTrace();
@@ -129,7 +124,7 @@ public class HeartbeatRequest implements HeartbeatRequestLocal {
 			m.setAgentTypes(types);
 			socketSender.socketSend(m);
 			
-			if(!manager.getCenterAgents().hasNext()){
+			if(manager.getCenterAgents().hasNext()){
 				List<AID> list = manager.getCenterAgent(center.getAlias());
 				manager.removeAgent(center.getAlias());
 				

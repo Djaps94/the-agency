@@ -30,6 +30,7 @@ public class AgencyOperation implements AgencyOperationLocal{
 
 	public void sendRegisterResponse(ServiceMessage message, Channel channel, ObjectMapper mapper, BasicProperties property) throws ConnectionException, RegisterSlaveException, NodeExistsException, IOException, TimeoutException, InterruptedException{
 		List<AgentCenter> centers = dealer.registerCenter(message);
+		
 		if(centers.isEmpty())
 			channel.basicPublish("", property.getReplyTo(), new BasicProperties().builder().build(), "Register successful".getBytes());
 		else{
@@ -43,6 +44,7 @@ public class AgencyOperation implements AgencyOperationLocal{
 	
 	public void sendGetTypesResponse(ServiceMessage message, Channel channel, ObjectMapper mapper, BasicProperties property) throws ConnectionException, IOException, TimeoutException, InterruptedException{
 		Map<String, Set<AgentType>> types = dealer.registerAgentTypes(message);
+		
 		ServiceMessage msg = new ServiceMessage();
 		msg.setOtherTypes(types);
 		String m = mapper.writeValueAsString(msg);
@@ -51,6 +53,7 @@ public class AgencyOperation implements AgencyOperationLocal{
 	
 	public void sendGetRunningResponse(Channel channel, ObjectMapper mapper, BasicProperties property) throws IOException{
 		Map<String, List<AID>> agents = dealer.getRunningAgents();
+		
 		ServiceMessage msg = new ServiceMessage();
 		msg.setOtherAgents(agents);
 		String data = mapper.writeValueAsString(msg);
@@ -83,6 +86,7 @@ public class AgencyOperation implements AgencyOperationLocal{
 	@Override
 	public void addAgent(ServiceMessage message, Channel channel, BasicProperties property) throws IOException {
 		dealer.addAgent(message);
+		
 		ServiceMessage msg = new ServiceMessage();
 		ObjectMapper mapper = new ObjectMapper();
 		String data = mapper.writeValueAsString(msg);
@@ -93,6 +97,7 @@ public class AgencyOperation implements AgencyOperationLocal{
 	@Override
 	public void runAgent(ServiceMessage message, Channel channel, BasicProperties property) throws IOException {
 		AID agent = dealer.runAgent(message);
+		
 		ServiceMessage msg = new ServiceMessage();
 		msg.setAid(agent);
 		ObjectMapper mapper = new ObjectMapper();
@@ -104,6 +109,7 @@ public class AgencyOperation implements AgencyOperationLocal{
 	@Override
 	public void stopAgent(ServiceMessage message, Channel channel, BasicProperties property) throws IOException {
 		AID agent = dealer.stopAgent(message);
+		
 		ServiceMessage msg = new ServiceMessage();
 		msg.setAid(agent);
 		ObjectMapper mapper = new ObjectMapper();

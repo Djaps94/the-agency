@@ -12,14 +12,8 @@ import model.AgentType;
 @SuppressWarnings("serial")
 public class SocketMessage implements Serializable{
 
-	public enum messageType { GET_TYPES,
-							  GET_AGENTS,
-							  ADD_TYPE,
-							  SEND_MESSAGE,
-							  START_AGENT,
-							  STOP_AGENT,
-							  REMOVE_AGENTS,
-							  REMOVE_TYPES
+	public enum messageType {
+		GET_TYPES, GET_AGENTS, ADD_TYPE, SEND_MESSAGE, START_AGENT, STOP_AGENT, REMOVE_AGENTS, REMOVE_TYPES
 	};
 	
 	private AID aid;

@@ -27,13 +27,15 @@ public class MessageRequest implements MessageRequestLocal {
 		
 	public ServiceMessage sendMessage(String destination, ServiceMessage message) throws ConnectionException, IOException, TimeoutException, InterruptedException{
 		ConnectionFactory factory = new ConnectionFactory();
-	  	factory.setHost("127.0.0.1");
+	  	
+		factory.setHost("127.0.0.1");
 	  	factory.setPort(5672);
 	  	factory.setVirtualHost("/");
 		Connection connection = factory.newConnection();
 		Channel channel = connection.createChannel();
 		String ReplyQueueName = channel.queueDeclare().getQueue();
 		BlockingQueue<ServiceMessage> response = new ArrayBlockingQueue<>(1);
+		
 		ObjectMapper mapper = new ObjectMapper();
 		String msg = mapper.writeValueAsString(message);
 		BasicProperties props = new BasicProperties().builder().replyTo(ReplyQueueName).build();

@@ -101,6 +101,7 @@ public class AgencySocket implements MessageListener{
 			SocketMessage msg   = (SocketMessage) ((ObjectMessage)message).getObject();
 			ObjectMapper mapper = new ObjectMapper();
 			String data = mapper.writeValueAsString(msg);
+			
 			for(Entry<String, Session> entry : sessionHolder.getEntry())
 				entry.getValue().getBasicRemote().sendText(data);
 		} catch (JMSException | IOException e) {
@@ -146,15 +147,18 @@ public class AgencySocket implements MessageListener{
 		AID agent = new AID();
 		AgentType t = new AgentType(msg.getTypeName(), msg.getTypeModule());
 		agent.setType(t); agent.setName(msg.getAgentName());
+		
 		if(agency.isSupportedContained(t)){
 			agentManager.startAgent(agent);
 		}else{
 			while(agency.getOtherSupportedTypes().hasNext()){
 				Entry<String, Set<AgentType>> entry = agency.getOtherSupportedTypes().next();
+				
 				if(entry.getValue().contains(t)){
 					Optional<AgentCenter> center = registry.getCenters().filter(cent -> cent.getAlias().equals(entry.getKey())).findFirst();
 					ServiceMessage message = new ServiceMessage(OperationType.RUN_AGENT);
 					message.setAid(agent);
+					
 					if(center.isPresent())
 						try {
 							requester.sendMessage(center.get().getAddress(), message);
@@ -170,11 +174,13 @@ public class AgencySocket implements MessageListener{
 	private void stopAgent(Session session, ObjectMapper mapper, AID agentID){
 		if(agentID == null)
 			return;
+		
 		if(agentID.getHost().getAddress().equals(registry.getThisCenter().getAddress())){
 			agentManager.stopAgent(agentID);
 		}else{
 			ServiceMessage message = new ServiceMessage(OperationType.STOP_AGENT);
 			message.setAid(agentID);
+			
 			try {
 				requester.sendMessage(agentID.getHost().getAddress(), message);
 			} catch (ConnectionException | IOException | TimeoutException | InterruptedException e) {

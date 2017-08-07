@@ -68,11 +68,11 @@ public class NetworkManagment implements NetworkManagmentLocal{
 			master = true;
 			try {
 				registry.setThisCenter(createCenter());
-				System.out.println("MASTER NODE UP");
 				beatRequest.startTimer();
 				beatResponse.pulseTick();
 				messageResponse.waitMessage();
 				rabbitHandler.recieveMessage();
+				System.out.println("MASTER NODE UP");
 			} catch (IOException e) {
 				//TODO: shutdown script
 			}
@@ -84,9 +84,9 @@ public class NetworkManagment implements NetworkManagmentLocal{
 			slave = createCenter();
 			System.out.println("SLAVE NODE UP "+slave.getAlias());
 			registry.setThisCenter(slave);
-			master = false;
 			messageResponse.waitMessage();
 			rabbitHandler.recieveMessage();
+			master = false;
 			try {
 				ServiceMessage message = sendMessageToMaster(masterIpAddress, slave);
 				if(message != null){
@@ -113,15 +113,11 @@ public class NetworkManagment implements NetworkManagmentLocal{
 			
 			try {
 				ServiceMessage message = getAllAgentTypes(masterIpAddress, slave);
-				if(message != null) message.getOtherTypes().entrySet()
-														   .stream()
-														   .forEach(entry -> agency.addOtherTypes(entry.getKey(), entry.getValue()));
+				if(message != null) message.getOtherTypes().entrySet().stream().forEach(entry -> agency.addOtherTypes(entry.getKey(), entry.getValue()));
 			} catch (ConnectionException | IOException | TimeoutException | InterruptedException e) {
 				try {
 					ServiceMessage message = getAllAgentTypes(masterIpAddress, slave);
-					if(message != null) message.getOtherTypes().entrySet()
-															   .stream()
-															   .forEach(entry -> agency.addOtherTypes(entry.getKey(), entry.getValue()));
+					if(message != null) message.getOtherTypes().entrySet().stream().forEach(entry -> agency.addOtherTypes(entry.getKey(), entry.getValue()));
 				} catch (ConnectionException | IOException | TimeoutException | InterruptedException e1) {
 					try {
 						ServiceMessage message = rollback(masterIpAddress, slave);

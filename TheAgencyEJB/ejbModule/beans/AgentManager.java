@@ -24,38 +24,41 @@ public class AgentManager implements AgentManagerLocal {
 
 	@EJB
 	private AgencyManagerLocal manager;
-	
+
 	@EJB
 	private AgentRegistryLocal agentRegistry;
-	
+
 	@EJB
 	private AgencyRegistryLocal registry;
-	
+
 	@EJB
 	private MessageRequestLocal requester;
-	
+
 	@EJB
 	private SocketSenderLocal socketSender;
 
-    public AgentManager() {
-    
-    }
+	public AgentManager() {
+
+	}
 
 	@Override
 	public AID startAgent(AID aid) {
 		aid.setHost(registry.getThisCenter());
+
 		try {
 			InitialContext context = new InitialContext();
-			Agent agent = (Agent)context.lookup("java:module/"+aid.getType().getName());
+			Agent agent = (Agent) context.lookup("java:module/" + aid.getType().getName());
 			agent.setId(aid);
 			agentRegistry.addRunningAgent(agent);
 		} catch (NamingException e1) {
 			e1.printStackTrace();
 		}
 		agentRegistry.addRunningAID(aid);
+
 		ServiceMessage message = new ServiceMessage(OperationType.ADD_AGENT);
 		message.setAid(aid);
 		message.setCenter(registry.getThisCenter());
+
 		registry.getCenters().forEach(center -> {
 			try {
 				requester.sendMessage(center.getAddress(), message);
@@ -63,7 +66,7 @@ public class AgentManager implements AgentManagerLocal {
 				System.out.println("Can't send agent to other centers");
 			}
 		});
-		
+
 		SocketMessage msg = new SocketMessage();
 		msg.setMsgType(messageType.START_AGENT);
 		msg.setAid(aid);
@@ -78,13 +81,15 @@ public class AgentManager implements AgentManagerLocal {
 		ServiceMessage message = new ServiceMessage(OperationType.DELETE_AGENT);
 		message.setAid(agent);
 		message.setCenter(registry.getThisCenter());
+
 		registry.getCenters().forEach(center -> {
 			try {
 				requester.sendMessage(center.getAddress(), message);
 			} catch (ConnectionException | IOException | TimeoutException | InterruptedException e) {
+			
 			}
 		});
-		
+
 		SocketMessage msg = new SocketMessage();
 		msg.setMsgType(messageType.STOP_AGENT);
 		msg.setAid(agent);

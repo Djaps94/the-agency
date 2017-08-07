@@ -39,49 +39,45 @@ public class HeartbeatResponse implements HeartBeatResponseLocal{
 	
     @PostConstruct
     private void initialise(){
-    	factory = new ConnectionFactory();
+		factory = new ConnectionFactory();
 		try {
-        	factory.setHost("127.0.0.1");
-        	factory.setPort(5672);
-        	factory.setVirtualHost("/");
+			factory.setHost("127.0.0.1");
+			factory.setPort(5672);
+			factory.setVirtualHost("/");
 			connection = factory.newConnection();
-			channel    = connection.createChannel();
+			channel = connection.createChannel();
 		} catch (IOException | TimeoutException e) {
 			e.printStackTrace();
 		}
-    }
-    
-    public void pulseTick(){
-    	try {
-			channel.queueDeclare(queueName+registry.getThisCenter().getAlias(), false, false, false, null);
+	}
+
+	public void pulseTick() {
+		try {
+			channel.queueDeclare(queueName + registry.getThisCenter().getAlias(), false, false, false, null);
 			channel.basicQos(1);
-			channel.basicConsume(queueName+registry.getThisCenter().getAlias(), false, new DefaultConsumer(channel){
+			channel.basicConsume(queueName + registry.getThisCenter().getAlias(), false, new DefaultConsumer(channel) {
 				@Override
 				public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body) throws IOException {
-					BasicProperties replyProperty = new BasicProperties()
-													  .builder()
-													  .correlationId(properties.getCorrelationId())
-													  .build();
+					BasicProperties replyProperty = new BasicProperties().builder().correlationId(properties.getCorrelationId()).build();
 					channel.basicPublish("", properties.getReplyTo(), replyProperty, "Alive".getBytes());
 					channel.basicAck(envelope.getDeliveryTag(), false);
 				}
 			});
-			
-			
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-    	
-    }
-    
-    @PreDestroy
-    private void destroy(){
-    	try {
+
+	}
+
+	@PreDestroy
+	private void destroy() {
+		try {
 			channel.close();
 			connection.close();
 		} catch (IOException | TimeoutException e) {
 			e.printStackTrace();
 		}
-    }
+	}
 
 }

@@ -10,17 +10,8 @@ import java.util.Set;
 public class ServiceMessage implements Serializable {
 
 	public enum OperationType { REGISTER,
-								GET_CENTERS,
-								GET_TYPES,
-								DELIVER_TYPES,
-								ROLLBACK,
-								GET_RUNNING,
-								TURN_OFF,
-								DELETE_AGENT,
-								ADD_AGENT,
-								RUN_AGENT,
-								STOP_AGENT
-							  };
+		GET_CENTERS, GET_TYPES, DELIVER_TYPES, ROLLBACK, GET_RUNNING, TURN_OFF, DELETE_AGENT, ADD_AGENT, RUN_AGENT, STOP_AGENT
+	};
 	
 	private AgentCenter center;
 	private OperationType type;
