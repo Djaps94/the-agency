@@ -13,8 +13,8 @@ import exceptions.ConnectionException;
 import handshake.HandshakeRequesterLocal;
 import model.AID;
 import model.Agent;
-import model.HandshakeMessage;
-import model.HandshakeMessage.handshakeType;
+import model.ServiceMessage;
+import model.ServiceMessage.handshakeType;
 import util.SocketMessage;
 import util.SocketMessage.messageType;
 
@@ -50,7 +50,7 @@ public class AgentManager implements AgentManagerLocal {
 			e1.printStackTrace();
 		}
 		manager.getRunningAgents().add(aid);
-		HandshakeMessage message = new HandshakeMessage(handshakeType.ADD_AGENT);
+		ServiceMessage message = new ServiceMessage(handshakeType.ADD_AGENT);
 		message.setAid(aid);
 		message.setCenter(registry.getThisCenter());
 		registry.getCenters().forEach(center -> {
@@ -70,7 +70,7 @@ public class AgentManager implements AgentManagerLocal {
 	@Override
 	public AID stopAgent(AID agent) {
 		manager.getRunningAgents().remove(agent);
-		HandshakeMessage message = new HandshakeMessage(handshakeType.DELETE_AGENT);
+		ServiceMessage message = new ServiceMessage(handshakeType.DELETE_AGENT);
 		message.setAid(agent);
 		message.setCenter(registry.getThisCenter());
 		registry.getCenters().forEach(center -> {

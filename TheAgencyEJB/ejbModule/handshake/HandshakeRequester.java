@@ -15,7 +15,7 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 
 import exceptions.ConnectionException;
-import model.HandshakeMessage;
+import model.ServiceMessage;
 import util.HandshakeConsumer;
 
 @Stateless
@@ -23,7 +23,7 @@ public class HandshakeRequester implements HandshakeRequesterLocal {
 	
 	public HandshakeRequester() { }
 		
-	public HandshakeMessage sendMessage(String destination, HandshakeMessage message) throws ConnectionException, IOException, TimeoutException, InterruptedException{
+	public ServiceMessage sendMessage(String destination, ServiceMessage message) throws ConnectionException, IOException, TimeoutException, InterruptedException{
 		ConnectionFactory factory = new ConnectionFactory();
 	  	factory.setHost("127.0.0.1");
 	  	factory.setPort(5672);
@@ -31,7 +31,7 @@ public class HandshakeRequester implements HandshakeRequesterLocal {
 		Connection connection = factory.newConnection();
 		Channel channel = connection.createChannel();
 		String ReplyQueueName = channel.queueDeclare().getQueue();
-		BlockingQueue<HandshakeMessage> response = new ArrayBlockingQueue<>(1);
+		BlockingQueue<ServiceMessage> response = new ArrayBlockingQueue<>(1);
 		ObjectMapper mapper = new ObjectMapper();
 		String msg = mapper.writeValueAsString(message);
 		BasicProperties props = new BasicProperties().builder().replyTo(ReplyQueueName).build();

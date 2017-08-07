@@ -9,14 +9,14 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
-import model.HandshakeMessage;
+import model.ServiceMessage;
 
 public class HandshakeConsumer extends DefaultConsumer{
 
 	private ObjectMapper mapper;
-	private BlockingQueue<HandshakeMessage> response;
+	private BlockingQueue<ServiceMessage> response;
 	
-	public HandshakeConsumer(Channel channel, ObjectMapper mapper, BlockingQueue<HandshakeMessage> response) {
+	public HandshakeConsumer(Channel channel, ObjectMapper mapper, BlockingQueue<ServiceMessage> response) {
 		super(channel);
 		this.mapper   = mapper;
 		this.response = response;
@@ -25,11 +25,11 @@ public class HandshakeConsumer extends DefaultConsumer{
 	@Override
 	public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body) {
 		String data = new String(body);
-		HandshakeMessage msg = null;
+		ServiceMessage msg = null;
 		try {
-			msg = mapper.readValue(data, HandshakeMessage.class);
+			msg = mapper.readValue(data, ServiceMessage.class);
 		} catch (IOException e) {
-			msg = new HandshakeMessage();
+			msg = new ServiceMessage();
 		}
 		response.offer(msg);
 	}

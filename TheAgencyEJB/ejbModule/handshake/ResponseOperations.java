@@ -20,7 +20,7 @@ import exceptions.RegisterSlaveException;
 import model.AID;
 import model.AgentCenter;
 import model.AgentType;
-import model.HandshakeMessage;
+import model.ServiceMessage;
 
 @Stateless
 public class ResponseOperations implements ResponseOperationsLocal{
@@ -28,22 +28,22 @@ public class ResponseOperations implements ResponseOperationsLocal{
 	@EJB
 	private HandshakeDealerLocal dealer;
 
-	public void sendRegisterResponse(HandshakeMessage message, Channel channel, ObjectMapper mapper, BasicProperties property) throws ConnectionException, RegisterSlaveException, NodeExistsException, IOException, TimeoutException, InterruptedException{
+	public void sendRegisterResponse(ServiceMessage message, Channel channel, ObjectMapper mapper, BasicProperties property) throws ConnectionException, RegisterSlaveException, NodeExistsException, IOException, TimeoutException, InterruptedException{
 		List<AgentCenter> centers = dealer.registerCenter(message);
 		if(centers.isEmpty())
 			channel.basicPublish("", property.getReplyTo(), new BasicProperties().builder().build(), "Register successful".getBytes());
 		else{
-			HandshakeMessage msg = new HandshakeMessage();
+			ServiceMessage msg = new ServiceMessage();
 			msg.setCenters(centers);
-			msg.setType(HandshakeMessage.handshakeType.GET_CENTERS);
+			msg.setType(ServiceMessage.handshakeType.GET_CENTERS);
 			String m = mapper.writeValueAsString(msg);
 			channel.basicPublish("", property.getReplyTo(), new BasicProperties().builder().build(), m.getBytes());
 		}
 	}
 	
-	public void sendGetTypesResponse(HandshakeMessage message, Channel channel, ObjectMapper mapper, BasicProperties property) throws ConnectionException, IOException, TimeoutException, InterruptedException{
+	public void sendGetTypesResponse(ServiceMessage message, Channel channel, ObjectMapper mapper, BasicProperties property) throws ConnectionException, IOException, TimeoutException, InterruptedException{
 		Map<String, Set<AgentType>> types = dealer.registerAgentTypes(message);
-		HandshakeMessage msg = new HandshakeMessage();
+		ServiceMessage msg = new ServiceMessage();
 		msg.setOtherTypes(types);
 		String m = mapper.writeValueAsString(msg);
 		channel.basicPublish("", property.getReplyTo(), new BasicProperties().builder().build(), m.getBytes());
@@ -51,21 +51,21 @@ public class ResponseOperations implements ResponseOperationsLocal{
 	
 	public void sendGetRunningResponse(Channel channel, ObjectMapper mapper, BasicProperties property) throws IOException{
 		Map<String, List<AID>> agents = dealer.getRunningAgents();
-		HandshakeMessage msg = new HandshakeMessage();
+		ServiceMessage msg = new ServiceMessage();
 		msg.setOtherAgents(agents);
 		String data = mapper.writeValueAsString(msg);
 		channel.basicPublish("", property.getReplyTo(), new BasicProperties().builder().build(), data.getBytes());
 	}
 	
-	public void addTypes(HandshakeMessage message, Channel channel, BasicProperties property) throws IOException{
+	public void addTypes(ServiceMessage message, Channel channel, BasicProperties property) throws IOException{
 		dealer.addTypes(message);
 		channel.basicPublish("", property.getReplyTo(), new BasicProperties().builder().build(), "Add types to other nodes".getBytes());
 	}
 	
-	public void rollback(HandshakeMessage message, Channel channel, ObjectMapper mapper, BasicProperties property) throws IOException{
+	public void rollback(ServiceMessage message, Channel channel, ObjectMapper mapper, BasicProperties property) throws IOException{
 		try {
 			dealer.rollback(message);
-			HandshakeMessage msg = new HandshakeMessage();
+			ServiceMessage msg = new ServiceMessage();
 			String data = mapper.writeValueAsString(msg);
 			channel.basicPublish("", property.getReplyTo(), new BasicProperties().builder().build(), data.getBytes());
 		} catch (ConnectionException | JsonProcessingException | TimeoutException | InterruptedException e) {
@@ -75,15 +75,15 @@ public class ResponseOperations implements ResponseOperationsLocal{
 	}
 
 	@Override
-	public void deleteRunningAgent(HandshakeMessage message, Channel channel, BasicProperties property) throws IOException {
+	public void deleteRunningAgent(ServiceMessage message, Channel channel, BasicProperties property) throws IOException {
 		dealer.deleteAgent(message);
 		channel.basicPublish("", property.getReplyTo(), new BasicProperties().builder().build(), "Agent deleted".getBytes());
 	}
 
 	@Override
-	public void addAgent(HandshakeMessage message, Channel channel, BasicProperties property) throws IOException {
+	public void addAgent(ServiceMessage message, Channel channel, BasicProperties property) throws IOException {
 		dealer.addAgent(message);
-		HandshakeMessage msg = new HandshakeMessage();
+		ServiceMessage msg = new ServiceMessage();
 		ObjectMapper mapper = new ObjectMapper();
 		String data = mapper.writeValueAsString(msg);
 		channel.basicPublish("", property.getReplyTo(), new BasicProperties().builder().build(), data.getBytes());
@@ -91,9 +91,9 @@ public class ResponseOperations implements ResponseOperationsLocal{
 	}
 
 	@Override
-	public void runAgent(HandshakeMessage message, Channel channel, BasicProperties property) throws IOException {
+	public void runAgent(ServiceMessage message, Channel channel, BasicProperties property) throws IOException {
 		AID agent = dealer.runAgent(message);
-		HandshakeMessage msg = new HandshakeMessage();
+		ServiceMessage msg = new ServiceMessage();
 		msg.setAid(agent);
 		ObjectMapper mapper = new ObjectMapper();
 		String data = mapper.writeValueAsString(msg);
@@ -102,9 +102,9 @@ public class ResponseOperations implements ResponseOperationsLocal{
 	}
 
 	@Override
-	public void stopAgent(HandshakeMessage message, Channel channel, BasicProperties property) throws IOException {
+	public void stopAgent(ServiceMessage message, Channel channel, BasicProperties property) throws IOException {
 		AID agent = dealer.stopAgent(message);
-		HandshakeMessage msg = new HandshakeMessage();
+		ServiceMessage msg = new ServiceMessage();
 		msg.setAid(agent);
 		ObjectMapper mapper = new ObjectMapper();
 		String data = mapper.writeValueAsString(agent);

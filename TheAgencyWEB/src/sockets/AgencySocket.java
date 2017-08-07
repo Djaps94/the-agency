@@ -35,8 +35,8 @@ import model.ACLMessage;
 import model.AID;
 import model.AgentCenter;
 import model.AgentType;
-import model.HandshakeMessage;
-import model.HandshakeMessage.handshakeType;
+import model.ServiceMessage;
+import model.ServiceMessage.handshakeType;
 import util.SocketMessage;
 import util.SocketMessage.messageType;
 
@@ -146,7 +146,7 @@ public class AgencySocket implements MessageListener{
 			for(Entry<String, Set<AgentType>> entry : agency.getOtherSupportedTypes().entrySet()){
 				if(entry.getValue().contains(t)){
 					Optional<AgentCenter> center = registry.getCenters().stream().filter(cent -> cent.getAlias().equals(entry.getKey())).findFirst();
-					HandshakeMessage message = new HandshakeMessage(handshakeType.RUN_AGENT);
+					ServiceMessage message = new ServiceMessage(handshakeType.RUN_AGENT);
 					message.setAid(agent);
 					if(center.isPresent())
 						try {
@@ -166,7 +166,7 @@ public class AgencySocket implements MessageListener{
 		if(agentID.getHost().getAddress().equals(registry.getThisCenter().getAddress())){
 			agentManager.stopAgent(agentID);
 		}else{
-			HandshakeMessage message = new HandshakeMessage(handshakeType.STOP_AGENT);
+			ServiceMessage message = new ServiceMessage(handshakeType.STOP_AGENT);
 			message.setAid(agentID);
 			try {
 				requester.sendMessage(agentID.getHost().getAddress(), message);

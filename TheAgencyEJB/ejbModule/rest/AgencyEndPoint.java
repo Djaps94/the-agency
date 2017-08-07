@@ -35,8 +35,8 @@ import model.ACLMessage.Performative;
 import model.AID;
 import model.AgentCenter;
 import model.AgentType;
-import model.HandshakeMessage;
-import model.HandshakeMessage.handshakeType;
+import model.ServiceMessage;
+import model.ServiceMessage.handshakeType;
 
 @Stateless
 @Path("/agency")
@@ -121,11 +121,11 @@ public class AgencyEndPoint {
 			for(Entry<String, Set<AgentType>> entry : manager.getOtherSupportedTypes().entrySet()){
 				if(entry.getValue().contains(t)){
 					Optional<AgentCenter> center = registry.getCenters().filter(cent -> cent.getAlias().equals(entry.getKey())).findFirst();
-					HandshakeMessage message = new HandshakeMessage(handshakeType.RUN_AGENT);
+					ServiceMessage message = new ServiceMessage(handshakeType.RUN_AGENT);
 					message.setAid(agent);
 					if(center.isPresent())
 						try {
-							HandshakeMessage msg = requester.sendMessage(center.get().getAddress(), message);
+							ServiceMessage msg = requester.sendMessage(center.get().getAddress(), message);
 							return msg.getAid();
 						} catch (ConnectionException | IOException | TimeoutException | InterruptedException e) {
 							System.out.println("Could not initialise agent");
@@ -146,10 +146,10 @@ public class AgencyEndPoint {
 		if(agentID.getHost().getAddress().equals(registry.getThisCenter().getAddress())){
 			return agentManager.stopAgent(agentID);
 		}else{
-			HandshakeMessage message = new HandshakeMessage(handshakeType.STOP_AGENT);
+			ServiceMessage message = new ServiceMessage(handshakeType.STOP_AGENT);
 			message.setAid(agentID);
 			try {
-				HandshakeMessage msg = requester.sendMessage(agentID.getHost().getAddress(), message);
+				ServiceMessage msg = requester.sendMessage(agentID.getHost().getAddress(), message);
 				return msg.getAid();
 			} catch (ConnectionException | IOException | TimeoutException | InterruptedException e) {
 				return null;

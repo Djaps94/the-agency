@@ -23,8 +23,8 @@ import exceptions.RegisterSlaveException;
 import model.AID;
 import model.AgentCenter;
 import model.AgentType;
-import model.HandshakeMessage;
-import model.HandshakeMessage.handshakeType;
+import model.ServiceMessage;
+import model.ServiceMessage.handshakeType;
 import util.SocketMessage;
 import util.SocketMessage.messageType;
 
@@ -51,7 +51,7 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 	
 	public HandshakeDealer() { }
 	
-	public List<AgentCenter> registerCenter(HandshakeMessage message) throws RegisterSlaveException, ConnectionException, NodeExistsException, IOException, TimeoutException, InterruptedException{
+	public List<AgentCenter> registerCenter(ServiceMessage message) throws RegisterSlaveException, ConnectionException, NodeExistsException, IOException, TimeoutException, InterruptedException{
 		if(nodesManagment.isMaster()){
 			
 			while(registry.getCentersIterator().hasNext()){
@@ -71,7 +71,7 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 		return new ArrayList<AgentCenter>();
 	}
 	
-	public Map<String, Set<AgentType>> registerAgentTypes(HandshakeMessage message) throws ConnectionException, IOException, TimeoutException, InterruptedException{
+	public Map<String, Set<AgentType>> registerAgentTypes(ServiceMessage message) throws ConnectionException, IOException, TimeoutException, InterruptedException{
 		Map<String,Set<AgentType>> returnSet = new HashMap<String, Set<AgentType>>();
 		if(nodesManagment.isMaster()){
 			returnSet.put(registry.getThisCenter().getAlias(),manager.getSupportedTypes());
@@ -96,11 +96,11 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 		return returnSet;
 	}
 	
-	public void addTypes(HandshakeMessage message){
+	public void addTypes(ServiceMessage message){
 		manager.addOtherTypes(message.getCenter().getAlias(), message.getAgentTypes());
 	}
 	
-	public void rollback(HandshakeMessage message) throws ConnectionException, IOException, TimeoutException, InterruptedException{
+	public void rollback(ServiceMessage message) throws ConnectionException, IOException, TimeoutException, InterruptedException{
 		if(nodesManagment.isMaster()){
 			registry.deleteCenter(message.getCenter());
 			Set<AgentType> type = manager.getOtherSupportedTypes().get(message.getCenter().getAlias());
@@ -140,7 +140,7 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 	}
 
 	@Override
-	public void deleteAgent(HandshakeMessage message) {
+	public void deleteAgent(ServiceMessage message) {
 		manager.getCenterAgents().get(message.getCenter().getAlias()).remove(message.getAid());
 		SocketMessage msg = new SocketMessage();
 		msg.setMsgType(messageType.STOP_AGENT);
@@ -149,7 +149,7 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 	}
 
 	@Override
-	public void addAgent(HandshakeMessage message) {
+	public void addAgent(ServiceMessage message) {
 		if(manager.getCenterAgents().containsKey(message.getCenter().getAlias())){
 			manager.getCenterAgents().get(message.getCenter().getAlias()).add(message.getAid());
 		}else{
@@ -164,11 +164,11 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 	}
 
 	@Override
-	public AID runAgent(HandshakeMessage message) {
+	public AID runAgent(ServiceMessage message) {
 		return agentManager.startAgent(message.getAid());
 	}
 	
-	public AID stopAgent(HandshakeMessage message){
+	public AID stopAgent(ServiceMessage message){
 		return agentManager.stopAgent(message.getAid());
 	}
 	

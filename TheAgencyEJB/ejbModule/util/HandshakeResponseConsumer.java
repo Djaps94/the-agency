@@ -17,8 +17,8 @@ import exceptions.NodeExistsException;
 import exceptions.RegisterSlaveException;
 import handshake.HandshakeRequesterLocal;
 import handshake.ResponseOperationsLocal;
-import model.HandshakeMessage;
-import model.HandshakeMessage.handshakeType;
+import model.ServiceMessage;
+import model.ServiceMessage.handshakeType;
 
 public class HandshakeResponseConsumer extends DefaultConsumer{
 
@@ -41,7 +41,7 @@ public class HandshakeResponseConsumer extends DefaultConsumer{
 	public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body) throws IOException {
 		channel.basicAck(envelope.getDeliveryTag(), false);
 		String data = new String(body);
-		HandshakeMessage message = mapper.readValue(data, HandshakeMessage.class);
+		ServiceMessage message = mapper.readValue(data, ServiceMessage.class);
 		switch(message.getType()){
 		case REGISTER: { 
 			try {

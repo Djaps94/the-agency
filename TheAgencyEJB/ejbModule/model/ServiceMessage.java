@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class HandshakeMessage implements Serializable {
+public class ServiceMessage implements Serializable {
 
 	public enum handshakeType { REGISTER,
 								GET_CENTERS,
@@ -31,14 +31,14 @@ public class HandshakeMessage implements Serializable {
 	private String agentName;
 	private AID aid;
 	
-	public HandshakeMessage() { }
+	public ServiceMessage() { }
 	
-	public HandshakeMessage(AgentCenter center, handshakeType type){
+	public ServiceMessage(AgentCenter center, handshakeType type){
 		this.center = center;
 		this.type   = type;
 	}
 	
-	public HandshakeMessage(handshakeType type){
+	public ServiceMessage(handshakeType type){
 		this.type = type;
 	}
 

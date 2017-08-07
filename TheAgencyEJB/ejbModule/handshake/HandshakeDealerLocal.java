@@ -15,18 +15,18 @@ import model.AID;
 import model.Agent;
 import model.AgentCenter;
 import model.AgentType;
-import model.HandshakeMessage;
+import model.ServiceMessage;
 
 @Local
 public interface HandshakeDealerLocal {
 
-	public List<AgentCenter> registerCenter(HandshakeMessage message) throws RegisterSlaveException, ConnectionException, NodeExistsException, IOException, TimeoutException, InterruptedException;
-	public Map<String, Set<AgentType>> registerAgentTypes(HandshakeMessage message) throws ConnectionException, IOException, TimeoutException, InterruptedException;
-	public void addTypes(HandshakeMessage message);
-	public void rollback(HandshakeMessage message) throws ConnectionException, IOException, TimeoutException, InterruptedException;
+	public List<AgentCenter> registerCenter(ServiceMessage message) throws RegisterSlaveException, ConnectionException, NodeExistsException, IOException, TimeoutException, InterruptedException;
+	public Map<String, Set<AgentType>> registerAgentTypes(ServiceMessage message) throws ConnectionException, IOException, TimeoutException, InterruptedException;
+	public void addTypes(ServiceMessage message);
+	public void rollback(ServiceMessage message) throws ConnectionException, IOException, TimeoutException, InterruptedException;
 	public Map<String,List<AID>> getRunningAgents();
-	public void deleteAgent(HandshakeMessage message);
-	public void addAgent(HandshakeMessage message);
-	public AID runAgent(HandshakeMessage message);
-	public AID stopAgent(HandshakeMessage message);
+	public void deleteAgent(ServiceMessage message);
+	public void addAgent(ServiceMessage message);
+	public AID runAgent(ServiceMessage message);
+	public AID stopAgent(ServiceMessage message);
 }

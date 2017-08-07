@@ -6,11 +6,11 @@ import java.util.concurrent.TimeoutException;
 import javax.ejb.Local;
 
 import exceptions.ConnectionException;
-import model.HandshakeMessage;
+import model.ServiceMessage;
 
 @Local
 public interface HandshakeRequesterLocal {
 	
-	public HandshakeMessage sendMessage(String destination, HandshakeMessage message) throws ConnectionException, IOException, TimeoutException, InterruptedException;
+	public ServiceMessage sendMessage(String destination, ServiceMessage message) throws ConnectionException, IOException, TimeoutException, InterruptedException;
 
 }
