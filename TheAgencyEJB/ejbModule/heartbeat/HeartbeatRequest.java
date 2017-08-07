@@ -121,7 +121,7 @@ public class HeartbeatRequest implements HeartbeatRequestLocal {
 	private void removeDeadCenter(List<AgentCenter> centers){
 		for(AgentCenter center : centers){
 			registry.deleteCenter(center);
-			Set<AgentType> types = manager.getOtherSupportedTypes().get(center.getAlias());
+			Set<AgentType> types = manager.getOtherAgentTypes(center.getAlias());
 			manager.deleteOtherTypes(center.getAlias());
 			
 			SocketMessage m = new SocketMessage();
@@ -129,9 +129,9 @@ public class HeartbeatRequest implements HeartbeatRequestLocal {
 			m.setAgentTypes(types);
 			socketSender.socketSend(m);
 			
-			if(!manager.getCenterAgents().isEmpty()){
-				List<AID> list = manager.getCenterAgents().get(center.getAlias());
-				manager.getCenterAgents().remove(center.getAlias());
+			if(!manager.getCenterAgents().hasNext()){
+				List<AID> list = manager.getCenterAgent(center.getAlias());
+				manager.removeAgent(center.getAlias());
 				
 				SocketMessage message = new SocketMessage();
 				message.setMsgType(messageType.REMOVE_AGENTS);

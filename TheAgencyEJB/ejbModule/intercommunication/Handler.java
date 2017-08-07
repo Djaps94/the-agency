@@ -41,7 +41,8 @@ public class Handler implements HandlerLocal{
 			if(aid.getHost().getAlias().equals(registry.getThisCenter().getAlias())){
 				dispatcher.sendMesssage(message, aid);
 			}else{
-				for(Entry<String, List<AID>> entry : agency.getCenterAgents().entrySet()){
+				while(agency.getCenterAgents().hasNext()){
+					Entry<String, List<AID>> entry = agency.getCenterAgents().next();
 					if(entry.getKey().equals(aid.getHost().getAlias())){
 						rabbit.notifyCenter(message, aid, entry.getKey());
 						break;

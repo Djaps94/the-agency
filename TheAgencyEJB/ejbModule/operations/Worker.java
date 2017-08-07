@@ -16,6 +16,7 @@ import javax.ejb.Stateless;
 import beans.AgencyManagerLocal;
 import beans.AgencyRegistryLocal;
 import beans.AgentManagerLocal;
+import beans.AgentRegistryLocal;
 import beans.NetworkManagmentLocal;
 import beans.SocketSenderLocal;
 import exceptions.ConnectionException;
@@ -51,6 +52,9 @@ public class Worker implements WorkerLocal{
 	@EJB
 	private SocketSenderLocal socketSender;
 	
+	@EJB
+	private AgentRegistryLocal agentRegistry;
+	
 	public Worker() { }
 	
 	public List<AgentCenter> registerCenter(ServiceMessage message) throws RegisterSlaveException, ConnectionException, NodeExistsException, IOException, TimeoutException, InterruptedException{
@@ -74,7 +78,7 @@ public class Worker implements WorkerLocal{
 	}
 	
 	public Map<String, Set<AgentType>> registerAgentTypes(ServiceMessage message) throws ConnectionException, IOException, TimeoutException, InterruptedException{
-		Map<String,Set<AgentType>> returnSet = new HashMap<String, Set<AgentType>>();
+		Map<String,Set<AgentType>> types = new HashMap<String, Set<AgentType>>();
 		
 		if(nodesManagment.isMaster()){
 			Set<AgentType> temp = new HashSet<AgentType>();
@@ -82,12 +86,10 @@ public class Worker implements WorkerLocal{
 			while(manager.getSupportedTypes().hasNext())
 				temp.add(manager.getSupportedTypes().next());
 			
-			returnSet.put(registry.getThisCenter().getAlias(), temp);
+			types.put(registry.getThisCenter().getAlias(), temp);
 			
-			if(!manager.getOtherSupportedTypes().isEmpty())
-				manager.getOtherSupportedTypes().entrySet()
-												.stream()
-												.forEach(entrySet -> returnSet.put(entrySet.getKey(), entrySet.getValue()));
+			if(!manager.getOtherSupportedTypes().hasNext())
+				manager.getOtherSupportedTypesStream().forEach(entry -> types.put(entry.getKey(), entry.getValue()));
 
 			manager.addOtherTypes(message.getCenter().getAlias(), message.getAgentTypes());
 			message.setType(OperationType.DELIVER_TYPES);
@@ -102,9 +104,9 @@ public class Worker implements WorkerLocal{
 			msg.setMsgType(messageType.ADD_TYPE);
 			msg.setAgentTypes(message.getAgentTypes());
 			socketSender.socketSend(msg);
-			return returnSet;
+			return types;
 		}	
-		return returnSet;
+		return types;
 	}
 	
 	public void addTypes(ServiceMessage message){
@@ -114,9 +116,9 @@ public class Worker implements WorkerLocal{
 	public void rollback(ServiceMessage message) throws ConnectionException, IOException, TimeoutException, InterruptedException{
 		if(nodesManagment.isMaster()){
 			registry.deleteCenter(message.getCenter());
-			Set<AgentType> type = manager.getOtherSupportedTypes().get(message.getCenter().getAlias());
+			Set<AgentType> type = manager.getOtherAgentTypes(message.getCenter().getAlias());
 			manager.deleteOtherTypes(message.getCenter().getAlias());
-			manager.removeAllRunningAgents(message.getRunningAgents());
+			agentRegistry.removeAllRunningAIDs(message.getRunningAgents());
 			
 			SocketMessage msg = new SocketMessage();
 			msg.setMsgType(messageType.REMOVE_AGENTS);
@@ -135,9 +137,9 @@ public class Worker implements WorkerLocal{
 		}
 		
 		registry.deleteCenter(message.getCenter());
-		Set<AgentType> types = manager.getOtherSupportedTypes().get(message.getCenter().getAlias());
+		Set<AgentType> types = manager.getOtherAgentTypes(message.getCenter().getAlias());
 		manager.deleteOtherTypes(message.getCenter().getAlias());
-		manager.removeAllRunningAgents(message.getRunningAgents());
+		agentRegistry.removeAllRunningAIDs(message.getRunningAgents());
 		
 		SocketMessage msg = new SocketMessage();
 		msg.setMsgType(messageType.REMOVE_AGENTS);
@@ -154,8 +156,8 @@ public class Worker implements WorkerLocal{
 		Map<String, List<AID>> agents = new HashMap<String, List<AID>>();
 		List<AID> tempAgents = new ArrayList<>();
 		
-		while(manager.getRunningAgents().hasNext())
-			tempAgents.add(manager.getRunningAgents().next());
+		while(agentRegistry.getRunningAID().hasNext())
+			tempAgents.add(agentRegistry.getRunningAID().next());
 		
 		agents.put(registry.getThisCenter().getAlias(), tempAgents);
 		return agents;
@@ -163,7 +165,8 @@ public class Worker implements WorkerLocal{
 
 	@Override
 	public void deleteAgent(ServiceMessage message) {
-		manager.getCenterAgents().get(message.getCenter().getAlias()).remove(message.getAid());
+		manager.getCenterAgent(message.getCenter().getAlias()).remove(message.getAid());
+		
 		SocketMessage msg = new SocketMessage();
 		msg.setMsgType(messageType.STOP_AGENT);
 		msg.setAid(message.getAid());
@@ -172,12 +175,12 @@ public class Worker implements WorkerLocal{
 
 	@Override
 	public void addAgent(ServiceMessage message) {
-		if(manager.getCenterAgents().containsKey(message.getCenter().getAlias())){
-			manager.getCenterAgents().get(message.getCenter().getAlias()).add(message.getAid());
+		if(manager.isAgentContained(message.getCenter().getAlias())){
+			manager.getCenterAgent(message.getCenter().getAlias()).add(message.getAid());
 		}else{
 			List<AID> list = new ArrayList<>();
 			list.add(message.getAid());
-			manager.getCenterAgents().put(message.getCenter().getAlias(), list);
+			manager.addCenterAgent(message.getCenter().getAlias(), list);
 		}
 		
 		SocketMessage msg = new SocketMessage();

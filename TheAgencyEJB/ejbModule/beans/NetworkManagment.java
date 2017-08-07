@@ -6,7 +6,6 @@ import java.net.UnknownHostException;
 import java.util.concurrent.TimeoutException;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.ejb.EJB;
 import javax.ejb.Local;
 import javax.ejb.Singleton;
@@ -59,6 +58,9 @@ public class NetworkManagment implements NetworkManagmentLocal{
 	
 	@EJB
 	private HandlerRabbitLocal rabbitHandler;
+	
+	@EJB
+	private AgentRegistry agentRegistry;
 	
 	@PostConstruct
 	public void initialise(){		
@@ -132,11 +134,11 @@ public class NetworkManagment implements NetworkManagmentLocal{
 			}
 			try {
 				ServiceMessage message = getAllRunningAgents(masterIpAddress, slave);
-				if(message != null) agency.getCenterAgents().putAll(message.getOtherAgents());
+				if(message != null) agency.addCenterAgents(message.getOtherAgents());
 			} catch (ConnectionException | IOException | TimeoutException | InterruptedException e) {
 				try {
 					ServiceMessage message = getAllRunningAgents(masterIpAddress, slave);
-					if(message != null) agency.getCenterAgents().putAll(message.getOtherAgents());									
+					if(message != null) agency.addCenterAgents(message.getOtherAgents());									
 				} catch (ConnectionException | IOException | TimeoutException | InterruptedException e1) {
 					try {
 						ServiceMessage message = rollback(masterIpAddress, slave);
@@ -188,7 +190,7 @@ public class NetworkManagment implements NetworkManagmentLocal{
 		message.setType(type);
 		message.setAgentTypes(agency.getSupportedTypes());
 		message.setCenter(slave);
-		message.setRunningAgents(agency.getRunningAgents());
+		message.setRunningAgents(agentRegistry.getRunningAID());
 		return message;
 	}
 		

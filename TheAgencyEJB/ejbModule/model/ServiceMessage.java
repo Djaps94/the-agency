@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 public class ServiceMessage implements Serializable {
@@ -101,8 +102,8 @@ public class ServiceMessage implements Serializable {
 		this.agentType = agentType;
 	}
 
-	public Map<String, List<AID>> getOtherAgents() {
-		return otherAgents;
+	public Iterator<Entry<String, List<AID>>> getOtherAgents() {
+		return otherAgents.entrySet().iterator();
 	}
 
 	public void setOtherAgents(Map<String, List<AID>> otherAgents) {

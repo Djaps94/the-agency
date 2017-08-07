@@ -6,7 +6,7 @@ import javax.ejb.Singleton;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import beans.AgencyManagerLocal;
+import beans.AgentRegistryLocal;
 import model.ACLMessage;
 import model.AID;
 import model.Agent;
@@ -20,8 +20,8 @@ import model.Agent;
 public class MessageDispatcher implements MessageDispatcherLocal {
 	
     @EJB
-    private AgencyManagerLocal manager;
-	
+    private AgentRegistryLocal registry;
+    
 	public MessageDispatcher() {
     
     }
@@ -32,8 +32,8 @@ public class MessageDispatcher implements MessageDispatcherLocal {
 			Agent a = (Agent)context.lookup("java:module/"+aid.getType().getName());
 			a.setId(aid);
 			
-			while(manager.getStartedAgents().hasNext()){
-				Agent agent = manager.getStartedAgents().next();
+			while(registry.getRunningAgents().hasNext()){
+				Agent agent = registry.getRunningAgents().next();
 				if(agent.getId().getName().equals(a.getId().getName())){
 					agent.handleMessage(message);
 					return;

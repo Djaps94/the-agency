@@ -1,11 +1,11 @@
 package beans;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -14,32 +14,24 @@ import javax.ejb.Singleton;
 
 import model.ACLMessage.Performative;
 import model.AID;
-import model.Agent;
 import model.AgentType;
 
 @Singleton
 public class AgencyManager implements AgencyManagerLocal {
 
-	private List<AID> runningAgents;
+
 	private Map<String, List<AID>> centerAgents;
 	private Set<AgentType> supportedTypes; 
 	private Map<String,Set<AgentType>> otherSupportedTypes;
-	private List<Agent> startedAgents;
-	private Performative performative;
+	public static Performative performative;
 	
 	public AgencyManager() { }
 	
 	@PostConstruct
 	public void initialise(){
-		this.runningAgents  = new ArrayList<AID>();
 		this.supportedTypes = new HashSet<AgentType>();
 		this.otherSupportedTypes = new HashMap<String, Set<AgentType>>();
 		this.centerAgents = new HashMap<String, List<AID>>();
-		startedAgents = new ArrayList<Agent>();
-	}
-	
-	public Performative getPerformative(){
-		return performative;
 	}
 	
 	public Iterator<AgentType> getSupportedTypes() {
@@ -58,38 +50,18 @@ public class AgencyManager implements AgencyManagerLocal {
 		this.supportedTypes = supportedTypes;
 	}
 
-	public Iterator<AID> getRunningAgents() {
-		return runningAgents.iterator();
+	public Iterator<Entry<String, Set<AgentType>>> getOtherSupportedTypes() {
+		return otherSupportedTypes.entrySet().iterator();
 	}
 	
-	public Stream<AID> getRunningAgentsStream(){
-		return runningAgents.stream();
+	public Set<AgentType> getOtherAgentTypes(String key){
+		return otherSupportedTypes.get(key);
 	}
 	
-	public void addRunningAgent(AID aid){
-		runningAgents.add(aid);
-	}
-	
-	public void removeRunningAgent(AID aid){
-		runningAgents.remove(aid);
-	}
-	
-	public void removeAllRunningAgents(Iterator<AID> agents){
-		while(agents.hasNext())
-			runningAgents.remove(agents.next());
+	public Stream<Entry<String, Set<AgentType>>> getOtherSupportedTypesStream(){
+		return otherSupportedTypes.entrySet().stream();
 	}
 
-	public void setRunningAgents(List<AID> runningAgents) {
-		this.runningAgents = runningAgents;
-	}
-
-	public Map<String, Set<AgentType>> getOtherSupportedTypes() {
-		return otherSupportedTypes;
-	}
-
-	public void setOtherSupportedTypes(Map<String, Set<AgentType>> otherSupportedTypes) {
-		this.otherSupportedTypes = otherSupportedTypes;
-	}
 	
 	public boolean isContained(String alias){
 		return otherSupportedTypes.containsKey(alias);
@@ -106,29 +78,37 @@ public class AgencyManager implements AgencyManagerLocal {
 		otherSupportedTypes.remove(alias);
 	}
 
-	public Map<String, List<AID>> getCenterAgents() {
-		return centerAgents;
+	public Iterator<Entry<String, List<AID>>> getCenterAgents() {
+		return centerAgents.entrySet().iterator();
+	}
+	
+	public List<AID> getCenterAgent(String key) {
+		return centerAgents.get(key);
+	}
+	
+	public boolean isAgentContained(String key) {
+		return centerAgents.containsKey(key);
+	}
+	
+	public void removeAgent(String key) {
+		centerAgents.remove(key);
+	}
+	
+	public void addCenterAgent(String key, List<AID> aids) {
+		centerAgents.put(key, aids);
+	}
+	
+	public void addCenterAgents(Iterator<Entry<String, List<AID>>> iter) {
+		while(iter.hasNext()){
+			Entry<String, List<AID>> entry = iter.next();
+			if(centerAgents.containsKey(entry.getKey()))
+				centerAgents.get(entry.getKey()).addAll(entry.getValue());
+			else
+				centerAgents.put(entry.getKey(), entry.getValue());
+		}
 	}
 
 	public void setCenterAgents(Map<String, List<AID>> centerAgents) {
 		this.centerAgents = centerAgents;
 	}
-
-	public Iterator<Agent> getStartedAgents() {
-		return startedAgents.iterator();
-	}
-	
-	public void addStartedAgent(Agent agent){
-		this.startedAgents.add(agent);
-	}
-	
-	public void removeStartedAgent(Agent agent){
-		this.startedAgents.remove(agent);
-	}
-
-	public void setStartedAgents(List<Agent> startedAgents) {
-		this.startedAgents = startedAgents;
-	}
-	
-	
 }

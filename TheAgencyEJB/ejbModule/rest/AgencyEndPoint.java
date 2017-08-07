@@ -26,6 +26,7 @@ import javax.ws.rs.core.MediaType;
 import beans.AgencyManagerLocal;
 import beans.AgencyRegistryLocal;
 import beans.AgentManagerLocal;
+import beans.AgentRegistryLocal;
 import exceptions.ConnectionException;
 import intercommunication.HandlerLocal;
 import intercommunication.MessageDispatcherLocal;
@@ -63,15 +64,19 @@ public class AgencyEndPoint {
 	
 	@EJB
 	private HandlerLocal handler;
+	
+	@EJB
+	private AgentRegistryLocal agentRegistry;
 
 	@GET
 	@Path("/agents/classes")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<AgentType> getAgentType(){
 		List<AgentType> types = new ArrayList<>();
-		for(Entry<String, Set<AgentType>> entry : manager.getOtherSupportedTypes().entrySet()){
-			entry.getValue().forEach(type -> types.add(type));
-		}
+		
+		while(manager.getOtherSupportedTypes().hasNext())
+			manager.getOtherSupportedTypes().next().getValue().forEach(type -> types.add(type));
+		
 		manager.getSupportedTypesStream().forEach(el -> types.add(el));
 		return types;
 		
@@ -82,14 +87,17 @@ public class AgencyEndPoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<AID> getRunningAgents(){
 		List<AID> agents = new ArrayList<AID>();
-		Iterator<AID> agentsIter = manager.getRunningAgents();
+		Iterator<AID> agentsIter = agentRegistry.getRunningAID();
+		
 		if(!agentsIter.hasNext())
 			while(agentsIter.hasNext())
 				agents.add(agentsIter.next());
-		if(!manager.getCenterAgents().isEmpty()){
-			for(Entry<String, List<AID>> entry : manager.getCenterAgents().entrySet())
-				agents.addAll(entry.getValue());
+		
+		if(!manager.getCenterAgents().hasNext()){
+			while(manager.getCenterAgents().hasNext())
+				agents.addAll(manager.getCenterAgents().next().getValue());
 		}
+		
 		return agents;
 	}
 	
@@ -111,7 +119,7 @@ public class AgencyEndPoint {
 	@Path("/agents/running/{type}/{name}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public AID runAgent(@PathParam("type") String type, @PathParam("name") String name){
-		if(manager.getRunningAgentsStream().anyMatch(agent -> agent.getName().equals(name)))
+		if(agentRegistry.getRunningAIDStream().anyMatch(agent -> agent.getName().equals(name)))
 			return null;
 		
 		String[] typesPart = type.split(":");
@@ -122,7 +130,8 @@ public class AgencyEndPoint {
 		if(manager.isSupportedContained(t)){
 			return agentManager.startAgent(agent);
 		}else{
-			for(Entry<String, Set<AgentType>> entry : manager.getOtherSupportedTypes().entrySet()){
+			while(manager.getOtherSupportedTypes().hasNext()){
+				Entry<String, Set<AgentType>> entry = manager.getOtherSupportedTypes().next();
 				if(entry.getValue().contains(t)){
 					Optional<AgentCenter> center = registry.getCenters().filter(cent -> cent.getAlias().equals(entry.getKey())).findFirst();
 					ServiceMessage message = new ServiceMessage(OperationType.RUN_AGENT);

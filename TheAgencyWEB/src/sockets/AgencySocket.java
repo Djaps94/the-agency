@@ -16,7 +16,6 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
-import javax.websocket.OnClose;
 import javax.websocket.OnMessage;
 import javax.websocket.OnOpen;
 import javax.websocket.Session;
@@ -27,6 +26,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import beans.AgencyManagerLocal;
 import beans.AgencyRegistryLocal;
 import beans.AgentManagerLocal;
+import beans.AgentRegistryLocal;
 import beans.SessionHolderLocal;
 import exceptions.ConnectionException;
 import intercommunication.HandlerLocal;
@@ -65,15 +65,14 @@ public class AgencySocket implements MessageListener{
 	@EJB
 	private HandlerLocal handler;
 	
+	@EJB
+	private AgentRegistryLocal agentRegistry;
+	
 	@OnOpen
 	public void onOpen(Session session){
 		sessionHolder.addSession(session.getId(), session);
 	}
 	
-	@OnClose
-	public void onClose(Session session) throws IOException{
-		//sessionHolder.removeSession(session.getId());
-	}
 	
 	@OnMessage
 	public void onMessage(Session session, String message){
@@ -111,21 +110,28 @@ public class AgencySocket implements MessageListener{
 	
 	private void getRunningAgents(Session session, ObjectMapper mapper) throws IOException{
 		List<AID> runningAgents = new ArrayList<AID>();
-		runningAgents.addAll(agency.getRunningAgents());
-		for(Entry<String, List<AID>> entry : agency.getCenterAgents().entrySet()){
-			runningAgents.addAll(entry.getValue());
-		}
+		
+		while(agentRegistry.getRunningAID().hasNext())
+			runningAgents.add(agentRegistry.getRunningAID().next());
+		
+		while(agency.getCenterAgents().hasNext())
+			runningAgents.addAll(agency.getCenterAgents().next().getValue());
+		
 		SocketMessage msg = new SocketMessage();
 		msg.setMsgType(messageType.GET_AGENTS);
-		msg.setRunningAgents(runningAgents);
+		msg.setRunningAgents(runningAgents.iterator());
 		String output = mapper.writeValueAsString(msg);
 		session.getBasicRemote().sendText(output);
 	}
 	
 	private void getAgentTypes(Session session, ObjectMapper mapper) throws IOException{
 		Set<AgentType> type = new HashSet<AgentType>();
-		type.addAll(agency.getSupportedTypes());
-		agency.getOtherSupportedTypes().entrySet().stream().forEach(entry -> type.addAll(entry.getValue()));
+		
+		while(agency.getSupportedTypes().hasNext())
+			type.add(agency.getSupportedTypes().next());
+		
+		agency.getOtherSupportedTypesStream().forEach(entry -> type.addAll(entry.getValue()));
+		
 		SocketMessage msg = new SocketMessage();
 		msg.setMsgType(messageType.GET_TYPES);
 		msg.setAgentTypes(type);
@@ -134,18 +140,19 @@ public class AgencySocket implements MessageListener{
 	}
 	
 	private void startAgent(Session session, ObjectMapper mapper, SocketMessage msg){
-		if(agency.getRunningAgents().stream().anyMatch(agent -> agent.getName().equals(msg.getAgentName())))
+		if(agentRegistry.getRunningAIDStream().anyMatch(agent -> agent.getName().equals(msg.getAgentName())))
 			return;
 		
 		AID agent = new AID();
 		AgentType t = new AgentType(msg.getTypeName(), msg.getTypeModule());
 		agent.setType(t); agent.setName(msg.getAgentName());
-		if(agency.getSupportedTypes().contains(t)){
+		if(agency.isSupportedContained(t)){
 			agentManager.startAgent(agent);
 		}else{
-			for(Entry<String, Set<AgentType>> entry : agency.getOtherSupportedTypes().entrySet()){
+			while(agency.getOtherSupportedTypes().hasNext()){
+				Entry<String, Set<AgentType>> entry = agency.getOtherSupportedTypes().next();
 				if(entry.getValue().contains(t)){
-					Optional<AgentCenter> center = registry.getCenters().stream().filter(cent -> cent.getAlias().equals(entry.getKey())).findFirst();
+					Optional<AgentCenter> center = registry.getCenters().filter(cent -> cent.getAlias().equals(entry.getKey())).findFirst();
 					ServiceMessage message = new ServiceMessage(OperationType.RUN_AGENT);
 					message.setAid(agent);
 					if(center.isPresent())
