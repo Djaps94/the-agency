@@ -10,13 +10,15 @@ import javax.ejb.Stateless;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.AMQP.BasicProperties;
+
+import consumers.HandshakeConsumer;
+
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 
 import exceptions.ConnectionException;
 import model.ServiceMessage;
-import util.HandshakeConsumer;
 
 @Stateless
 public class MessageRequest implements MessageRequestLocal {

@@ -27,10 +27,10 @@ import com.rabbitmq.client.ConnectionFactory;
 import beans.AgencyManagerLocal;
 import beans.AgencyRegistryLocal;
 import beans.SocketSenderLocal;
+import consumers.HeartbeatConsumer;
 import model.AID;
 import model.AgentCenter;
 import model.AgentType;
-import util.HeartbeatConsumer;
 import util.SocketMessage;
 import util.SocketMessage.messageType;
 

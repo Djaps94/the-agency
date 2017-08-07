@@ -14,8 +14,8 @@ import com.rabbitmq.client.ConnectionFactory;
 
 import beans.AgencyRegistryLocal;
 import beans.NetworkManagmentLocal;
+import consumers.HandshakeResponseConsumer;
 import handshake.ResponseOperationsLocal;
-import util.HandshakeResponseConsumer;
 
 @Singleton
 public class MessageResponse implements MessageResponseLocal{	

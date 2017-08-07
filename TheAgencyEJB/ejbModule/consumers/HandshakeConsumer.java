@@ -1,4 +1,4 @@
-package util;
+package consumers;
 
 import java.io.IOException;
 import java.util.concurrent.BlockingQueue;
