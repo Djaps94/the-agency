@@ -15,20 +15,20 @@ import beans.NetworkManagmentLocal;
 import exceptions.ConnectionException;
 import exceptions.NodeExistsException;
 import exceptions.RegisterSlaveException;
-import handshake.HandshakeRequesterLocal;
 import handshake.ResponseOperationsLocal;
 import model.ServiceMessage;
 import model.ServiceMessage.handshakeType;
+import service.MessageRequestLocal;
 
 public class HandshakeResponseConsumer extends DefaultConsumer{
 
 	private ObjectMapper mapper;
 	private NetworkManagmentLocal nodesManagment;
-	private HandshakeRequesterLocal requester;
+	private MessageRequestLocal requester;
 	private ResponseOperationsLocal operations;
 	private Channel channel;
 	
-	public HandshakeResponseConsumer(Channel channel, ObjectMapper mapper, NetworkManagmentLocal nodesManagment, HandshakeRequesterLocal requester, ResponseOperationsLocal operations) {
+	public HandshakeResponseConsumer(Channel channel, ObjectMapper mapper, NetworkManagmentLocal nodesManagment, MessageRequestLocal requester, ResponseOperationsLocal operations) {
 		super(channel);
 		this.channel 		= channel;
 		this.mapper 		= mapper;

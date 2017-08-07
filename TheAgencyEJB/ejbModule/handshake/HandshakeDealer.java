@@ -25,6 +25,7 @@ import model.AgentCenter;
 import model.AgentType;
 import model.ServiceMessage;
 import model.ServiceMessage.handshakeType;
+import service.MessageRequestLocal;
 import util.SocketMessage;
 import util.SocketMessage.messageType;
 
@@ -38,7 +39,7 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 	private NetworkManagmentLocal nodesManagment;
 	
 	@EJB
-	private HandshakeRequesterLocal requester;
+	private MessageRequestLocal requester;
 	
 	@EJB
 	private AgencyManagerLocal manager;

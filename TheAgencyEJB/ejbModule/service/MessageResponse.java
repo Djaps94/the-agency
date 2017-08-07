@@ -1,4 +1,4 @@
-package handshake;
+package service;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
@@ -14,10 +14,11 @@ import com.rabbitmq.client.ConnectionFactory;
 
 import beans.AgencyRegistryLocal;
 import beans.NetworkManagmentLocal;
+import handshake.ResponseOperationsLocal;
 import util.HandshakeResponseConsumer;
 
 @Singleton
-public class HandshakeResponse implements HandshakeResponseLocal{	
+public class MessageResponse implements MessageResponseLocal{	
 	
 	@EJB
 	private AgencyRegistryLocal registry;
@@ -26,7 +27,7 @@ public class HandshakeResponse implements HandshakeResponseLocal{
 	private NetworkManagmentLocal nodesManagment;
 	
 	@EJB
-	private HandshakeRequesterLocal requester;
+	private MessageRequestLocal requester;
 	
 	@EJB
 	private ResponseOperationsLocal operations;
@@ -35,7 +36,7 @@ public class HandshakeResponse implements HandshakeResponseLocal{
 	private Connection connection;
 	private Channel channel;
 	
-	public HandshakeResponse() { }
+	public MessageResponse() { }
 	
 	@PostConstruct
 	private void initialise(){

@@ -14,14 +14,14 @@ import javax.ejb.Startup;
 
 import exceptions.ConnectionException;
 import exceptions.NodeExistsException;
-import handshake.HandshakeRequesterLocal;
-import handshake.HandshakeResponseLocal;
 import heartbeat.HeartBeatResponseLocal;
 import heartbeat.HeartbeatRequestLocal;
 import intercommunication.HandlerRabbitLocal;
 import model.AgentCenter;
 import model.ServiceMessage;
 import model.ServiceMessage.handshakeType;
+import service.MessageRequestLocal;
+import service.MessageResponseLocal;
 import util.AgencyUtil;
 
 @Startup
@@ -43,7 +43,7 @@ public class NetworkManagment implements NetworkManagmentLocal{
 	private AgencyRegistryLocal registryBean;
 	
 	@EJB
-	private HandshakeRequesterLocal requester;
+	private MessageRequestLocal requester;
 		
 	@EJB 
 	private AgencyManagerLocal agency;
@@ -55,7 +55,7 @@ public class NetworkManagment implements NetworkManagmentLocal{
 	private HeartBeatResponseLocal beatResponse;
 	
 	@EJB
-	private HandshakeResponseLocal handshakeResponse;
+	private MessageResponseLocal handshakeResponse;
 	
 	@EJB
 	private HandlerRabbitLocal rabbitHandler;

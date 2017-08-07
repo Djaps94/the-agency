@@ -10,11 +10,11 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import exceptions.ConnectionException;
-import handshake.HandshakeRequesterLocal;
 import model.AID;
 import model.Agent;
 import model.ServiceMessage;
 import model.ServiceMessage.handshakeType;
+import service.MessageRequestLocal;
 import util.SocketMessage;
 import util.SocketMessage.messageType;
 
@@ -29,7 +29,7 @@ public class AgentManager implements AgentManagerLocal {
 	private AgencyRegistryLocal registry;
 	
 	@EJB
-	private HandshakeRequesterLocal requester;
+	private MessageRequestLocal requester;
 	
 	@EJB
 	private SocketSenderLocal socketSender;

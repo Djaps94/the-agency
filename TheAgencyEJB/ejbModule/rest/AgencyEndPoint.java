@@ -26,7 +26,6 @@ import beans.AgencyManagerLocal;
 import beans.AgencyRegistryLocal;
 import beans.AgentManagerLocal;
 import exceptions.ConnectionException;
-import handshake.HandshakeRequesterLocal;
 import intercommunication.HandlerLocal;
 import intercommunication.MessageDispatcherLocal;
 import intercommunication.RabbitDispatcherLocal;
@@ -37,6 +36,7 @@ import model.AgentCenter;
 import model.AgentType;
 import model.ServiceMessage;
 import model.ServiceMessage.handshakeType;
+import service.MessageRequestLocal;
 
 @Stateless
 @Path("/agency")
@@ -46,7 +46,7 @@ public class AgencyEndPoint {
 	private AgencyManagerLocal manager;
 	
 	@EJB
-	private HandshakeRequesterLocal requester;
+	private MessageRequestLocal requester;
 	
 	@EJB
 	private AgencyRegistryLocal registry;

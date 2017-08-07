@@ -29,7 +29,6 @@ import beans.AgencyRegistryLocal;
 import beans.AgentManagerLocal;
 import beans.SessionHolderLocal;
 import exceptions.ConnectionException;
-import handshake.HandshakeRequesterLocal;
 import intercommunication.HandlerLocal;
 import model.ACLMessage;
 import model.AID;
@@ -37,6 +36,7 @@ import model.AgentCenter;
 import model.AgentType;
 import model.ServiceMessage;
 import model.ServiceMessage.handshakeType;
+import service.MessageRequestLocal;
 import util.SocketMessage;
 import util.SocketMessage.messageType;
 
@@ -54,7 +54,7 @@ public class AgencySocket implements MessageListener{
 	private AgencyManagerLocal agency;
 	
 	@EJB
-	private HandshakeRequesterLocal requester;
+	private MessageRequestLocal requester;
 	
 	@EJB
 	private AgencyRegistryLocal registry;

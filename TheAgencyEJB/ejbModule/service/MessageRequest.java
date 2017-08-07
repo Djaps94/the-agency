@@ -1,4 +1,4 @@
-package handshake;
+package service;
 
 import java.io.IOException;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -19,9 +19,9 @@ import model.ServiceMessage;
 import util.HandshakeConsumer;
 
 @Stateless
-public class HandshakeRequester implements HandshakeRequesterLocal {
+public class MessageRequest implements MessageRequestLocal {
 	
-	public HandshakeRequester() { }
+	public MessageRequest() { }
 		
 	public ServiceMessage sendMessage(String destination, ServiceMessage message) throws ConnectionException, IOException, TimeoutException, InterruptedException{
 		ConnectionFactory factory = new ConnectionFactory();
