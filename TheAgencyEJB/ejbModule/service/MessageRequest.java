@@ -11,7 +11,7 @@ import javax.ejb.Stateless;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.AMQP.BasicProperties;
 
-import consumers.HandshakeConsumer;
+import consumers.ServiceMessageConsumer;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
@@ -39,7 +39,7 @@ public class MessageRequest implements MessageRequestLocal {
 		BasicProperties props = new BasicProperties().builder().replyTo(ReplyQueueName).build();
 	
 		channel.basicPublish("", destination, props, msg.getBytes());
-		channel.basicConsume(ReplyQueueName, true, new HandshakeConsumer(channel, mapper, response));
+		channel.basicConsume(ReplyQueueName, true, new ServiceMessageConsumer(channel, mapper, response));
 		return response.poll(5, TimeUnit.SECONDS);
 	}
 	

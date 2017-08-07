@@ -14,7 +14,7 @@ import com.rabbitmq.client.ConnectionFactory;
 
 import beans.AgencyRegistryLocal;
 import beans.NetworkManagmentLocal;
-import consumers.HandshakeResponseConsumer;
+import consumers.HandshakeConsumer;
 import handshake.ResponseOperationsLocal;
 
 @Singleton
@@ -60,7 +60,7 @@ public class MessageResponse implements MessageResponseLocal{
 			e.printStackTrace();
 		}
 		ObjectMapper mapper = new ObjectMapper();
-		channel.basicConsume(registry.getThisCenter().getAddress(), new HandshakeResponseConsumer(channel, mapper, nodesManagment, requester, operations));
+		channel.basicConsume(registry.getThisCenter().getAddress(), new HandshakeConsumer(channel, mapper, nodesManagment, requester, operations));
 
 	}
 }
