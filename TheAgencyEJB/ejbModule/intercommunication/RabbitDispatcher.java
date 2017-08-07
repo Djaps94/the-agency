@@ -28,6 +28,8 @@ public class RabbitDispatcher implements RabbitDispatcherLocal{
 	private Channel channel;
 	private ObjectMapper mapper;
 	
+	private final String QUEUE_NAME = ":Agent";
+	
 	public RabbitDispatcher() { }
 	
 	@PostConstruct
@@ -48,8 +50,8 @@ public class RabbitDispatcher implements RabbitDispatcherLocal{
 		try {
 			InterCenterMessage msg = new InterCenterMessage(message, aid);
 			String data = mapper.writeValueAsString(msg);
-			BasicProperties props = new BasicProperties().builder().replyTo(alias+"/"+"ACL").build();
-			channel.basicPublish("", alias+"/"+"ACL", props, data.getBytes());
+			BasicProperties props = new BasicProperties().builder().replyTo(alias+QUEUE_NAME).build();
+			channel.basicPublish("", alias+QUEUE_NAME, props, data.getBytes());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

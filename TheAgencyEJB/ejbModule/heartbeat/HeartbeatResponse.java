@@ -31,7 +31,7 @@ public class HeartbeatResponse implements HeartBeatResponseLocal{
 	private ConnectionFactory factory;
 	private Connection connection;
 	private Channel channel;
-	private final String queueName = "Heartbeat";
+	private final String QUEUE_NAME = ":Heartbeat";
 
     public HeartbeatResponse() {
     	
@@ -53,9 +53,9 @@ public class HeartbeatResponse implements HeartBeatResponseLocal{
 
 	public void pulseTick() {
 		try {
-			channel.queueDeclare(queueName + registry.getThisCenter().getAlias(), false, false, false, null);
+			channel.queueDeclare(registry.getThisCenter().getAlias()+QUEUE_NAME, false, false, false, null);
 			channel.basicQos(1);
-			channel.basicConsume(queueName + registry.getThisCenter().getAlias(), false, new DefaultConsumer(channel) {
+			channel.basicConsume(registry.getThisCenter().getAlias()+QUEUE_NAME, false, new DefaultConsumer(channel) {
 				@Override
 				public void handleDelivery(String consumerTag, Envelope envelope, BasicProperties properties, byte[] body) throws IOException {
 					BasicProperties replyProperty = new BasicProperties().builder().correlationId(properties.getCorrelationId()).build();

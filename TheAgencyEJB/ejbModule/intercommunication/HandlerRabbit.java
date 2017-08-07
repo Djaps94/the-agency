@@ -26,6 +26,8 @@ public class HandlerRabbit implements HandlerRabbitLocal{
 	private Connection connection;
 	private Channel channel;
 	
+	private final String QUEUE_NAME = ":Agent";
+	
 	public HandlerRabbit(){
 		
 	}
@@ -46,10 +48,9 @@ public class HandlerRabbit implements HandlerRabbitLocal{
 	
 	public void recieveMessage(){
 		try {
-			channel.queueDeclare(registry.getThisCenter().getAlias()+"/"+"ACL",false, false, false, null);
+			channel.queueDeclare(registry.getThisCenter().getAlias()+QUEUE_NAME, false, false, false, null);
 			channel.basicQos(1);
-			HandlerConsumer consumer = new HandlerConsumer(channel, dispatcher);
-			channel.basicConsume(registry.getThisCenter().getAlias()+"/"+"ACL", false, consumer);
+			channel.basicConsume(registry.getThisCenter().getAlias()+QUEUE_NAME, false, new HandlerConsumer(channel, dispatcher));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

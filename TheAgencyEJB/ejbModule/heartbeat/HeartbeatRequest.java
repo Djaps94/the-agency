@@ -54,7 +54,7 @@ public class HeartbeatRequest implements HeartbeatRequestLocal {
 	private ConnectionFactory factory;
 	private Connection connection;
 	private Channel channel;
-	private String RequestQueueName;
+	private final String REQUEST_NAME = ":Heartbeat";
 	private String ReplyQueueName;
 	private BlockingQueue<String> response;
 	
@@ -75,8 +75,8 @@ public class HeartbeatRequest implements HeartbeatRequestLocal {
 			channel = connection.createChannel();
 			ReplyQueueName = channel.queueDeclare().getQueue();
 		} catch (IOException | TimeoutException e) {
+		
 		}
-		RequestQueueName = "Heartbeat";
 	}
 
 	@Override
@@ -104,7 +104,7 @@ public class HeartbeatRequest implements HeartbeatRequestLocal {
 		try {
 			BasicProperties properties = new BasicProperties().builder().replyTo(ReplyQueueName).correlationId(center.getAlias()).build();
 
-			channel.basicPublish("", RequestQueueName + center.getAlias(), properties, "Check pulse".getBytes());
+			channel.basicPublish("", center.getAlias()+REQUEST_NAME, properties, "Check pulse".getBytes());
 			channel.basicConsume(ReplyQueueName, true, new HeartbeatConsumer(channel, center.getAlias(), response));
 			return response.poll(5, TimeUnit.SECONDS);
 		} catch (IOException | InterruptedException e) {
