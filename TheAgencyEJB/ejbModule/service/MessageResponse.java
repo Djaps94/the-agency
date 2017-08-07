@@ -27,7 +27,7 @@ public class MessageResponse implements MessageResponseLocal{
 	private NetworkManagmentLocal nodesManagment;
 	
 	@EJB
-	private MessageRequestLocal requester;
+	private MessageRequestLocal request;
 	
 	@EJB
 	private AgencyOperationLocal operations;
@@ -60,7 +60,7 @@ public class MessageResponse implements MessageResponseLocal{
 			e.printStackTrace();
 		}
 		ObjectMapper mapper = new ObjectMapper();
-		channel.basicConsume(registry.getThisCenter().getAddress(), new AgencyOperationConsumer(channel, mapper, nodesManagment, requester, operations));
+		channel.basicConsume(registry.getThisCenter().getAddress(), new AgencyOperationConsumer(channel, mapper, nodesManagment, request, operations));
 
 	}
 }

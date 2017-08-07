@@ -1,6 +1,7 @@
 package util;
 
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -60,8 +61,9 @@ public class SocketMessage implements Serializable{
 	}
 
 
-	public void setRunningAgents(List<AID> runningAgents) {
-		this.runningAgents = runningAgents;
+	public void setRunningAgents(Iterator<AID> runningAgents) {
+		while(runningAgents.hasNext())
+			this.runningAgents.add(runningAgents.next());
 	}
 
 

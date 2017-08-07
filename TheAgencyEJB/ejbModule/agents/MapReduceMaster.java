@@ -1,11 +1,8 @@
 package agents;
 
 import java.io.File;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -92,7 +89,7 @@ public class MapReduceMaster extends Agent{
 		case REJECT_PROPOSAL:
 			break;
 		case REQUEST: {
-			boolean support = manager.getSupportedTypes().stream().anyMatch(type -> type.getName().equals("MapReduceSlave"));
+			boolean support = manager.getSupportedTypesStream().anyMatch(type -> type.getName().equals("MapReduceSlave"));
 			File file = new File("/home/predrag/workspace/the-agency/TheAgencyEJB/files");
 			slaves = file.listFiles().length;
 			for(int i = 0; i < slaves; i++){

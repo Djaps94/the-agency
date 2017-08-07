@@ -35,7 +35,7 @@ public class AgencyOperation implements AgencyOperationLocal{
 		else{
 			ServiceMessage msg = new ServiceMessage();
 			msg.setCenters(centers);
-			msg.setType(ServiceMessage.handshakeType.GET_CENTERS);
+			msg.setType(ServiceMessage.OperationType.GET_CENTERS);
 			String m = mapper.writeValueAsString(msg);
 			channel.basicPublish("", property.getReplyTo(), new BasicProperties().builder().build(), m.getBytes());
 		}

@@ -2,6 +2,7 @@ package rest;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -35,7 +36,7 @@ import model.AID;
 import model.AgentCenter;
 import model.AgentType;
 import model.ServiceMessage;
-import model.ServiceMessage.handshakeType;
+import model.ServiceMessage.OperationType;
 import service.MessageRequestLocal;
 
 @Stateless
@@ -46,7 +47,7 @@ public class AgencyEndPoint {
 	private AgencyManagerLocal manager;
 	
 	@EJB
-	private MessageRequestLocal requester;
+	private MessageRequestLocal request;
 	
 	@EJB
 	private AgencyRegistryLocal registry;
@@ -71,7 +72,7 @@ public class AgencyEndPoint {
 		for(Entry<String, Set<AgentType>> entry : manager.getOtherSupportedTypes().entrySet()){
 			entry.getValue().forEach(type -> types.add(type));
 		}
-		manager.getSupportedTypes().forEach(el -> types.add(el));
+		manager.getSupportedTypesStream().forEach(el -> types.add(el));
 		return types;
 		
 	}
@@ -81,8 +82,10 @@ public class AgencyEndPoint {
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<AID> getRunningAgents(){
 		List<AID> agents = new ArrayList<AID>();
-		if(!manager.getRunningAgents().isEmpty())
-			agents.addAll(manager.getRunningAgents());
+		Iterator<AID> agentsIter = manager.getRunningAgents();
+		if(!agentsIter.hasNext())
+			while(agentsIter.hasNext())
+				agents.add(agentsIter.next());
 		if(!manager.getCenterAgents().isEmpty()){
 			for(Entry<String, List<AID>> entry : manager.getCenterAgents().entrySet())
 				agents.addAll(entry.getValue());
@@ -108,24 +111,25 @@ public class AgencyEndPoint {
 	@Path("/agents/running/{type}/{name}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public AID runAgent(@PathParam("type") String type, @PathParam("name") String name){
-		if(manager.getRunningAgents().stream().anyMatch(agent -> agent.getName().equals(name)))
+		if(manager.getRunningAgentsStream().anyMatch(agent -> agent.getName().equals(name)))
 			return null;
 		
 		String[] typesPart = type.split(":");
 		AID agent = new AID();
 		AgentType t = new AgentType(typesPart[1].trim(), typesPart[0].trim());
-		agent.setType(t); agent.setName(name);
-		if(manager.getSupportedTypes().contains(t)){
+		agent.setType(t); 
+		agent.setName(name);
+		if(manager.isSupportedContained(t)){
 			return agentManager.startAgent(agent);
 		}else{
 			for(Entry<String, Set<AgentType>> entry : manager.getOtherSupportedTypes().entrySet()){
 				if(entry.getValue().contains(t)){
 					Optional<AgentCenter> center = registry.getCenters().filter(cent -> cent.getAlias().equals(entry.getKey())).findFirst();
-					ServiceMessage message = new ServiceMessage(handshakeType.RUN_AGENT);
+					ServiceMessage message = new ServiceMessage(OperationType.RUN_AGENT);
 					message.setAid(agent);
 					if(center.isPresent())
 						try {
-							ServiceMessage msg = requester.sendMessage(center.get().getAddress(), message);
+							ServiceMessage msg = request.sendMessage(center.get().getAddress(), message);
 							return msg.getAid();
 						} catch (ConnectionException | IOException | TimeoutException | InterruptedException e) {
 							System.out.println("Could not initialise agent");
@@ -146,10 +150,10 @@ public class AgencyEndPoint {
 		if(agentID.getHost().getAddress().equals(registry.getThisCenter().getAddress())){
 			return agentManager.stopAgent(agentID);
 		}else{
-			ServiceMessage message = new ServiceMessage(handshakeType.STOP_AGENT);
+			ServiceMessage message = new ServiceMessage(OperationType.STOP_AGENT);
 			message.setAid(agentID);
 			try {
-				ServiceMessage msg = requester.sendMessage(agentID.getHost().getAddress(), message);
+				ServiceMessage msg = request.sendMessage(agentID.getHost().getAddress(), message);
 				return msg.getAid();
 			} catch (ConnectionException | IOException | TimeoutException | InterruptedException e) {
 				return null;

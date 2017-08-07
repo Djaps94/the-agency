@@ -1,13 +1,14 @@
 package model;
 
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 public class ServiceMessage implements Serializable {
 
-	public enum handshakeType { REGISTER,
+	public enum OperationType { REGISTER,
 								GET_CENTERS,
 								GET_TYPES,
 								DELIVER_TYPES,
@@ -21,7 +22,7 @@ public class ServiceMessage implements Serializable {
 							  };
 	
 	private AgentCenter center;
-	private handshakeType type;
+	private OperationType type;
 	private List<AgentCenter> centers;
 	private Set<AgentType> agentTypes;
 	private Map<String, Set<AgentType>> otherTypes;
@@ -33,12 +34,12 @@ public class ServiceMessage implements Serializable {
 	
 	public ServiceMessage() { }
 	
-	public ServiceMessage(AgentCenter center, handshakeType type){
+	public ServiceMessage(AgentCenter center, OperationType type){
 		this.center = center;
 		this.type   = type;
 	}
 	
-	public ServiceMessage(handshakeType type){
+	public ServiceMessage(OperationType type){
 		this.type = type;
 	}
 
@@ -50,11 +51,11 @@ public class ServiceMessage implements Serializable {
 		this.center = center;
 	}
 
-	public handshakeType getType() {
+	public OperationType getType() {
 		return type;
 	}
 
-	public void setType(handshakeType type) {
+	public void setType(OperationType type) {
 		this.type = type;
 	}
 
@@ -70,8 +71,9 @@ public class ServiceMessage implements Serializable {
 		return agentTypes;
 	}
 
-	public void setAgentTypes(Set<AgentType> agentTypes) {
-		this.agentTypes = agentTypes;
+	public void setAgentTypes(Iterator<AgentType> agentTypes) {
+		while(agentTypes.hasNext())
+			this.agentTypes.add(agentTypes.next());
 	}
 
 	public Map<String, Set<AgentType>> getOtherTypes() {
@@ -82,12 +84,13 @@ public class ServiceMessage implements Serializable {
 		this.otherTypes = otherTypes;
 	}
 
-	public List<AID> getRunningAgents() {
-		return runningAgents;
+	public Iterator<AID> getRunningAgents() {
+		return runningAgents.iterator();
 	}
 
-	public void setRunningAgents(List<AID> runningAgents) {
-		this.runningAgents = runningAgents;
+	public void setRunningAgents(Iterator<AID> runningAgents) {
+		while(runningAgents.hasNext())
+		this.runningAgents.add(runningAgents.next());
 	}
 
 	public AgentType getAgentType() {

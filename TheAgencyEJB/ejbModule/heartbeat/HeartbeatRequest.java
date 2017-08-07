@@ -123,16 +123,19 @@ public class HeartbeatRequest implements HeartbeatRequestLocal {
 			registry.deleteCenter(center);
 			Set<AgentType> types = manager.getOtherSupportedTypes().get(center.getAlias());
 			manager.deleteOtherTypes(center.getAlias());
+			
 			SocketMessage m = new SocketMessage();
 			m.setMsgType(messageType.REMOVE_TYPES);
 			m.setAgentTypes(types);
 			socketSender.socketSend(m);
+			
 			if(!manager.getCenterAgents().isEmpty()){
 				List<AID> list = manager.getCenterAgents().get(center.getAlias());
 				manager.getCenterAgents().remove(center.getAlias());
+				
 				SocketMessage message = new SocketMessage();
 				message.setMsgType(messageType.REMOVE_AGENTS);
-				message.setRunningAgents(list);
+				message.setRunningAgents(list.iterator());
 				socketSender.socketSend(message);
 			}
 		}

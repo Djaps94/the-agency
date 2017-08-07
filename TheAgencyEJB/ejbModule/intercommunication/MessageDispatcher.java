@@ -32,7 +32,8 @@ public class MessageDispatcher implements MessageDispatcherLocal {
 			Agent a = (Agent)context.lookup("java:module/"+aid.getType().getName());
 			a.setId(aid);
 			
-			for(Agent agent : manager.getStartedAgents()){
+			while(manager.getStartedAgents().hasNext()){
+				Agent agent = manager.getStartedAgents().next();
 				if(agent.getId().getName().equals(a.getId().getName())){
 					agent.handleMessage(message);
 					return;

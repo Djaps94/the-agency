@@ -13,7 +13,7 @@ import exceptions.ConnectionException;
 import model.AID;
 import model.Agent;
 import model.ServiceMessage;
-import model.ServiceMessage.handshakeType;
+import model.ServiceMessage.OperationType;
 import service.MessageRequestLocal;
 import util.SocketMessage;
 import util.SocketMessage.messageType;
@@ -45,12 +45,12 @@ public class AgentManager implements AgentManagerLocal {
 			InitialContext context = new InitialContext();
 			Agent agent = (Agent)context.lookup("java:module/"+aid.getType().getName());
 			agent.setId(aid);
-			manager.getStartedAgents().add(agent);
+			manager.addStartedAgent(agent);
 		} catch (NamingException e1) {
 			e1.printStackTrace();
 		}
-		manager.getRunningAgents().add(aid);
-		ServiceMessage message = new ServiceMessage(handshakeType.ADD_AGENT);
+		manager.addRunningAgent(aid);
+		ServiceMessage message = new ServiceMessage(OperationType.ADD_AGENT);
 		message.setAid(aid);
 		message.setCenter(registry.getThisCenter());
 		registry.getCenters().forEach(center -> {
@@ -69,8 +69,8 @@ public class AgentManager implements AgentManagerLocal {
 
 	@Override
 	public AID stopAgent(AID agent) {
-		manager.getRunningAgents().remove(agent);
-		ServiceMessage message = new ServiceMessage(handshakeType.DELETE_AGENT);
+		manager.removeRunningAgent(agent);
+		ServiceMessage message = new ServiceMessage(OperationType.DELETE_AGENT);
 		message.setAid(agent);
 		message.setCenter(registry.getThisCenter());
 		registry.getCenters().forEach(center -> {

@@ -16,7 +16,7 @@ import exceptions.ConnectionException;
 import exceptions.NodeExistsException;
 import exceptions.RegisterSlaveException;
 import model.ServiceMessage;
-import model.ServiceMessage.handshakeType;
+import model.ServiceMessage.OperationType;
 import operations.AgencyOperationLocal;
 import service.MessageRequestLocal;
 
@@ -51,7 +51,7 @@ public class AgencyOperationConsumer extends DefaultConsumer{
 					operation.sendRegisterResponse(message, channel, mapper, properties);
 				} catch (RegisterSlaveException | ConnectionException | NodeExistsException | TimeoutException | InterruptedException e1) {
 					try {
-						message.setType(handshakeType.ROLLBACK);
+						message.setType(OperationType.ROLLBACK);
 						request.sendMessage(nodesManagment.getMasterAddress(), message);
 					} catch (ConnectionException | TimeoutException | InterruptedException e2) {
 						//TODO: shutdown server
@@ -68,7 +68,7 @@ public class AgencyOperationConsumer extends DefaultConsumer{
 					operation.sendGetTypesResponse(message, channel, mapper, properties);
 				} catch (ConnectionException | JsonEOFException | TimeoutException | InterruptedException e1) {
 					try {
-						message.setType(handshakeType.ROLLBACK);
+						message.setType(OperationType.ROLLBACK);
 						request.sendMessage(nodesManagment.getMasterAddress(), message);
 					} catch (ConnectionException | TimeoutException | InterruptedException e2) {
 						// TODO: shutdown server
@@ -87,7 +87,7 @@ public class AgencyOperationConsumer extends DefaultConsumer{
 					operation.sendGetRunningResponse(channel, mapper, properties);
 				} catch(JsonProcessingException e1){
 					try {
-						message.setType(handshakeType.ROLLBACK);
+						message.setType(OperationType.ROLLBACK);
 						request.sendMessage(nodesManagment.getMasterAddress(), message);
 					} catch (ConnectionException | TimeoutException | InterruptedException e2) {
 						// TODO shutdown server
