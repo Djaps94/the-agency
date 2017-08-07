@@ -86,16 +86,15 @@ public class HeartbeatRequest implements HeartbeatRequestLocal {
 	@Timeout
 	private void sendPulse(Timer timer){
 		List<AgentCenter> deadList = new ArrayList<>();
-		for(AgentCenter center : registry.getCenters()){
+		registry.getCenters().forEach(center -> {
 			String data = checkPulse(center);
-			System.out.println(data);
 			if(data == null){
 				String temp = checkPulse(center);
 				if(temp == null){
 					deadList.add(center);
 				}
 			}
-		}
+		});
 			System.out.println("Heart tick...");
 			if(!deadList.isEmpty())
 				removeDeadCenter(deadList);

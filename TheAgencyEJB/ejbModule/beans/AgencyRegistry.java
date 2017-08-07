@@ -1,7 +1,9 @@
 package beans;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
@@ -37,8 +39,12 @@ public class AgencyRegistry implements AgencyRegistryLocal{
 	}
 	
 	@Override
-	public List<AgentCenter> getCenters() {
-		return registeredCenters;
+	public Stream<AgentCenter> getCenters() {
+		return registeredCenters.stream();
+	}
+	
+	public Iterator<AgentCenter> getCentersIterator(){
+		return registeredCenters.iterator();
 	}
 
 	@Override

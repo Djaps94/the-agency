@@ -19,7 +19,7 @@ public class ContractNetInitiator extends Agent{
 
 	@EJB
 	private HandlerLocal handler;
-	
+
 	@Override
 	public void handleMessage(ACLMessage message) {
 		switch(message.getPerformative()){
@@ -29,7 +29,7 @@ public class ContractNetInitiator extends Agent{
 			break;
 		case CANCEL:
 			break;
-		case CFP: 
+		case CFP:
 			break;
 		case CONFIRM:
 			break;
@@ -52,8 +52,7 @@ public class ContractNetInitiator extends Agent{
 			break;
 		case PROPOSE: {
 			System.out.println("Propose came from: "+message.getSender().getName());
-			Random rn = new Random();
-			int offer = rn.nextInt(5);
+			int offer = new Random().nextInt(5);
 			int proposale = Integer.parseInt(message.getContent());
 			List<AID> recievers = new ArrayList<AID>();
 			recievers.add(message.getSender());
@@ -94,9 +93,9 @@ public class ContractNetInitiator extends Agent{
 			break;
 		default:
 			break;
-		
+
 		}
-		
+
 	}
 
 }

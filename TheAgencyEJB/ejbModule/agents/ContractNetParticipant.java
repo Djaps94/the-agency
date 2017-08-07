@@ -31,6 +31,7 @@ public class ContractNetParticipant  extends Agent{
 			msg.setSender(getId());
 			List<AID> receivers = new ArrayList<AID>();
 			receivers.add(message.getSender());
+			msg.setRecievers(receivers);
 			handler.sendAgentMessage(msg);
 		}
 			break;
@@ -41,18 +42,18 @@ public class ContractNetParticipant  extends Agent{
 		case CFP: {
 			System.out.println("Call for proposal from: "+message.getSender().getName());
 			Random rd = new Random();
-			int acceptance = rd.nextInt(5);
+			int acceptance = rd.nextInt(3);
 			int sent = Integer.parseInt(message.getContent());
 			ACLMessage msg = new ACLMessage();
 			List<AID> recievers = new ArrayList<AID>();
 			recievers.add(message.getSender());
 			msg.setRecievers(recievers);
+			msg.setSender(getId());
 			if(sent != acceptance){
 				msg.setPerformative(Performative.REFUSE);
 				msg.setContent("I refuse your call!");
 				handler.sendAgentMessage(msg);
 			}else{
-				msg.setSender(getId());
 				msg.setContent(Integer.toString(acceptance));
 				msg.setPerformative(Performative.PROPOSE);
 				handler.sendAgentMessage(msg);

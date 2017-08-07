@@ -120,7 +120,7 @@ public class AgencyEndPoint {
 		}else{
 			for(Entry<String, Set<AgentType>> entry : manager.getOtherSupportedTypes().entrySet()){
 				if(entry.getValue().contains(t)){
-					Optional<AgentCenter> center = registry.getCenters().stream().filter(cent -> cent.getAlias().equals(entry.getKey())).findFirst();
+					Optional<AgentCenter> center = registry.getCenters().filter(cent -> cent.getAlias().equals(entry.getKey())).findFirst();
 					HandshakeMessage message = new HandshakeMessage(handshakeType.RUN_AGENT);
 					message.setAid(agent);
 					if(center.isPresent())

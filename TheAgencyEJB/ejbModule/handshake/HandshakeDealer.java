@@ -54,12 +54,12 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 	public List<AgentCenter> registerCenter(HandshakeMessage message) throws RegisterSlaveException, ConnectionException, NodeExistsException, IOException, TimeoutException, InterruptedException{
 		if(nodesManagment.isMaster()){
 			
-			for(AgentCenter center : registry.getCenters())
-				requester.sendMessage(center.getAddress(), message);
+			while(registry.getCentersIterator().hasNext()){
+				requester.sendMessage(registry.getCentersIterator().next().getAddress(), message);
+			}
 			
 			registry.addCenter(message.getCenter());
 			List<AgentCenter> list = registry.getCenters()
-											.stream()
 											.filter(center -> !center.getAlias().equals(message.getCenter().getAlias()))
 											.collect(Collectors.toList());
 			
@@ -82,7 +82,8 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 
 			manager.addOtherTypes(message.getCenter().getAlias(), message.getAgentTypes());
 			message.setType(handshakeType.DELIVER_TYPES);
-			for(AgentCenter center : registry.getCenters()){
+			while(registry.getCentersIterator().hasNext()){
+				AgentCenter center = registry.getCentersIterator().next();
 				if(!center.getAlias().equals(message.getCenter().getAlias()))
 						requester.sendMessage(center.getAddress(), message);
 			}
@@ -113,8 +114,8 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 			msg.setMsgType(messageType.REMOVE_TYPES);
 			msg.setAgentTypes(type);
 			socketSender.socketSend(m);
-			for(AgentCenter center : registry.getCenters())
-				requester.sendMessage(center.getAddress(), message);
+			while(registry.getCentersIterator().hasNext())
+				requester.sendMessage(registry.getCentersIterator().next().getAddress(), message);
 			return;
 		}
 		

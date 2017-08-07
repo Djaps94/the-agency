@@ -53,7 +53,7 @@ public class AgentManager implements AgentManagerLocal {
 		HandshakeMessage message = new HandshakeMessage(handshakeType.ADD_AGENT);
 		message.setAid(aid);
 		message.setCenter(registry.getThisCenter());
-		registry.getCenters().stream().forEach(center -> {
+		registry.getCenters().forEach(center -> {
 			try {
 				requester.sendMessage(center.getAddress(), message);
 			} catch (ConnectionException | IOException | TimeoutException | InterruptedException e) {
@@ -73,7 +73,7 @@ public class AgentManager implements AgentManagerLocal {
 		HandshakeMessage message = new HandshakeMessage(handshakeType.DELETE_AGENT);
 		message.setAid(agent);
 		message.setCenter(registry.getThisCenter());
-		registry.getCenters().stream().forEach(center -> {
+		registry.getCenters().forEach(center -> {
 			try {
 				requester.sendMessage(center.getAddress(), message);
 			} catch (ConnectionException | IOException | TimeoutException | InterruptedException e) {
