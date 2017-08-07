@@ -142,7 +142,7 @@ public class NetworkManagment implements NetworkManagmentLocal{
 						ServiceMessage message = rollback(masterIpAddress, slave);
 						if(message != null) shutdownServer();
 					} catch (ConnectionException | IOException | TimeoutException | InterruptedException e2) {
-						System.out.println("Handshake failed. Rollback failed. Shuting down serve...");
+						System.out.println("Handshake failed. Rollback failed. Shuting down server...");
 						shutdownServer();
 					}
 				}

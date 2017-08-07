@@ -15,25 +15,25 @@ import beans.NetworkManagmentLocal;
 import exceptions.ConnectionException;
 import exceptions.NodeExistsException;
 import exceptions.RegisterSlaveException;
-import handshake.ResponseOperationsLocal;
 import model.ServiceMessage;
 import model.ServiceMessage.handshakeType;
+import operations.AgencyOperationLocal;
 import service.MessageRequestLocal;
 
-public class HandshakeConsumer extends DefaultConsumer{
+public class AgencyOperationConsumer extends DefaultConsumer{
 
 	private ObjectMapper mapper;
 	private NetworkManagmentLocal nodesManagment;
-	private MessageRequestLocal requester;
-	private ResponseOperationsLocal operations;
+	private MessageRequestLocal request;
+	private AgencyOperationLocal operation;
 	private Channel channel;
 	
-	public HandshakeConsumer(Channel channel, ObjectMapper mapper, NetworkManagmentLocal nodesManagment, MessageRequestLocal requester, ResponseOperationsLocal operations) {
+	public AgencyOperationConsumer(Channel channel, ObjectMapper mapper, NetworkManagmentLocal nodesManagment, MessageRequestLocal requester, AgencyOperationLocal operations) {
 		super(channel);
 		this.channel 		= channel;
 		this.mapper 		= mapper;
-		this.requester 		= requester;
-		this.operations 	= operations;
+		this.request 		= requester;
+		this.operation 		= operations;
 		this.nodesManagment = nodesManagment;
 	}
 	
@@ -45,14 +45,14 @@ public class HandshakeConsumer extends DefaultConsumer{
 		switch(message.getType()){
 		case REGISTER: { 
 			try {
-				operations.sendRegisterResponse(message, channel, mapper, properties);
+				operation.sendRegisterResponse(message, channel, mapper, properties);
 			} catch (RegisterSlaveException | ConnectionException | NodeExistsException | TimeoutException | InterruptedException e) {
 				try {
-					operations.sendRegisterResponse(message, channel, mapper, properties);
+					operation.sendRegisterResponse(message, channel, mapper, properties);
 				} catch (RegisterSlaveException | ConnectionException | NodeExistsException | TimeoutException | InterruptedException e1) {
 					try {
 						message.setType(handshakeType.ROLLBACK);
-						requester.sendMessage(nodesManagment.getMasterAddress(), message);
+						request.sendMessage(nodesManagment.getMasterAddress(), message);
 					} catch (ConnectionException | TimeoutException | InterruptedException e2) {
 						//TODO: shutdown server
 					}
@@ -62,14 +62,14 @@ public class HandshakeConsumer extends DefaultConsumer{
 		break;
 		case GET_TYPES: {
 			try {
-				operations.sendGetTypesResponse(message, channel, mapper, properties);
+				operation.sendGetTypesResponse(message, channel, mapper, properties);
 			} catch (ConnectionException | JsonProcessingException | TimeoutException | InterruptedException e) {
 				try {
-					operations.sendGetTypesResponse(message, channel, mapper, properties);
+					operation.sendGetTypesResponse(message, channel, mapper, properties);
 				} catch (ConnectionException | JsonEOFException | TimeoutException | InterruptedException e1) {
 					try {
 						message.setType(handshakeType.ROLLBACK);
-						requester.sendMessage(nodesManagment.getMasterAddress(), message);
+						request.sendMessage(nodesManagment.getMasterAddress(), message);
 					} catch (ConnectionException | TimeoutException | InterruptedException e2) {
 						// TODO: shutdown server
 					}
@@ -77,18 +77,18 @@ public class HandshakeConsumer extends DefaultConsumer{
 			}
 		}
 		break;
-		case DELIVER_TYPES: operations.addTypes(message, channel, properties); 
+		case DELIVER_TYPES: operation.addTypes(message, channel, properties); 
 		break;
 		case GET_RUNNING: {
 			try {
-				operations.sendGetRunningResponse(channel, mapper, properties);
+				operation.sendGetRunningResponse(channel, mapper, properties);
 			} catch(JsonProcessingException e){
 				try {
-					operations.sendGetRunningResponse(channel, mapper, properties);
+					operation.sendGetRunningResponse(channel, mapper, properties);
 				} catch(JsonProcessingException e1){
 					try {
 						message.setType(handshakeType.ROLLBACK);
-						requester.sendMessage(nodesManagment.getMasterAddress(), message);
+						request.sendMessage(nodesManagment.getMasterAddress(), message);
 					} catch (ConnectionException | TimeoutException | InterruptedException e2) {
 						// TODO shutdown server
 					}
@@ -96,15 +96,15 @@ public class HandshakeConsumer extends DefaultConsumer{
 			}
 		}
 		break;
-		case 	 ROLLBACK: operations.rollback(message, channel, mapper, properties); 
+		case 	 ROLLBACK: operation.rollback(message, channel, mapper, properties); 
 		break;
-		case DELETE_AGENT: operations.deleteRunningAgent(message, channel, properties);
+		case DELETE_AGENT: operation.deleteRunningAgent(message, channel, properties);
 		break;
-		case 	ADD_AGENT: operations.addAgent(message, channel, properties);
+		case 	ADD_AGENT: operation.addAgent(message, channel, properties);
 		break;
-		case 	RUN_AGENT: operations.runAgent(message, channel, properties); 
+		case 	RUN_AGENT: operation.runAgent(message, channel, properties); 
 		break; 
-		case   STOP_AGENT: operations.stopAgent(message, channel, properties);
+		case   STOP_AGENT: operation.stopAgent(message, channel, properties);
 		break;
 		default:
 		break;

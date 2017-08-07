@@ -1,4 +1,4 @@
-package handshake;
+package operations;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ import util.SocketMessage;
 import util.SocketMessage.messageType;
 
 @Stateless
-public class HandshakeDealer implements HandshakeDealerLocal{
+public class Worker implements WorkerLocal{
 
 	@EJB
 	private AgencyRegistryLocal registry;
@@ -50,7 +50,7 @@ public class HandshakeDealer implements HandshakeDealerLocal{
 	@EJB
 	private SocketSenderLocal socketSender;
 	
-	public HandshakeDealer() { }
+	public Worker() { }
 	
 	public List<AgentCenter> registerCenter(ServiceMessage message) throws RegisterSlaveException, ConnectionException, NodeExistsException, IOException, TimeoutException, InterruptedException{
 		if(nodesManagment.isMaster()){

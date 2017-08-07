@@ -1,4 +1,4 @@
-package handshake;
+package operations;
 
 import java.io.IOException;
 import java.util.List;
@@ -18,7 +18,7 @@ import model.AgentType;
 import model.ServiceMessage;
 
 @Local
-public interface HandshakeDealerLocal {
+public interface WorkerLocal {
 
 	public List<AgentCenter> registerCenter(ServiceMessage message) throws RegisterSlaveException, ConnectionException, NodeExistsException, IOException, TimeoutException, InterruptedException;
 	public Map<String, Set<AgentType>> registerAgentTypes(ServiceMessage message) throws ConnectionException, IOException, TimeoutException, InterruptedException;

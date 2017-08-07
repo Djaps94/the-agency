@@ -1,4 +1,4 @@
-package handshake;
+package operations;
 
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
@@ -15,7 +15,7 @@ import exceptions.RegisterSlaveException;
 import model.ServiceMessage;
 
 @Local
-public interface ResponseOperationsLocal {
+public interface AgencyOperationLocal {
 	
 	public void sendRegisterResponse(ServiceMessage message, Channel channel, ObjectMapper mapper, BasicProperties property) throws ConnectionException, RegisterSlaveException, NodeExistsException, IOException, TimeoutException, InterruptedException;
 	public void sendGetTypesResponse(ServiceMessage message, Channel channel, ObjectMapper mapper, BasicProperties property) throws ConnectionException, IOException, TimeoutException, InterruptedException;

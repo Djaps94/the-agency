@@ -1,4 +1,4 @@
-package handshake;
+package operations;
 
 import java.io.IOException;
 import java.util.List;
@@ -23,10 +23,10 @@ import model.AgentType;
 import model.ServiceMessage;
 
 @Stateless
-public class ResponseOperations implements ResponseOperationsLocal{
+public class AgencyOperation implements AgencyOperationLocal{
 	
 	@EJB
-	private HandshakeDealerLocal dealer;
+	private WorkerLocal dealer;
 
 	public void sendRegisterResponse(ServiceMessage message, Channel channel, ObjectMapper mapper, BasicProperties property) throws ConnectionException, RegisterSlaveException, NodeExistsException, IOException, TimeoutException, InterruptedException{
 		List<AgentCenter> centers = dealer.registerCenter(message);
