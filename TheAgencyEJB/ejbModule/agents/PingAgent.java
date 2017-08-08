@@ -5,7 +5,7 @@ import javax.ejb.Stateful;
 
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
-import intercommunication.MessageDispatcherLocal;
+import intercommunication.DispatcherLocal;
 import model.ACLMessage;
 import model.AID;
 import model.Agent;
@@ -16,7 +16,7 @@ import model.Agent;
 public class PingAgent extends Agent {
 
 	@EJB
-	private MessageDispatcherLocal dispatcher;
+	private DispatcherLocal dispatcher;
 	
 	@Override
 	public void handleMessage(ACLMessage message) {

@@ -15,7 +15,7 @@ import model.AID;
 
 @Stateless
 @LocalBean
-public class Handler implements HandlerLocal{
+public class Receiver implements ReceiverLocal{
 
 	@EJB
 	private AgencyManagerLocal agency;
@@ -24,17 +24,17 @@ public class Handler implements HandlerLocal{
 	private AgencyRegistryLocal registry;
 	
 	@EJB
-	private RabbitDispatcherLocal rabbit;
+	private MediatorDispatcherLocal rabbit;
 	
 	@EJB
-	private MessageDispatcherLocal dispatcher;
+	private DispatcherLocal dispatcher;
 	
-    public Handler() {
+    public Receiver() {
 
     }
 	
 	@Override
-	public void sendAgentMessage(ACLMessage message) {
+	public void recieveAgentMessage(ACLMessage message) {
 		if(message == null)
 			return;
 		for(AID aid : message.getRecievers()){

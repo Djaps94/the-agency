@@ -7,7 +7,7 @@ import java.util.Random;
 import javax.ejb.EJB;
 import javax.ejb.Stateful;
 
-import intercommunication.HandlerLocal;
+import intercommunication.ReceiverLocal;
 import model.ACLMessage;
 import model.AID;
 import model.Agent;
@@ -18,7 +18,7 @@ import model.ACLMessage.Performative;
 public class ContractNetParticipant  extends Agent{
 	
 	@EJB
-	private HandlerLocal handler;
+	private ReceiverLocal handler;
 
 	@Override
 	public void handleMessage(ACLMessage message) {
@@ -32,7 +32,7 @@ public class ContractNetParticipant  extends Agent{
 			List<AID> receivers = new ArrayList<AID>();
 			receivers.add(message.getSender());
 			msg.setRecievers(receivers);
-			handler.sendAgentMessage(msg);
+			handler.recieveAgentMessage(msg);
 		}
 			break;
 		case AGREE:
@@ -52,11 +52,11 @@ public class ContractNetParticipant  extends Agent{
 			if(sent != acceptance){
 				msg.setPerformative(Performative.REFUSE);
 				msg.setContent("I refuse your call!");
-				handler.sendAgentMessage(msg);
+				handler.recieveAgentMessage(msg);
 			}else{
 				msg.setContent(Integer.toString(acceptance));
 				msg.setPerformative(Performative.PROPOSE);
-				handler.sendAgentMessage(msg);
+				handler.recieveAgentMessage(msg);
 			}
 		}
 			break;

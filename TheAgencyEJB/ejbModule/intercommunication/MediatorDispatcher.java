@@ -18,7 +18,7 @@ import model.ACLMessage;
 import model.AID;
 
 @Singleton
-public class RabbitDispatcher implements RabbitDispatcherLocal{
+public class MediatorDispatcher implements MediatorDispatcherLocal{
 	
 	@EJB
 	private AgencyRegistryLocal registry;
@@ -30,7 +30,7 @@ public class RabbitDispatcher implements RabbitDispatcherLocal{
 	
 	private final String QUEUE_NAME = ":Agent";
 	
-	public RabbitDispatcher() { }
+	public MediatorDispatcher() { }
 	
 	@PostConstruct
 	private void initialise(){
@@ -48,7 +48,7 @@ public class RabbitDispatcher implements RabbitDispatcherLocal{
 	
 	public void notifyCenter(ACLMessage message, AID aid, String alias){
 		try {
-			InterCenterMessage msg = new InterCenterMessage(message, aid);
+			InterAgencyMessage msg = new InterAgencyMessage(message, aid);
 			String data = mapper.writeValueAsString(msg);
 			BasicProperties props = new BasicProperties().builder().replyTo(alias+QUEUE_NAME).build();
 			channel.basicPublish("", alias+QUEUE_NAME, props, data.getBytes());

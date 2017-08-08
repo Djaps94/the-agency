@@ -28,9 +28,9 @@ import beans.AgencyRegistryLocal;
 import beans.AgentManagerLocal;
 import beans.AgentRegistryLocal;
 import exceptions.ConnectionException;
-import intercommunication.HandlerLocal;
-import intercommunication.MessageDispatcherLocal;
-import intercommunication.RabbitDispatcherLocal;
+import intercommunication.ReceiverLocal;
+import intercommunication.DispatcherLocal;
+import intercommunication.MediatorDispatcherLocal;
 import model.ACLMessage;
 import model.ACLMessage.Performative;
 import model.AID;
@@ -57,13 +57,13 @@ public class AgencyEndPoint {
 	private AgentManagerLocal agentManager;
 	
 	@EJB
-	private MessageDispatcherLocal dispatcher;
+	private DispatcherLocal dispatcher;
 	
 	@EJB
-	private RabbitDispatcherLocal rabbit;
+	private MediatorDispatcherLocal rabbit;
 	
 	@EJB
-	private HandlerLocal handler;
+	private ReceiverLocal handler;
 	
 	@EJB
 	private AgentRegistryLocal agentRegistry;
@@ -109,7 +109,7 @@ public class AgencyEndPoint {
 	@Path("/messages")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public void sendMessageToAgent(ACLMessage message){
-		handler.sendAgentMessage(message);
+		handler.recieveAgentMessage(message);
 	}
 	
 	@PUT

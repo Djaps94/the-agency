@@ -6,7 +6,7 @@ import model.ACLMessage;
 import model.AID;
 
 @Local
-public interface RabbitDispatcherLocal {
+public interface MediatorDispatcherLocal {
 
 	public void notifyCenter(ACLMessage message, AID aid, String address);
 }

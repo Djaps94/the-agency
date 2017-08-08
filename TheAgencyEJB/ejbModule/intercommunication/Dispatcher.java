@@ -12,17 +12,17 @@ import model.AID;
 import model.Agent;
 
 /**
- * Session Bean implementation class MessageDispatcher
+ * Session Bean implementation class Dispatcher
  * Aka Diana Burnwood
  */
 @Singleton
 @LocalBean
-public class MessageDispatcher implements MessageDispatcherLocal {
+public class Dispatcher implements DispatcherLocal {
 	
     @EJB
     private AgentRegistryLocal registry;
     
-	public MessageDispatcher() {
+	public Dispatcher() {
     
     }
 

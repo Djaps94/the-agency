@@ -15,7 +15,7 @@ import exceptions.ConnectionException;
 import exceptions.NodeExistsException;
 import heartbeat.HeartBeatResponseLocal;
 import heartbeat.HeartbeatRequestLocal;
-import intercommunication.HandlerRabbitLocal;
+import intercommunication.MediatorLocal;
 import model.AgentCenter;
 import model.ServiceMessage;
 import model.ServiceMessage.OperationType;
@@ -57,7 +57,7 @@ public class NetworkManagment implements NetworkManagmentLocal{
 	private MessageResponseLocal messageResponse;
 	
 	@EJB
-	private HandlerRabbitLocal rabbitHandler;
+	private MediatorLocal rabbitHandler;
 	
 	@EJB
 	private AgentRegistry agentRegistry;
@@ -71,7 +71,7 @@ public class NetworkManagment implements NetworkManagmentLocal{
 				beatRequest.startTimer();
 				beatResponse.pulseTick();
 				messageResponse.waitMessage();
-				rabbitHandler.recieveMessage();
+				rabbitHandler.recieveAgentMessage();
 				System.out.println("MASTER NODE UP");
 			} catch (IOException e) {
 				//TODO: shutdown script
@@ -85,7 +85,7 @@ public class NetworkManagment implements NetworkManagmentLocal{
 			System.out.println("SLAVE NODE UP "+slave.getAlias());
 			registry.setThisCenter(slave);
 			messageResponse.waitMessage();
-			rabbitHandler.recieveMessage();
+			rabbitHandler.recieveAgentMessage();
 			master = false;
 			try {
 				ServiceMessage message = sendMessageToMaster(masterIpAddress, slave);

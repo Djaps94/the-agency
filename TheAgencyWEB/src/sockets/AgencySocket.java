@@ -29,7 +29,7 @@ import beans.AgentManagerLocal;
 import beans.AgentRegistryLocal;
 import beans.SessionHolderLocal;
 import exceptions.ConnectionException;
-import intercommunication.HandlerLocal;
+import intercommunication.ReceiverLocal;
 import model.ACLMessage;
 import model.AID;
 import model.AgentCenter;
@@ -63,7 +63,7 @@ public class AgencySocket implements MessageListener{
 	private AgentManagerLocal agentManager;
 	
 	@EJB
-	private HandlerLocal handler;
+	private ReceiverLocal handler;
 	
 	@EJB
 	private AgentRegistryLocal agentRegistry;
@@ -190,7 +190,7 @@ public class AgencySocket implements MessageListener{
 	}
 	
 	private void sendMessage(ACLMessage message){
-		handler.sendAgentMessage(message);
+		handler.recieveAgentMessage(message);
 	}
 
 }

@@ -15,7 +15,7 @@ import javax.ejb.EJB;
 import javax.ejb.LocalBean;
 import javax.ejb.Stateful;
 
-import intercommunication.HandlerLocal;
+import intercommunication.ReceiverLocal;
 import model.ACLMessage;
 import model.ACLMessage.Performative;
 import model.AID;
@@ -30,7 +30,7 @@ public class MapReduceSlave extends Agent{
 	private Map<Character, Integer> numberOfChars;
 	
     @EJB
-    private HandlerLocal handler;
+    private ReceiverLocal handler;
     
 	public MapReduceSlave() {
    
@@ -105,7 +105,7 @@ public class MapReduceSlave extends Agent{
 			recievers.add(message.getSender());
 			msg.setRecievers(recievers);
 			msg.setPerformative(Performative.INFORM);
-			handler.sendAgentMessage(msg);
+			handler.recieveAgentMessage(msg);
 			
 		}
 			break;

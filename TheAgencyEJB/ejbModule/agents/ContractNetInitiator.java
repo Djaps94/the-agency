@@ -7,7 +7,7 @@ import java.util.Random;
 import javax.ejb.EJB;
 import javax.ejb.Stateful;
 
-import intercommunication.HandlerLocal;
+import intercommunication.ReceiverLocal;
 import model.ACLMessage;
 import model.ACLMessage.Performative;
 import model.AID;
@@ -18,7 +18,7 @@ import model.Agent;
 public class ContractNetInitiator extends Agent{
 
 	@EJB
-	private HandlerLocal handler;
+	private ReceiverLocal handler;
 
 	@Override
 	public void handleMessage(ACLMessage message) {
@@ -62,11 +62,11 @@ public class ContractNetInitiator extends Agent{
 			if(offer != proposale){
 				msg.setPerformative(Performative.REJECT_PROPOSAL);
 				msg.setContent("I reject your proposal "+message.getSender().getName());
-				handler.sendAgentMessage(msg);
+				handler.recieveAgentMessage(msg);
 			}else{
 				msg.setPerformative(Performative.ACCEPT_PROPOSAL);
 				msg.setContent("I accept your proposale of"+Integer.toString(proposale));
-				handler.sendAgentMessage(msg);
+				handler.recieveAgentMessage(msg);
 			}
 		}
 			break;

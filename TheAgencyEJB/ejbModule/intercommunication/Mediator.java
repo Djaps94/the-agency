@@ -14,13 +14,13 @@ import com.rabbitmq.client.ConnectionFactory;
 import beans.AgencyRegistryLocal;
 
 @Singleton
-public class HandlerRabbit implements HandlerRabbitLocal{
+public class Mediator implements MediatorLocal{
 
 	@EJB
 	private AgencyRegistryLocal registry;
 	
 	@EJB
-	private MessageDispatcherLocal dispatcher;
+	private DispatcherLocal dispatcher;
 	
 	private ConnectionFactory factory;
 	private Connection connection;
@@ -28,7 +28,7 @@ public class HandlerRabbit implements HandlerRabbitLocal{
 	
 	private final String QUEUE_NAME = ":Agent";
 	
-	public HandlerRabbit(){
+	public Mediator(){
 		
 	}
 	
@@ -46,11 +46,11 @@ public class HandlerRabbit implements HandlerRabbitLocal{
 		}
 	}
 	
-	public void recieveMessage(){
+	public void recieveAgentMessage(){
 		try {
 			channel.queueDeclare(registry.getThisCenter().getAlias()+QUEUE_NAME, false, false, false, null);
 			channel.basicQos(1);
-			channel.basicConsume(registry.getThisCenter().getAlias()+QUEUE_NAME, false, new HandlerConsumer(channel, dispatcher));
+			channel.basicConsume(registry.getThisCenter().getAlias()+QUEUE_NAME, false, new MediatorConsumer(channel, dispatcher));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -5,7 +5,7 @@ import javax.ejb.Local;
 import model.ACLMessage;
 
 @Local
-public interface HandlerLocal {
+public interface ReceiverLocal {
 
-	public void sendAgentMessage(ACLMessage message);
+	public void recieveAgentMessage(ACLMessage message);
 }
