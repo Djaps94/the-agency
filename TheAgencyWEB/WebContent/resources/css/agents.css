@@ -1,11 +1,32 @@
 #topDiv {
 	width:100%; 
-	overflow-y: auto; 
-	border: 0.5px solid #6B0000;
+	overflow:auto;
+	border: 0.5px solid #060B21;
 }
 
 #agentTypes {
 	text-align: left;
 	padding-top: 2%;
 	font-style: italic;
+	color: #C8DEC1;
 }
+
+#typeList {
+	padding-top: 15%; 
+	padding-right: 10%; 
+	padding-left: 10%;
+}
+
+hr {
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0)); 
+	height: 1px; 
+	border: 0;
+}
+
+div.caption {
+	color: #C8DEC1;
+}
+
+div.row {
+	margin: 2%;
+}  

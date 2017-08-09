@@ -2,17 +2,77 @@
 	<div id="topDiv">
 		<h3 id="agentTypes">Agent types</h3>
 		<hr>
-		<ul class="list-group" style="padding-top: 15%; padding-right: 10%; padding-left: 10%;" ng-repeat="type in agentCollections.agentTypes">
-	  		<li class="list-group-item" ng-click="show = !show">
-	  			<label>Module: </label><label>{{ type.module }}</label>
-	  			<label>Name: </label><label>{{ type.name }}</label>
-	  		</li>
-	  		<li ng-if="show" class="list-group-item" style="margin-top:1%;">
-	  			<div>
-	  				<input type="text" ng-model="agentInfo.name"/> <button class="btn btn-sm btn-primary" ng-click="startAgent(type.module, type.name)">Start</button>
-	  			</div>
-	  		</li>
-		</ul>
+		<div class="row" ng-repeat="type in agentCollections.agentTypes" ng-if="$index % 4 == 0">
+			  <div class="col-sm-3 hvr-grow" ng-if="($index < agentCollections.agentTypes.length)">
+				<div class="thumbnail">
+			  		<div class="caption" ng-click="show = !show">
+                        <h4>Name: </h4>
+                        <span>{{ agentCollections.agentTypes[$index].name }}</span>
+                        <hr>
+                        <h6>Module: </h6>
+                        <span>{{ agentCollections.agentTypes[$index].module }}</span>
+                        <hr>
+			  		</div>
+			  		<li ng-if="show" class="list-group-item" style="margin-top:1%;">
+			  			<div>
+			  				<input type="text" ng-model="agentInfo.name"/> <button class="btn btn-sm btn-primary" ng-click="startAgent(agentCollections.agentTypes[$index].module, agentCollections.agentTypes[$index].name)">Start</button>
+			  			</div>
+			  		</li>
+				</div>
+			  </div>
+			   <div class="col-sm-3 hvr-grow" ng-if="($index + 1 < agentCollections.agentTypes.length)">
+                <div class="thumbnail">
+                    <div class="caption" ng-click="show = !show">
+                        <h4>Name: </h4>
+                        <span>{{ agentCollections.agentTypes[$index + 1].name }}</span>
+                        <hr>
+                        <h6>Module: </h6>
+                        <span>{{ agentCollections.agentTypes[$index + 1].module }}</span>
+                        <hr>
+                    </div>
+                    <li ng-if="show" class="list-group-item" style="margin-top:1%;">
+                        <div>
+                            <input type="text" ng-model="agentInfo.name"/> <button class="btn btn-sm btn-primary" ng-click="startAgent(agentCollections.agentTypes[$index+1].module, agentCollections.agentTypes[$index+1].name)">Start</button>
+                        </div>
+                    </li>
+                </div>
+              </div>
+               <div class="col-sm-3 hvr-grow" ng-if="($index + 2 < agentCollections.agentTypes.length)">
+                <div class="thumbnail">
+                    <div class="caption" data-toggle="popover" data-content="I am popover">
+                        <h4>Name: </h4>
+                        <span>{{ agentCollections.agentTypes[$index + 2].name }}</span>
+                        <hr>
+                        <h6>Module: </h6>
+                        <span>{{ agentCollections.agentTypes[$index + 2].module }}</span>
+                        <hr>
+                    </div>
+                    <li ng-show="show" class="list-group-item" style="margin-top:1%;">
+                        <div>
+                            <input type="text" ng-model="agentInfo.name"/> <button class="btn btn-sm btn-primary" ng-click="startAgent(agentCollections.agentTypes[$index + 2].module, agentCollections.agentTypes[$index + 2].name)">Start</button>
+                        </div>
+                    </li>
+                </div>
+              </div>
+               <div class="col-sm-3 hvr-grow" ng-if="($index + 3 < agentCollections.agentTypes.length)">
+                <div class="thumbnail">
+                    <div class="caption" ng-click="show = !show">
+                        <h4>Name: </h4>
+                        <span>{{ agentCollections.agentTypes[$index + 3].name }}</span>
+                        <hr>
+                        <h6>Module: </h6>
+                        <span>{{ agentCollections.agentTypes[$index + 3].module }}</span>
+                        <hr>
+                    </div>
+                    <li ng-if="show" class="list-group-item" style="margin-top:1%;">
+                        <div>
+                            <input type="text" ng-model="agentInfo.name"/> <button class="btn btn-sm btn-primary" ng-click="startAgent(agentCollections.agentTypes[$index+3].module, agentCollections.agentTypes[$index+3].name)">Start</button>
+                        </div>
+                    </li>
+                </div>
+              </div>
+		  </div>
+
 		<button class="btn btn-sm btn-info" ng-click="getTypes()" style="margin-left: 7%;">Refresh</button>
 	</div>
 	<div style="position:relative; width: 100%; background-color: white; border-bottom: 0.5px solid #6B0000; border-top: 0.5px solid #6B0000">
