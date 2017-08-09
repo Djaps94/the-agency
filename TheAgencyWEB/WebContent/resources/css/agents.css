@@ -1,0 +1,11 @@
+#topDiv {
+	width:100%; 
+	overflow-y: auto; 
+	border: 0.5px solid #6B0000;
+}
+
+#agentTypes {
+	text-align: left;
+	padding-top: 2%;
+	font-style: italic;
+}

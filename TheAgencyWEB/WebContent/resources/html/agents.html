@@ -1,6 +1,6 @@
-<div ng-controller="agentController" style="height: 95%; width: 100%;">
-	<div  style="float: left; width:25%; height: 95%; overflow-y: auto; background-color: white; border: 0.5px solid #6B0000">
-		<h6 style="text-align: center; padding-top:15%;">Agent types</h6>
+<div ng-controller="agentController">
+	<div id="topDiv">
+		<h3 id="agentTypes">Agent types</h3>
 		<hr>
 		<ul class="list-group" style="padding-top: 15%; padding-right: 10%; padding-left: 10%;" ng-repeat="type in agentCollections.agentTypes">
 	  		<li class="list-group-item" ng-click="show = !show">
@@ -13,10 +13,9 @@
 	  			</div>
 	  		</li>
 		</ul>
-		<hr>
 		<button class="btn btn-sm btn-info" ng-click="getTypes()" style="margin-left: 7%;">Refresh</button>
 	</div>
-	<div style="position:relative; float: left; width: 50%; height: 95%; background-color: white; border-bottom: 0.5px solid #6B0000; border-top: 0.5px solid #6B0000">
+	<div style="position:relative; width: 100%; background-color: white; border-bottom: 0.5px solid #6B0000; border-top: 0.5px solid #6B0000">
 		<div style="width: 100%; position:absolute;">
 			<h6 style="margin: 5.5%;float:left;">Actions via: </h6>
 			<div class="checkbox" style="float:left;margin:5%;">
@@ -37,7 +36,7 @@
 			
 		</div>
 	</div>
-	<div style="float: left; width: 25%; height: 95%; overflow-y: auto; background-color: white;border: 0.5px solid #6B0000">
+	<div style="width: 100%;overflow-y: auto; background-color: white;border: 0.5px solid #6B0000">
 		<h6 style="text-align: center; margin-top:15%;">Active agents</h6>
 		<hr>
 		<ul class="list-group" style="padding-top: 15%;padding-right: 10%; padding-left: 10%;" ng-repeat="aid in agentCollections.runningAgents">
@@ -55,6 +54,8 @@
 		<hr>
 		<button class="btn btn-sm btn-info" ng-click="getRunning()" style="float: right;margin-right: 7%;">Refresh</button>
 	</div>
+	
+	
 <!-- MODAL -->	
 <div class="modal fade" id="messageModal" tabindex="-1" role="dialog"  aria-hidden="true">
   <div class="modal-dialog" role="document">
