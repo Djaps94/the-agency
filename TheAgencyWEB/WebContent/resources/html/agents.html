@@ -1,8 +1,9 @@
 <div ng-controller="agentController">
 	<div id="topDiv">
 		<h3 id="agentTypes">Agent types</h3>
+		<span id="hideTypes" class="hvr-icon-spin" ng-show="agentCollections.agentTypes.length > 0" ng-click="hideTypes()">{{typesText}}</span>
 		<hr>
-		<div class="row" ng-repeat="type in agentCollections.agentTypes" ng-if="$index % 4 == 0">
+		<div class="row slide-toggle-js" ng-repeat="type in agentCollections.agentTypes" ng-if="$index % 4 == 0 && showTypes">
 			  <div class="col-sm-3 hvr-grow" ng-if="($index < agentCollections.agentTypes.length)">
 				<div class="thumbnail">
 			  		<div class="caption" ng-click="show = !show">

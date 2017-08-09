@@ -1,2 +1,3 @@
-var app = angular.module('TheAgency',['routes',
-									  'AgentModule']);
+var app = angular.module('TheAgency', ['routes',
+									   'AgentModule',
+									   'animation']);

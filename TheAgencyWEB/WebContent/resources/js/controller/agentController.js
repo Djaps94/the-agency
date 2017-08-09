@@ -10,6 +10,9 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 	$scope.modalRunningAgents = [];
 	$scope.modalPerformative = [];
 	
+	$scope.showTypes = true;
+	$scope.typesText = "Hide agent types"
+	
 	$scope.ACLMessage = {
 		performative : "",
 		sender : null,
@@ -23,6 +26,16 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 		replyWith : "",
 		inReplyTo : ""
 	};
+	
+	$scope.hideTypes = function() {
+		if($scope.showTypes){
+			$scope.typesText = "Show agent types";
+			$scope.showTypes = false;
+		}else{
+			$scope.typesText = "Hide agent types";
+			$scope.showTypes = true;
+		}
+	}
 	
 	$scope.fillModal = function(){
 		$http.get('/TheAgency/rest/agency/agents/running').then(function(response){

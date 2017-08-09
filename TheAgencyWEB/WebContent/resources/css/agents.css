@@ -29,4 +29,11 @@ div.caption {
 
 div.row {
 	margin: 2%;
+}
+
+#hideTypes {
+	margin-left: 2%;
+	color: #C8DEC1;
+	font-family: sans-serif;
+	font-size: 16px;
 }  
