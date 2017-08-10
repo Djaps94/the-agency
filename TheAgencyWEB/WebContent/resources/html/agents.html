@@ -1,5 +1,5 @@
-<div ng-controller="agentController">
-	<div id="topDiv">
+    <div ng-controller="agentController">
+	<div class="agentDiv">
 		<h3 id="agentTypes">Agent types</h3>
 		<span id="hideTypes" class="hvr-icon-spin" ng-show="agentCollections.agentTypes.length > 0" ng-click="hideTypes()">{{typesText}}</span>
 		<hr>
@@ -73,48 +73,111 @@
                 </div>
               </div>
 		  </div>
-
-		<button class="btn btn-sm btn-info" ng-click="getTypes()" style="margin-left: 7%;">Refresh</button>
 	</div>
-	<div style="position:relative; width: 100%; background-color: white; border-bottom: 0.5px solid #6B0000; border-top: 0.5px solid #6B0000">
-		<div style="width: 100%; position:absolute;">
-			<h6 style="margin: 5.5%;float:left;">Actions via: </h6>
-			<div class="checkbox" style="float:left;margin:5%;">
-				<label><input type="checkbox" ng-model="action.valueREST" value=""/>REST</label>
-			</div>
-			<div class="checkbox" style="margin: 5%;float:left;">
-				<label><input type="checkbox" ng-model="action.valueSocket" value=""/>Websockets</label>
-			</div>
-		</div>
-		<div style="position:absolute;top:20%; margin-left:2%;">
-			<button class="btn btn-sm btn-info" ng-click="showChat()">{{ Console.buttonChat }}</button>	
-		</div>
-		<div style="position:absolute; top:20%; margin-left:30%;">
-			<button class="btn btn-sm btn-info" data-toggle="modal" data-target="#messageModal" ng-click=fillModal()>Send message</button>
-		</div>
-		<h6 ng-show = "Console.show" style="position: absolute; bottom: 35%;text-align: center; width: 100%;">Follow communication between agents:</h6>
-		<div ng-show = "Console.show" style="position:absolute; overflow-y: auto; bottom: 0; height: 30%; width:95%; margin: 3%; border: 0.7px solid; border-radius: 5px;">
-			
-		</div>
-	</div>
-	<div style="width: 100%;overflow-y: auto; background-color: white;border: 0.5px solid #6B0000">
-		<h6 style="text-align: center; margin-top:15%;">Active agents</h6>
+	
+	<hr ng-if="agentCollections.agentTypes.length > 0 && showTypes">
+	
+	<div class="agentDiv">
+		<h3 id="agentActive">Active agents</h3>
 		<hr>
-		<ul class="list-group" style="padding-top: 15%;padding-right: 10%; padding-left: 10%;" ng-repeat="aid in agentCollections.runningAgents">
-			<li class="list-group-item" ng-click="turn = !turn">
-				<label>Agent name: </label><label>{{ aid.name }}</label>
-				<label>Agent type: </label><label>{{ aid.type.name }}</label>
-				<label>Agent center:</label><label>{{ aid.host.alias }}</label>
-			</li>
+		<div class="row slide-toggle-js" ng-repeat="aid in agentCollections.runningAgents" ng-if="$index % 4 == 0">
+		  <div class="col-sm-3 hvr-grow" ng-if="($index < agentCollections.runningAgents.length)">
+		    <div class="thumbnail">
+				<div class="caption" ng-click="turn = !turn">
+					<h3>Agent name: </h3>
+					<label>{{ agentCollections.runningAgents[$index].name }}</label>
+					<hr>
+					<h4>Agent type: </h4>
+					<span>{{ agentCollections.runningAgents[$index].type.name }}</span>
+					<hr>
+					<h4>Agent center:</h4>
+					<span>{{ agentCollections.runningAgents[$index].host.alias }}</span>
+				</div>
+			</div>
 			<li ng-if="turn" class="list-group-item" style="margin-top: 1%;">
 				<div>
 					<button class="btn btn-sm btn-danger" ng-click="stopAgent(aid)">Stop</button>
 				</div>
 			</li>
-		</ul>
-		<hr>
-		<button class="btn btn-sm btn-info" ng-click="getRunning()" style="float: right;margin-right: 7%;">Refresh</button>
+		  </div>
+		  <div class="col-sm-3 hvr-grow" ng-if="($index + 1 < agentCollections.runningAgents.length)">
+            <div class="thumbnail">
+                <div class="caption" ng-click="turn = !turn">
+                    <h3>Agent name: </h3>
+                    <label>{{ agentCollections.runningAgents[$index + 1].name }}</label>
+                    <hr>
+                    <h4>Agent type: </h4>
+                    <span>{{ agentCollections.runningAgents[$index + 1].type.name }}</span>
+                    <hr>
+                    <h4>Agent center:</h4>
+                    <span>{{ agentCollections.runningAgents[$index + 1].host.alias }}</span>
+                </div>
+            </div>
+            <li ng-if="turn" class="list-group-item" style="margin-top: 1%;">
+                <div>
+                    <button class="btn btn-sm btn-danger" ng-click="stopAgent(aid)">Stop</button>
+                </div>
+            </li>
+          </div>
+          <div class="col-sm-3 hvr-grow" ng-if="($index + 2 < agentCollections.runningAgents.length)">
+            <div class="thumbnail">
+                <div class="caption" ng-click="turn = !turn">
+                    <h3>Agent name: </h3>
+                    <label>{{ agentCollections.runningAgents[$index + 2].name }}</label>
+                    <hr>
+                    <h4>Agent type: </h4>
+                    <span>{{ agentCollections.runningAgents[$index + 2].type.name }}</span>
+                    <hr>
+                    <h4>Agent center:</h4>
+                    <span>{{ agentCollections.runningAgents[$index + 2].host.alias }}</span>
+                </div>
+            </div>
+            <li ng-if="turn" class="list-group-item" style="margin-top: 1%;">
+                <div>
+                    <button class="btn btn-sm btn-danger" ng-click="stopAgent(aid)">Stop</button>
+                </div>
+            </li>
+          </div>
+          <div class="col-sm-3 hvr-grow" ng-if="($index + 3 < agentCollections.runningAgents.length)">
+            <div class="thumbnail">
+                <div class="caption" ng-click="turn = !turn">
+                    <h3>Agent name: </h3>
+                    <label>{{ agentCollections.runningAgents[$index + 3].name }}</label>
+                    <hr>
+                    <h4>Agent type: </h4>
+                    <span>{{ agentCollections.runningAgents[$index + 3].type.name }}</span>
+                    <hr>
+                    <h4>Agent center:</h4>
+                    <span>{{ agentCollections.runningAgents[$index + 3].host.alias }}</span>
+                </div>
+            </div>
+            <li ng-if="turn" class="list-group-item" style="margin-top: 1%;">
+                <div>
+                    <button class="btn btn-sm btn-danger" ng-click="stopAgent(aid)">Stop</button>
+                </div>
+            </li>
+          </div>
+		</div>
 	</div>
+	
+	<div id="bottomDiv">
+	   <h3 id="operationTitle">Operations</h3>
+	   <br>
+        <div id="operations">
+            <button id="typesButton" class="btn btn-sm btn-info" ng-click="getTypes()">Agent types</button>
+            <input type="radio" ng-click="setRest()" name="comm" value="Rest"/>
+            <i class="fa fa-level-up fa-2x" area-hidden="true" data-toggle="tooltip" title="Rest"></i>
+            <input type="radio" ng-click="setSocket()" name="comm" value="Websocket"/>
+            <i class="fa fa-exchange fa-2x" area-hidden="true" data-toggle="tooltip" title="Websockets"></i>
+            <button id="runningButton" class="btn btn-sm btn-info" ng-click="getRunning()">Running Agents</button>            
+        </div>
+        <div id="message">
+            <button class="btn btn-sm btn-info" data-toggle="modal" data-target="#messageModal" ng-click=fillModal()>Send message</button>
+        </div>
+        <div id="console" ng-show = "action.valueSocket">
+            
+        </div>
+    </div>
 	
 	
 <!-- MODAL -->	

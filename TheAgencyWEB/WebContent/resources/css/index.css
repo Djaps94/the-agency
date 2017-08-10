@@ -4,14 +4,15 @@ html {
 	margin: 0px;
 	height: 100%;
 	width: 100%;
+	overflow-x: hidden;
 }
 
 body {
 	margin: 0px;
 	min-height: 100%;
 	width: 100%;
-	background-image:url('../images/cs.jpg');
-    background-repeat:no-repeat;
+	background-image:url('../images/mirrorcs.jpg');
+    background-repeat:repeat-y;
     background-size:cover;
 }
 

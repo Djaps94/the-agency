@@ -7,6 +7,16 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 			valueSocket : false
 	};
 	
+	$scope.setRest = function() {
+		$rootScope.action.valueREST = true;
+		$rootScope.action.valueSocket = false;
+	}
+	
+	$scope.setSocket = function() {
+		$rootScope.action.valueREST = false;
+		$rootScope.action.valueSocket = true;
+	}
+		
 	$scope.modalRunningAgents = [];
 	$scope.modalPerformative = [];
 	
@@ -98,20 +108,9 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 	}
 	
 	$scope.Console = {
-			buttonChat : "Show comm. chat",
 			show : false
 	}
-	
-	$scope.showChat = function(){
-		if(!$scope.Console.show){
-			$scope.Console.show = true;
-			$scope.Console.buttonChat = "Disable comm. chat";
-		}else{
-			$scope.Console.show = false;
-			$scope.Console.buttonChat = "Show comm. chat";
-		}
-	};
-	
+		
 	$scope.showRunOptions = function(){
 		if($scope.agentInfo.run)
 			$scope.agentInfo.run = false;
