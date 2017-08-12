@@ -42,12 +42,23 @@ public class AgentRegistry implements AgentRegistryLocal {
 	}
 
 	public void removeRunningAID(AID aid) {
-		runningAID.remove(aid);
+		for(int i = 0; i < runningAID.size(); i++){
+			if(runningAID.get(i).getName().equals(aid.getName())){
+				runningAID.remove(i);
+				break;
+			}
+		}
 	}
 
 	public void removeAllRunningAIDs(Iterator<AID> agents) {
-		while (agents.hasNext())
-			runningAID.remove(agents.next());
+		while (agents.hasNext()){
+			for(int i = 0; i < runningAID.size(); i++){
+				if(runningAID.get(i).getName().equals(agents.next().getName())){
+					runningAID.remove(i);
+					break;
+				}
+			}
+		}
 	}
 
 	public void setRunningAID(List<AID> runningAgents) {

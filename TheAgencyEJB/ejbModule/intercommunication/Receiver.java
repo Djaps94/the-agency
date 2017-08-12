@@ -1,5 +1,6 @@
 package intercommunication;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -41,8 +42,9 @@ public class Receiver implements ReceiverLocal{
 			if(aid.getHost().getAlias().equals(registry.getThisCenter().getAlias())){
 				dispatcher.sendMesssage(message, aid);
 			}else{
-				while(agency.getCenterAgents().hasNext()){
-					Entry<String, List<AID>> entry = agency.getCenterAgents().next();
+				Iterator<Entry<String, List<AID>>> agents = agency.getCenterAgents();
+				while(agents.hasNext()){
+					Entry<String, List<AID>> entry = agents.next();
 					if(entry.getKey().equals(aid.getHost().getAlias())){
 						rabbit.notifyCenter(message, aid, entry.getKey());
 						break;

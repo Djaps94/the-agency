@@ -22,6 +22,9 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 	
 	$scope.showTypes = true;
 	$scope.typesText = "Hide agent types"
+		
+	$scope.showAgents = true;
+	$scope.agentText = "Hide running agents"
 	
 	$scope.ACLMessage = {
 		performative : "",
@@ -44,6 +47,16 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 		}else{
 			$scope.typesText = "Hide agent types";
 			$scope.showTypes = true;
+		}
+	}
+	
+	$scope.hideAgents = function() {
+		if($scope.showAgents) {
+			$scope.agentText = "Show running agents";
+			$scope.showAgents = false;
+		} else {
+			$scope.agentText = "Hide running agents";
+			$scope.showAgents = true;
 		}
 	}
 	
@@ -81,7 +94,6 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 			var socketMessage = JSON.parse(message.data);
 			if($rootScope.action.valueSocket){
 				switch(socketMessage.msgType){
-				case 'ADD_TYPE'   : socketAgentTypes(socketMessage);	break;
 				case 'GET_TYPES'  : socketAgentTypes(socketMessage);	break;
 				case 'GET_AGENTS' : socketRunningAgents(socketMessage); break;
 				case 'START_AGENT': socketStartAgents(socketMessage);	break;
@@ -246,8 +258,10 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 					 }
 					 var index = -1;
 					 for(x = 0; x < $scope.agentCollections.runningAgents.length; x++){
-						 if($scope.agentCollections.runningAgents[x].name === res.name)
+						 if($scope.agentCollections.runningAgents[x].name === res.name) {
 							 index = x;
+							 break;
+						 }
 					 }
 					 if(index > -1)
 						 $scope.agentCollections.runningAgents.splice(index, 1);
@@ -265,8 +279,10 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 	var socketStopAgents = function(socketMessage){
 		 var index = -1;
 		 for(x = 0; x < $scope.agentCollections.runningAgents.length; x++){
-			 if($scope.agentCollections.runningAgents[x].name === socketMessage.aid.name)
+			 if($scope.agentCollections.runningAgents[x].name === socketMessage.aid.name){
 				 index = x;
+				 break;
+			 }
 		 }
 		 if(index > -1)
 			 $scope.$apply(function(){

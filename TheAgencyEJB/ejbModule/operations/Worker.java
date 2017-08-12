@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -62,8 +63,10 @@ public class Worker implements WorkerLocal {
 			NodeExistsException, IOException, TimeoutException, InterruptedException {
 		if (nodesManagment.isMaster()) {
 
-			while (registry.getCentersIterator().hasNext()) {
-				requester.sendMessage(registry.getCentersIterator().next().getAddress(), message);
+			Iterator<AgentCenter> centers = registry.getCentersIterator();
+			
+			while (centers.hasNext()) {
+				requester.sendMessage(centers.next().getAddress(), message);
 			}
 
 			registry.addCenter(message.getCenter());
@@ -85,19 +88,24 @@ public class Worker implements WorkerLocal {
 		if (nodesManagment.isMaster()) {
 			Set<AgentType> temp = new HashSet<AgentType>();
 
-			while (manager.getSupportedTypes().hasNext())
-				temp.add(manager.getSupportedTypes().next());
+			Iterator<AgentType> typeIterator = manager.getSupportedTypes();
+			
+			while (typeIterator.hasNext())
+				temp.add(typeIterator.next());
 			
 			types.put(registry.getThisCenter().getAlias(), temp);
+			 
 			
-			if (!manager.getOtherSupportedTypes().hasNext())
+			if (manager.getOtherSupportedTypes().hasNext())
 				manager.getOtherSupportedTypesStream().forEach(entry -> types.put(entry.getKey(), entry.getValue()));
 
 			manager.addOtherTypes(message.getCenter().getAlias(), message.getAgentTypes());
 			message.setType(OperationType.DELIVER_TYPES);
 
-			while (registry.getCentersIterator().hasNext()) {
-				AgentCenter center = registry.getCentersIterator().next();
+			Iterator<AgentCenter> centerIterator = registry.getCentersIterator();
+			
+			while (centerIterator.hasNext()) {
+				AgentCenter center = centerIterator.next();
 				if (!center.getAlias().equals(message.getCenter().getAlias()))
 					requester.sendMessage(center.getAddress(), message);
 			}
@@ -132,8 +140,10 @@ public class Worker implements WorkerLocal {
 			msg.setAgentTypes(type);
 			socketSender.socketSend(m);
 
-			while (registry.getCentersIterator().hasNext())
-				requester.sendMessage(registry.getCentersIterator().next().getAddress(), message);
+			Iterator<AgentCenter> centers = registry.getCentersIterator();
+			
+			while (centers.hasNext())
+				requester.sendMessage(centers.next().getAddress(), message);
 
 			return;
 		}
@@ -158,8 +168,10 @@ public class Worker implements WorkerLocal {
 		Map<String, List<AID>> agents = new HashMap<String, List<AID>>();
 		List<AID> tempAgents = new ArrayList<>();
 
-		while (agentRegistry.getRunningAID().hasNext())
-			tempAgents.add(agentRegistry.getRunningAID().next());
+		Iterator<AID> aids = agentRegistry.getRunningAID();
+		
+		while (aids.hasNext())
+			tempAgents.add(aids.next());
 
 		agents.put(registry.getThisCenter().getAlias(), tempAgents);
 		return agents;

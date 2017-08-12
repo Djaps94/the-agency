@@ -39,6 +39,14 @@ div.row {
 	font-size: 16px;
 }  
 
+#hideAgents {
+	margin-right: 2%;
+	float: right;
+	color: #C8DEC1;
+    font-family: sans-serif;
+    font-size: 16px;
+}
+
 #agentActive {
 	text-align: right;
     padding-top: 2%;
@@ -99,4 +107,12 @@ input[value="Websocket"] {
 	top: 450%;
 	border: 0.7px solid #C8DEC1; 
 	border-radius: 5px;
+}
+
+.turnoff {
+	margin-top: 3%;
+}
+
+.start {
+	background: rgba(255, 255, 255, .6)
 }

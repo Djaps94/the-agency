@@ -1,6 +1,8 @@
 package util;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -18,8 +20,8 @@ public class SocketMessage implements Serializable{
 	
 	private AID aid;
 	private AgentType type;
-	private List<AID> runningAgents;
-	private Set<AgentType> agentTypes;
+	private List<AID> runningAgents = new ArrayList<>();
+	private Set<AgentType> agentTypes = new HashSet<>();
 	private String agentName;
 	private String typeModule;
 	private String typeName;
@@ -55,9 +57,9 @@ public class SocketMessage implements Serializable{
 	}
 
 
-	public void setRunningAgents(Iterator<AID> runningAgents) {
-		while(runningAgents.hasNext())
-			this.runningAgents.add(runningAgents.next());
+	public void setRunningAgents(Iterator<AID> running) {
+		while(running.hasNext())
+			this.runningAgents.add(running.next());
 	}
 
 

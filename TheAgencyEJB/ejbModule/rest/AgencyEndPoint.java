@@ -74,8 +74,10 @@ public class AgencyEndPoint {
 	public List<AgentType> getAgentType(){
 		List<AgentType> types = new ArrayList<>();
 		
-		while(manager.getOtherSupportedTypes().hasNext())
-			manager.getOtherSupportedTypes().next().getValue().forEach(type -> types.add(type));
+		Iterator<Entry<String, Set<AgentType>>> iter = manager.getOtherSupportedTypes();
+		
+		while(iter.hasNext())
+			iter.next().getValue().forEach(type -> types.add(type));
 		
 		manager.getSupportedTypesStream().forEach(el -> types.add(el));
 		return types;
@@ -92,8 +94,10 @@ public class AgencyEndPoint {
 		while(agentsIter.hasNext())
 			agents.add(agentsIter.next());
 		
-		while(manager.getCenterAgents().hasNext())
-			agents.addAll(manager.getCenterAgents().next().getValue());
+		Iterator<Entry<String, List<AID>>> aids = manager.getCenterAgents();
+		
+		while(aids.hasNext())
+			agents.addAll(aids.next().getValue());
 		
 		return agents;
 	}
@@ -128,8 +132,9 @@ public class AgencyEndPoint {
 		if(manager.isSupportedContained(t)){
 			return agentManager.startAgent(agent);
 		}else{
-			while(manager.getOtherSupportedTypes().hasNext()){
-				Entry<String, Set<AgentType>> entry = manager.getOtherSupportedTypes().next();
+			Iterator<Entry<String, Set<AgentType>>> suppTypes = manager.getOtherSupportedTypes();
+			while(suppTypes.hasNext()){
+				Entry<String, Set<AgentType>> entry = suppTypes.next();
 				
 				if(entry.getValue().contains(t)){
 					Optional<AgentCenter> center = registry.getCenters().filter(cent -> cent.getAlias().equals(entry.getKey())).findFirst();
