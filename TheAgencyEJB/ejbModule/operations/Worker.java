@@ -128,7 +128,7 @@ public class Worker implements WorkerLocal {
 			registry.deleteCenter(message.getCenter());
 			Set<AgentType> type = manager.getOtherAgentTypes(message.getCenter().getAlias());
 			manager.deleteOtherTypes(message.getCenter().getAlias());
-			agentRegistry.removeAllRunningAIDs(message.getRunningAgents());
+			agentRegistry.removeAllRunningAIDs(message.getRunningAgents().iterator());
 
 			SocketMessage msg = new SocketMessage();
 			msg.setMsgType(messageType.REMOVE_AGENTS);
@@ -151,7 +151,7 @@ public class Worker implements WorkerLocal {
 		registry.deleteCenter(message.getCenter());
 		Set<AgentType> types = manager.getOtherAgentTypes(message.getCenter().getAlias());
 		manager.deleteOtherTypes(message.getCenter().getAlias());
-		agentRegistry.removeAllRunningAIDs(message.getRunningAgents());
+		agentRegistry.removeAllRunningAIDs(message.getRunningAgents().iterator());
 
 		SocketMessage msg = new SocketMessage();
 		msg.setMsgType(messageType.REMOVE_AGENTS);
@@ -210,6 +210,13 @@ public class Worker implements WorkerLocal {
 
 	public AID stopAgent(ServiceMessage message) {
 		return agentManager.stopAgent(message.getAid());
+	}
+	
+	public void streamMessage(ServiceMessage message) {
+		SocketMessage msg = new SocketMessage();
+		msg.setMsgType(messageType.STREAM_MESSAGE);
+		msg.setInfoStream(message.getMessageInfo());
+		socketSender.socketSend(msg);
 	}
 
 }

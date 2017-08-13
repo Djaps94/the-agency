@@ -1,5 +1,7 @@
 package intercommunication;
 
+import java.util.Iterator;
+
 import javax.ejb.EJB;
 import javax.ejb.LocalBean;
 import javax.ejb.Singleton;
@@ -31,9 +33,10 @@ public class Dispatcher implements DispatcherLocal {
 	  		InitialContext context = new InitialContext();
 			Agent a = (Agent)context.lookup("java:module/"+aid.getType().getName());
 			a.setId(aid);
+			Iterator<Agent> iter = registry.getRunningAgents();
 			
-			while(registry.getRunningAgents().hasNext()){
-				Agent agent = registry.getRunningAgents().next();
+			while(iter.hasNext()){
+				Agent agent = iter.next();
 				if(agent.getId().getName().equals(a.getId().getName())){
 					agent.handleMessage(message);
 					return;

@@ -12,7 +12,6 @@ import exceptions.ConnectionException;
 import exceptions.NodeExistsException;
 import exceptions.RegisterSlaveException;
 import model.AID;
-import model.Agent;
 import model.AgentCenter;
 import model.AgentType;
 import model.ServiceMessage;
@@ -20,13 +19,14 @@ import model.ServiceMessage;
 @Local
 public interface WorkerLocal {
 
-	public List<AgentCenter> registerCenter(ServiceMessage message) throws RegisterSlaveException, ConnectionException, NodeExistsException, IOException, TimeoutException, InterruptedException;
-	public Map<String, Set<AgentType>> registerAgentTypes(ServiceMessage message) throws ConnectionException, IOException, TimeoutException, InterruptedException;
-	public void addTypes(ServiceMessage message);
-	public void rollback(ServiceMessage message) throws ConnectionException, IOException, TimeoutException, InterruptedException;
-	public Map<String,List<AID>> getRunningAgents();
-	public void deleteAgent(ServiceMessage message);
-	public void addAgent(ServiceMessage message);
-	public AID runAgent(ServiceMessage message);
-	public AID stopAgent(ServiceMessage message);
+	List<AgentCenter> registerCenter(ServiceMessage message) throws RegisterSlaveException, ConnectionException, NodeExistsException, IOException, TimeoutException, InterruptedException;
+	Map<String, Set<AgentType>> registerAgentTypes(ServiceMessage message) throws ConnectionException, IOException, TimeoutException, InterruptedException;
+	void addTypes(ServiceMessage message);
+	void rollback(ServiceMessage message) throws ConnectionException, IOException, TimeoutException, InterruptedException;
+	Map<String,List<AID>> getRunningAgents();
+	void deleteAgent(ServiceMessage message);
+	void addAgent(ServiceMessage message);
+	AID runAgent(ServiceMessage message);
+	AID stopAgent(ServiceMessage message);
+	void streamMessage(ServiceMessage message); 
 }

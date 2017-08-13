@@ -7,6 +7,7 @@ import java.util.Random;
 import javax.ejb.EJB;
 import javax.ejb.Stateful;
 
+import beans.MessageStreamLocal;
 import intercommunication.ReceiverLocal;
 import model.ACLMessage;
 import model.ACLMessage.Performative;
@@ -19,46 +20,29 @@ public class ContractNetInitiator extends Agent{
 
 	@EJB
 	private ReceiverLocal handler;
+	
+	@EJB
+	private MessageStreamLocal streamer;
 
 	@Override
 	public void handleMessage(ACLMessage message) {
 		switch(message.getPerformative()){
-		case ACCEPT_PROPOSAL:
-			break;
-		case AGREE:
-			break;
-		case CANCEL:
-			break;
-		case CFP:
-			break;
-		case CONFIRM:
-			break;
-		case DISCONFIRM:
-			break;
-		case FAILURE:
-			break;
 		case INFORM: {
-			System.out.println("Message from "+message.getSender().getName());
-			System.out.println(message.getContent());
+			streamer.streamMessage("Message from "+message.getSender().getName()+"."+message.getContent(), message.getStreamTo());
 		}
 			break;
-		case INFORM_IF:
-			break;
-		case INFORM_REF:
-			break;
-		case NOT_UNDERSTOOD:
-			break;
-		case PROPAGATE:
-			break;
 		case PROPOSE: {
-			System.out.println("Propose came from: "+message.getSender().getName());
+			streamer.streamMessage("Propose came from: "+message.getSender().getName()+", with propose of "+message.getContent(), message.getStreamTo());
+		
 			int offer = new Random().nextInt(5);
 			int proposale = Integer.parseInt(message.getContent());
 			List<AID> recievers = new ArrayList<AID>();
 			recievers.add(message.getSender());
+			
 			ACLMessage msg = new ACLMessage();
 			msg.setSender(getId());
 			msg.setRecievers(recievers);
+			msg.setStreamTo(message.getStreamTo());
 			if(offer != proposale){
 				msg.setPerformative(Performative.REJECT_PROPOSAL);
 				msg.setContent("I reject your proposal "+message.getSender().getName());
@@ -70,26 +54,9 @@ public class ContractNetInitiator extends Agent{
 			}
 		}
 			break;
-		case PROXY:
-			break;
-		case QUERY_IF:
-			break;
-		case QUERY_REF:
-			break;
 		case REFUSE: {
-			System.out.println("Message from "+message.getSender().getName());
-			System.out.println("Okey, you refuse, i understand.");
+			streamer.streamMessage("Message from "+message.getSender().getName()+". Okey, you refuse, i understand.", message.getStreamTo());
 		}
-			break;
-		case REJECT_PROPOSAL:
-			break;
-		case REQUEST:
-			break;
-		case REQUEST_WHEN:
-			break;
-		case REQUEST_WHENEVER:
-			break;
-		case SUBSCRIBE:
 			break;
 		default:
 			break;

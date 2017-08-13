@@ -130,7 +130,7 @@ public class HeartbeatRequest implements HeartbeatRequestLocal {
 				
 				SocketMessage message = new SocketMessage();
 				message.setMsgType(messageType.REMOVE_AGENTS);
-				message.setRunningAgents(list.iterator());
+				message.setRunningAgents(list);
 				socketSender.socketSend(message);
 			}
 		}

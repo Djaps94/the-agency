@@ -1,15 +1,20 @@
 package model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class ServiceMessage implements Serializable {
 
-	public enum OperationType { REGISTER,
+	private static final long serialVersionUID = 4215142248690881085L;
+
+	public enum OperationType { REGISTER, STREAM_MESSAGE,
 		GET_CENTERS, GET_TYPES, DELIVER_TYPES, ROLLBACK, GET_RUNNING, TURN_OFF, DELETE_AGENT, ADD_AGENT, RUN_AGENT, STOP_AGENT
 	};
 	
@@ -23,6 +28,7 @@ public class ServiceMessage implements Serializable {
 	private List<AID> runningAgents;
 	private String agentName;
 	private AID aid;
+	private String messageInfo;
 	
 	public ServiceMessage() { }
 	
@@ -31,7 +37,7 @@ public class ServiceMessage implements Serializable {
 		this.type   = type;
 	}
 	
-	public ServiceMessage(OperationType type){
+	public ServiceMessage(OperationType type) {
 		this.type = type;
 	}
 
@@ -63,9 +69,8 @@ public class ServiceMessage implements Serializable {
 		return agentTypes;
 	}
 
-	public void setAgentTypes(Iterator<AgentType> agentTypes) {
-		while(agentTypes.hasNext())
-			this.agentTypes.add(agentTypes.next());
+	public void setAgentTypes(Set<AgentType> agentTypes) {
+		this.agentTypes = agentTypes;
 	}
 
 	public Map<String, Set<AgentType>> getOtherTypes() {
@@ -76,13 +81,12 @@ public class ServiceMessage implements Serializable {
 		this.otherTypes = otherTypes;
 	}
 
-	public Iterator<AID> getRunningAgents() {
-		return runningAgents.iterator();
+	public Map<String, List<AID>> getOtherAgents() {
+		return otherAgents;
 	}
 
-	public void setRunningAgents(Iterator<AID> runningAgents) {
-		while(runningAgents.hasNext())
-		this.runningAgents.add(runningAgents.next());
+	public void setOtherAgents(Map<String, List<AID>> otherAgents) {
+		this.otherAgents = otherAgents;
 	}
 
 	public AgentType getAgentType() {
@@ -93,12 +97,12 @@ public class ServiceMessage implements Serializable {
 		this.agentType = agentType;
 	}
 
-	public Iterator<Entry<String, List<AID>>> getOtherAgents() {
-		return otherAgents.entrySet().iterator();
+	public List<AID> getRunningAgents() {
+		return runningAgents;
 	}
 
-	public void setOtherAgents(Map<String, List<AID>> otherAgents) {
-		this.otherAgents = otherAgents;
+	public void setRunningAgents(List<AID> runningAgents) {
+		this.runningAgents = runningAgents;
 	}
 
 	public String getAgentName() {
@@ -116,6 +120,29 @@ public class ServiceMessage implements Serializable {
 	public void setAid(AID aid) {
 		this.aid = aid;
 	}
+
+	@JsonIgnore
+	public void setTypesViaIter(Iterator<AgentType> typeIterator) {
+		if(this.agentTypes == null)
+			this.agentTypes = new HashSet<>();
+		while(typeIterator.hasNext())
+			this.agentTypes.add(typeIterator.next());
+	}
 	
+	@JsonIgnore
+	public void setAIDsViaIter(Iterator<AID> aids){
+		if(this.runningAgents == null)
+			this.runningAgents = new ArrayList<>();
+		while(aids.hasNext())
+			this.runningAgents.add(aids.next());
+	}
+
+	public String getMessageInfo() {
+		return messageInfo;
+	}
+
+	public void setMessageInfo(String messageInfo) {
+		this.messageInfo = messageInfo;
+	}
 	
 }

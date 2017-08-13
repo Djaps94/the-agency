@@ -116,4 +116,11 @@ public class AgencyOperation implements AgencyOperationLocal{
 		String data = mapper.writeValueAsString(agent);
 		channel.basicPublish("", property.getReplyTo(), new BasicProperties().builder().build(), data.getBytes());
 	}
+	
+	@Override
+	public void streamMessage(ServiceMessage message, Channel channel, BasicProperties property) throws IOException {
+		dealer.streamMessage(message);
+		channel.basicPublish("", property.getReplyTo(), new BasicProperties().builder().build(), "Message streamed".getBytes());
+
+	}
 }	

@@ -97,16 +97,20 @@ input[value="Websocket"] {
 }
 
 #console {
-	position:absolute; 
+	position: absolute; 
 	overflow-y: auto;  
 	height: 500%; 
-	width:45%; 
+	width: 45%; 
 	margin-left: 29%;
 	margin-top: 3%;
 	margin-bottom: 3%;
 	top: 450%;
 	border: 0.7px solid #C8DEC1; 
 	border-radius: 5px;
+}
+
+.stream {
+	margin: 1%;
 }
 
 .turnoff {

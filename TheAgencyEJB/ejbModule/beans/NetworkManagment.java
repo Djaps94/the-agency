@@ -130,11 +130,11 @@ public class NetworkManagment implements NetworkManagmentLocal{
 			}
 			try {
 				ServiceMessage message = getAllRunningAgents(masterIpAddress, slave);
-				if(message != null) agency.addCenterAgents(message.getOtherAgents());
+				if(message != null) agency.addCenterAgents(message.getOtherAgents().entrySet().iterator());
 			} catch (ConnectionException | IOException | TimeoutException | InterruptedException e) {
 				try {
 					ServiceMessage message = getAllRunningAgents(masterIpAddress, slave);
-					if(message != null) agency.addCenterAgents(message.getOtherAgents());									
+					if(message != null) agency.addCenterAgents(message.getOtherAgents().entrySet().iterator());									
 				} catch (ConnectionException | IOException | TimeoutException | InterruptedException e1) {
 					try {
 						ServiceMessage message = rollback(masterIpAddress, slave);
@@ -184,9 +184,9 @@ public class NetworkManagment implements NetworkManagmentLocal{
 	private ServiceMessage createMessage(AgentCenter slave, OperationType type){
 		ServiceMessage message = new ServiceMessage();
 		message.setType(type);
-		message.setAgentTypes(agency.getSupportedTypes());
+		message.setTypesViaIter(agency.getSupportedTypes());
 		message.setCenter(slave);
-		message.setRunningAgents(agentRegistry.getRunningAID());
+		message.setAIDsViaIter(agentRegistry.getRunningAID());
 		return message;
 	}
 		

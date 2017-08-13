@@ -113,6 +113,9 @@ public class AgencyOperationConsumer extends DefaultConsumer {
 		case STOP_AGENT:
 			operation.stopAgent(message, channel, properties);
 			break;
+		case STREAM_MESSAGE:
+			operation.streamMessage(message, channel, properties);
+			break;
 		default:
 			break;
 

@@ -132,7 +132,7 @@ public class AgencySocket implements MessageListener{
 		
 		SocketMessage msg = new SocketMessage();
 		msg.setMsgType(messageType.GET_AGENTS);
-		msg.setRunningAgents(runningAgents.iterator());
+		msg.setRunningAgents(runningAgents);
 		String output = mapper.writeValueAsString(msg);
 		session.getBasicRemote().sendText(output);
 	}

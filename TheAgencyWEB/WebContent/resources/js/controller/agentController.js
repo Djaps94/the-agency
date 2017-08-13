@@ -2,6 +2,8 @@ var app = angular.module('AgentModule',[]);
 
 app.controller('agentController', ['$scope', '$rootScope', '$http', function($scope, $rootScope, $http){
 	
+	var url = window.location;
+	
 	$rootScope.action = {
 			valueREST : false,
 			valueSocket : false
@@ -37,8 +39,11 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 		protocol : "",
 		ontology : "",
 		replyWith : "",
-		inReplyTo : ""
+		inReplyTo : "",
+		streamTo: "127.0.0.1"+":"+url.port
 	};
+	
+	$scope.streamMessage = [];
 	
 	$scope.hideTypes = function() {
 		if($scope.showTypes){
@@ -74,7 +79,6 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 	};
 	
 	//Opening socket
-	var url = window.location;
 	var wsadress = "ws://"+url.hostname+":"+url.port+"/TheAgency/agents";
 	
 	
@@ -100,6 +104,7 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 				case 'STOP_AGENT' : socketStopAgents(socketMessage);	break;
 				case 'REMOVE_AGENTS': socketRemoveAgents(socketMessage);break;
 				case 'REMOVE_TYPES': socketRemoveTypes(socketMessage); break;
+				case 'STREAM_MESSAGE': streamMessage(socketMessage); break;
 				}
 			}
 		}
@@ -139,6 +144,12 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 			return true;
 		}
 		return false;
+	}
+	
+	var streamMessage = function(socketMessage) {
+		$scope.$apply(function(){
+			$scope.streamMessage.push(socketMessage.infoStream);
+		});
 	}
 		
 	//Get all agent types
@@ -301,7 +312,6 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 					'Content-type' : 'application/json;charset=utf-8'
 				}
 			});
-			socket.send(JSON.stringify(socketMessage));
 			$scope.ACLMessage.content = "";
 			$scope.ACLMessage.sender = null;
 			$scope.ACLMessage.recievers = [];

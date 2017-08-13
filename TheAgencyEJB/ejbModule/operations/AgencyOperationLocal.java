@@ -17,13 +17,14 @@ import model.ServiceMessage;
 @Local
 public interface AgencyOperationLocal {
 	
-	public void sendRegisterResponse(ServiceMessage message, Channel channel, ObjectMapper mapper, BasicProperties property) throws ConnectionException, RegisterSlaveException, NodeExistsException, IOException, TimeoutException, InterruptedException;
-	public void sendGetTypesResponse(ServiceMessage message, Channel channel, ObjectMapper mapper, BasicProperties property) throws ConnectionException, IOException, TimeoutException, InterruptedException;
-	public void sendGetRunningResponse(Channel channel, ObjectMapper mapper, BasicProperties property) throws IOException;
-	public void addTypes(ServiceMessage message, Channel channel, BasicProperties property) throws IOException;
-	public void rollback(ServiceMessage message, Channel channel, ObjectMapper mapper, BasicProperties property) throws IOException;
-	public void deleteRunningAgent(ServiceMessage message, Channel channel, BasicProperties property) throws IOException;
-	public void addAgent(ServiceMessage message, Channel channel,BasicProperties property) throws IOException;
-	public void runAgent(ServiceMessage message, Channel channel, BasicProperties property) throws IOException;
-	public void stopAgent(ServiceMessage message, Channel channel, BasicProperties property) throws IOException;
+	void sendRegisterResponse(ServiceMessage message, Channel channel, ObjectMapper mapper, BasicProperties property) throws ConnectionException, RegisterSlaveException, NodeExistsException, IOException, TimeoutException, InterruptedException;
+	void sendGetTypesResponse(ServiceMessage message, Channel channel, ObjectMapper mapper, BasicProperties property) throws ConnectionException, IOException, TimeoutException, InterruptedException;
+	void sendGetRunningResponse(Channel channel, ObjectMapper mapper, BasicProperties property) throws IOException;
+	void addTypes(ServiceMessage message, Channel channel, BasicProperties property) throws IOException;
+	void rollback(ServiceMessage message, Channel channel, ObjectMapper mapper, BasicProperties property) throws IOException;
+	void deleteRunningAgent(ServiceMessage message, Channel channel, BasicProperties property) throws IOException;
+	void addAgent(ServiceMessage message, Channel channel,BasicProperties property) throws IOException;
+	void runAgent(ServiceMessage message, Channel channel, BasicProperties property) throws IOException;
+	void stopAgent(ServiceMessage message, Channel channel, BasicProperties property) throws IOException;
+	void streamMessage(ServiceMessage message, Channel channel, BasicProperties property) throws IOException;
 }
