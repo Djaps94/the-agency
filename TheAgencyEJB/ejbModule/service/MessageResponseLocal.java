@@ -7,5 +7,5 @@ import javax.ejb.Local;
 @Local
 public interface MessageResponseLocal {
 
-	public void waitMessage() throws IOException;
+	void waitMessage() throws IOException;
 }

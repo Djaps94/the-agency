@@ -11,11 +11,11 @@ import model.AgentCenter;
 @Local
 public interface AgencyRegistryLocal {
 	
-	public void addCenter(AgentCenter center) throws NodeExistsException;
-	public void deleteCenter(AgentCenter center);
-	public Stream<AgentCenter> getCenters();
-	public Iterator<AgentCenter> getCentersIterator();
-	public void setThisCenter(AgentCenter center);
-	public AgentCenter getThisCenter();
+	void addCenter(AgentCenter center) throws NodeExistsException;
+	void deleteCenter(AgentCenter center);
+	Stream<AgentCenter> getCenters();
+	Iterator<AgentCenter> getCentersIterator();
+	void setThisCenter(AgentCenter center);
+	AgentCenter getThisCenter();
 
 }

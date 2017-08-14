@@ -7,5 +7,5 @@ import model.ACLMessage;
 @Local
 public interface ReceiverLocal {
 
-	public void recieveAgentMessage(ACLMessage message);
+	void recieveAgentMessage(ACLMessage message);
 }

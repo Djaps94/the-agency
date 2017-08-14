@@ -12,15 +12,15 @@ import model.Agent;
 @Local
 public interface AgentRegistryLocal {
 	
-	public Iterator<AID> getRunningAID();
-	public Stream<AID> getRunningAIDStream();
-	public void addRunningAID(AID aid);
-	public void removeRunningAID(AID aid);
-	public void setRunningAID(List<AID> runningAgents);
-	public void removeAllRunningAIDs(Iterator<AID> agents);
-	public Iterator<Agent> getRunningAgents();
-	public void addRunningAgent(Agent agent);
-	public void removeRunningAgent(AID agent);
-	public void setRunnnigAgents(List<Agent> startedAgents);
+	Iterator<AID> getRunningAID();
+	Stream<AID> getRunningAIDStream();
+	void addRunningAID(AID aid);
+	void removeRunningAID(AID aid);
+	void setRunningAID(List<AID> runningAgents);
+	void removeAllRunningAIDs(Iterator<AID> agents);
+	Iterator<Agent> getRunningAgents();
+	void addRunningAgent(Agent agent);
+	void removeRunningAgent(AID agent);
+	void setRunnnigAgents(List<Agent> startedAgents);
 
 }

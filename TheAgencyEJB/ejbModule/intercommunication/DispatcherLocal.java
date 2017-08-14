@@ -8,6 +8,6 @@ import model.AID;
 @Local
 public interface DispatcherLocal {
 	
-	public void sendMesssage(ACLMessage message, AID aid);
+	void sendMesssage(ACLMessage message, AID aid);
 
 }

@@ -11,6 +11,6 @@ import model.ServiceMessage;
 @Local
 public interface MessageRequestLocal {
 	
-	public ServiceMessage sendMessage(String destination, ServiceMessage message) throws ConnectionException, IOException, TimeoutException, InterruptedException;
+	ServiceMessage sendMessage(String destination, ServiceMessage message) throws ConnectionException, IOException, TimeoutException, InterruptedException;
 
 }
