@@ -2,13 +2,31 @@ var app = angular.module('AgentModule',[]);
 
 app.controller('agentController', ['$scope', '$rootScope', '$http', function($scope, $rootScope, $http){
 	
+	var url = window.location;
+	
 	$rootScope.action = {
 			valueREST : false,
 			valueSocket : false
 	};
 	
+	$scope.setRest = function() {
+		$rootScope.action.valueREST = true;
+		$rootScope.action.valueSocket = false;
+	}
+	
+	$scope.setSocket = function() {
+		$rootScope.action.valueREST = false;
+		$rootScope.action.valueSocket = true;
+	}
+		
 	$scope.modalRunningAgents = [];
 	$scope.modalPerformative = [];
+	
+	$scope.showTypes = true;
+	$scope.typesText = "Hide agent types"
+		
+	$scope.showAgents = true;
+	$scope.agentText = "Hide running agents"
 	
 	$scope.ACLMessage = {
 		performative : "",
@@ -21,8 +39,31 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 		protocol : "",
 		ontology : "",
 		replyWith : "",
-		inReplyTo : ""
+		inReplyTo : "",
+		streamTo: "127.0.0.1"+":"+url.port
 	};
+	
+	$scope.streamMessage = [];
+	
+	$scope.hideTypes = function() {
+		if($scope.showTypes){
+			$scope.typesText = "Show agent types";
+			$scope.showTypes = false;
+		}else{
+			$scope.typesText = "Hide agent types";
+			$scope.showTypes = true;
+		}
+	}
+	
+	$scope.hideAgents = function() {
+		if($scope.showAgents) {
+			$scope.agentText = "Show running agents";
+			$scope.showAgents = false;
+		} else {
+			$scope.agentText = "Hide running agents";
+			$scope.showAgents = true;
+		}
+	}
 	
 	$scope.fillModal = function(){
 		$http.get('/TheAgency/rest/agency/agents/running').then(function(response){
@@ -38,7 +79,6 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 	};
 	
 	//Opening socket
-	var url = window.location;
 	var wsadress = "ws://"+url.hostname+":"+url.port+"/TheAgency/agents";
 	
 	
@@ -58,13 +98,13 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 			var socketMessage = JSON.parse(message.data);
 			if($rootScope.action.valueSocket){
 				switch(socketMessage.msgType){
-				case 'ADD_TYPE'   : socketAgentTypes(socketMessage);	break;
 				case 'GET_TYPES'  : socketAgentTypes(socketMessage);	break;
 				case 'GET_AGENTS' : socketRunningAgents(socketMessage); break;
 				case 'START_AGENT': socketStartAgents(socketMessage);	break;
 				case 'STOP_AGENT' : socketStopAgents(socketMessage);	break;
 				case 'REMOVE_AGENTS': socketRemoveAgents(socketMessage);break;
 				case 'REMOVE_TYPES': socketRemoveTypes(socketMessage); break;
+				case 'STREAM_MESSAGE': streamMessage(socketMessage); break;
 				}
 			}
 		}
@@ -85,20 +125,9 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 	}
 	
 	$scope.Console = {
-			buttonChat : "Show comm. chat",
 			show : false
 	}
-	
-	$scope.showChat = function(){
-		if(!$scope.Console.show){
-			$scope.Console.show = true;
-			$scope.Console.buttonChat = "Disable comm. chat";
-		}else{
-			$scope.Console.show = false;
-			$scope.Console.buttonChat = "Show comm. chat";
-		}
-	};
-	
+		
 	$scope.showRunOptions = function(){
 		if($scope.agentInfo.run)
 			$scope.agentInfo.run = false;
@@ -115,6 +144,12 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 			return true;
 		}
 		return false;
+	}
+	
+	var streamMessage = function(socketMessage) {
+		$scope.$apply(function(){
+			$scope.streamMessage.push(socketMessage.infoStream);
+		});
 	}
 		
 	//Get all agent types
@@ -234,8 +269,10 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 					 }
 					 var index = -1;
 					 for(x = 0; x < $scope.agentCollections.runningAgents.length; x++){
-						 if($scope.agentCollections.runningAgents[x].name === res.name)
+						 if($scope.agentCollections.runningAgents[x].name === res.name) {
 							 index = x;
+							 break;
+						 }
 					 }
 					 if(index > -1)
 						 $scope.agentCollections.runningAgents.splice(index, 1);
@@ -253,8 +290,10 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 	var socketStopAgents = function(socketMessage){
 		 var index = -1;
 		 for(x = 0; x < $scope.agentCollections.runningAgents.length; x++){
-			 if($scope.agentCollections.runningAgents[x].name === socketMessage.aid.name)
+			 if($scope.agentCollections.runningAgents[x].name === socketMessage.aid.name){
 				 index = x;
+				 break;
+			 }
 		 }
 		 if(index > -1)
 			 $scope.$apply(function(){
@@ -273,7 +312,6 @@ app.controller('agentController', ['$scope', '$rootScope', '$http', function($sc
 					'Content-type' : 'application/json;charset=utf-8'
 				}
 			});
-			socket.send(JSON.stringify(socketMessage));
 			$scope.ACLMessage.content = "";
 			$scope.ACLMessage.sender = null;
 			$scope.ACLMessage.recievers = [];

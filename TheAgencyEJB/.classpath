@@ -16,8 +16,8 @@
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
 	<classpathentry kind="lib" path="/TheAgencyWEB/WebContent/WEB-INF/lib/jackson-core-2.8.8.jar" sourcepath="/home/predrag/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.8.8/jackson-core-2.8.8-sources.jar"/>
 	<classpathentry kind="lib" path="/TheAgencyWEB/WebContent/WEB-INF/lib/jackson-databind-2.8.8.jar" sourcepath="/home/predrag/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.8.8/jackson-databind-2.8.8-sources.jar"/>
-	<classpathentry kind="lib" path="/TheAgencyWEB/WebContent/WEB-INF/lib/jeromq-0.3.6.jar" sourcepath="/home/predrag/.m2/repository/org/zeromq/jeromq/0.3.6/jeromq-0.3.6-sources.jar"/>
 	<classpathentry kind="lib" path="/TheAgencyWEB/WebContent/WEB-INF/lib/amqp-client-4.1.1.jar" sourcepath="/home/predrag/.m2/repository/com/rabbitmq/amqp-client/4.1.1/amqp-client-4.1.1-sources.jar"/>
 	<classpathentry kind="lib" path="/TheAgencyWEB/WebContent/WEB-INF/lib/jackson-annotations-2.8.8.jar"/>
+	<classpathentry kind="lib" path="/TheAgencyWEB/WebContent/WEB-INF/lib/jaunt1.3.2.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

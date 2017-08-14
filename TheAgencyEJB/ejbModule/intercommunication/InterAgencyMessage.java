@@ -6,14 +6,14 @@ import model.ACLMessage;
 import model.AID;
 
 @SuppressWarnings("serial")
-public class InterCenterMessage implements Serializable{
+public class InterAgencyMessage implements Serializable{
 	
 	private ACLMessage message;
 	private AID aid;
 	
-	public InterCenterMessage() { }
+	public InterAgencyMessage() { }
 	
-	public InterCenterMessage(ACLMessage message, AID aid){
+	public InterAgencyMessage(ACLMessage message, AID aid){
 		this.message   = message;
 		this.aid = aid;
 	}

@@ -1,99 +1,111 @@
 package beans;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.Singleton;
 
-import model.ACLMessage.Performative;
 import model.AID;
-import model.Agent;
 import model.AgentType;
 
 @Singleton
 public class AgencyManager implements AgencyManagerLocal {
 
-	private List<AID> runningAgents;
 	private Map<String, List<AID>> centerAgents;
-	private Set<AgentType> supportedTypes; 
-	private Map<String,Set<AgentType>> otherSupportedTypes;
-	private List<Agent> startedAgents;
-	private Performative performative;
-	
-	public AgencyManager() { }
-	
+	private Set<AgentType> supportedTypes;
+	private Map<String, Set<AgentType>> otherSupportedTypes;
+
+	public AgencyManager() {
+	}
+
 	@PostConstruct
-	public void initialise(){
-		this.runningAgents  = new ArrayList<AID>();
+	public void initialise() {
 		this.supportedTypes = new HashSet<AgentType>();
 		this.otherSupportedTypes = new HashMap<String, Set<AgentType>>();
 		this.centerAgents = new HashMap<String, List<AID>>();
-		startedAgents = new ArrayList<Agent>();
 	}
-	
-	public Performative getPerformative(){
-		return performative;
+
+	public Iterator<AgentType> getSupportedTypes() {
+		return supportedTypes.iterator();
 	}
-	
-	public Set<AgentType> getSupportedTypes() {
-		return supportedTypes;
+
+	public Stream<AgentType> getSupportedTypesStream() {
+		return supportedTypes.stream();
+	}
+
+	public boolean isSupportedContained(AgentType t) {
+		return supportedTypes.contains(t);
 	}
 
 	public void setSupportedTypes(Set<AgentType> supportedTypes) {
 		this.supportedTypes = supportedTypes;
 	}
 
-	public List<AID> getRunningAgents() {
-		return runningAgents;
+	public Iterator<Entry<String, Set<AgentType>>> getOtherSupportedTypes() {
+		return otherSupportedTypes.entrySet().iterator();
 	}
 
-	public void setRunningAgents(List<AID> runningAgents) {
-		this.runningAgents = runningAgents;
+	public Set<AgentType> getOtherAgentTypes(String key) {
+		return otherSupportedTypes.get(key);
 	}
 
-	public Map<String, Set<AgentType>> getOtherSupportedTypes() {
-		return otherSupportedTypes;
+	public Stream<Entry<String, Set<AgentType>>> getOtherSupportedTypesStream() {
+		return otherSupportedTypes.entrySet().stream();
 	}
 
-	public void setOtherSupportedTypes(Map<String, Set<AgentType>> otherSupportedTypes) {
-		this.otherSupportedTypes = otherSupportedTypes;
-	}
-	
-	public boolean isContained(String alias){
+	public boolean isContained(String alias) {
 		return otherSupportedTypes.containsKey(alias);
 	}
-	
-	public void addOtherTypes(String alias, Set<AgentType> types){
-		if(!isContained(alias))
+
+	public void addOtherTypes(String alias, Set<AgentType> types) {
+		if (!isContained(alias))
 			otherSupportedTypes.put(alias, types);
 		else
 			otherSupportedTypes.get(alias).addAll(types);
 	}
-	
-	public void deleteOtherTypes(String alias){
+
+	public void deleteOtherTypes(String alias) {
 		otherSupportedTypes.remove(alias);
 	}
 
-	public Map<String, List<AID>> getCenterAgents() {
-		return centerAgents;
+	public Iterator<Entry<String, List<AID>>> getCenterAgents() {
+		return centerAgents.entrySet().iterator();
+	}
+
+	public List<AID> getCenterAgent(String key) {
+		return centerAgents.get(key);
+	}
+
+	public boolean isAgentContained(String key) {
+		return centerAgents.containsKey(key);
+	}
+
+	public void removeAgent(String key) {
+		centerAgents.remove(key);
+	}
+
+	public void addCenterAgent(String key, List<AID> aids) {
+		centerAgents.put(key, aids);
+	}
+
+	public void addCenterAgents(Iterator<Entry<String, List<AID>>> iter) {
+		while (iter.hasNext()) {
+			Entry<String, List<AID>> entry = iter.next();
+			if (centerAgents.containsKey(entry.getKey()))
+				centerAgents.get(entry.getKey()).addAll(entry.getValue());
+			else
+				centerAgents.put(entry.getKey(), entry.getValue());
+		}
 	}
 
 	public void setCenterAgents(Map<String, List<AID>> centerAgents) {
 		this.centerAgents = centerAgents;
 	}
-
-	public List<Agent> getStartedAgents() {
-		return startedAgents;
-	}
-
-	public void setStartedAgents(List<Agent> startedAgents) {
-		this.startedAgents = startedAgents;
-	}
-	
-	
 }

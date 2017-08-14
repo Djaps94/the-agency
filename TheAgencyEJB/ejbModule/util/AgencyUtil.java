@@ -14,7 +14,7 @@ public class AgencyUtil {
 		
 	public static Set<AgentType> agentTypes(String filename){
 		Set<AgentType> set = new HashSet<AgentType>();
-		InputStream in 		= AgencyUtil.class.getResourceAsStream(filename);
+		InputStream in 	  	= AgencyUtil.class.getResourceAsStream(filename);
 		BufferedReader br  = new BufferedReader(new InputStreamReader(in));
 		List<String> lines = br.lines().collect(Collectors.toList());
 		for(String line : lines){

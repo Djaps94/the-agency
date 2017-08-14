@@ -1,11 +1,8 @@
 package agents;
 
 import java.io.File;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -14,6 +11,7 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import beans.AgencyManagerLocal;
+import beans.MessageStreamLocal;
 import model.ACLMessage;
 import model.ACLMessage.Performative;
 import model.Agent;
@@ -24,6 +22,9 @@ public class MapReduceMaster extends Agent{
 	
     @EJB
     private AgencyManagerLocal manager;
+    
+    @EJB
+    private MessageStreamLocal streamer;
     
     private Map<Character, Integer> words;
     private int slaves;
@@ -37,23 +38,9 @@ public class MapReduceMaster extends Agent{
 	@Override
 	public void handleMessage(ACLMessage message) {
 		switch(message.getPerformative()){
-		case ACCEPT_PROPOSAL:
-			break;
-		case AGREE:
-			break;
-		case CANCEL:
-			break;
-		case CFP:
-			break;
-		case CONFIRM:
-			break;
-		case DISCONFIRM:
-			break;
-		case FAILURE:
-			break;
 		case INFORM: {
 			synchronized (message) {
-				System.out.println(message.getContent());
+				streamer.streamMessage(message.getContent(), message.getStreamTo());
 				((Map<Character,Integer>)message.getContentObject()).entrySet().forEach(entry -> {
 					if(words.containsKey(entry.getKey()))	
 						words.put(entry.getKey(), words.get(entry.getKey())+ entry.getValue());
@@ -71,28 +58,8 @@ public class MapReduceMaster extends Agent{
 			
 		}
 			break;
-		case INFORM_IF:
-			break;
-		case INFORM_REF:
-			break;
-		case NOT_UNDERSTOOD:
-			break;
-		case PROPAGATE:
-			break;
-		case PROPOSE:
-			break;
-		case PROXY:
-			break;
-		case QUERY_IF:
-			break;
-		case QUERY_REF:
-			break;
-		case REFUSE:
-			break;
-		case REJECT_PROPOSAL:
-			break;
 		case REQUEST: {
-			boolean support = manager.getSupportedTypes().stream().anyMatch(type -> type.getName().equals("MapReduceSlave"));
+			boolean support = manager.getSupportedTypesStream().anyMatch(type -> type.getName().equals("MapReduceSlave"));
 			File file = new File("/home/predrag/workspace/the-agency/TheAgencyEJB/files");
 			slaves = file.listFiles().length;
 			for(int i = 0; i < slaves; i++){
@@ -100,6 +67,7 @@ public class MapReduceMaster extends Agent{
 				msg.setPerformative(Performative.REQUEST);
 				msg.setSender(getId());
 				msg.setContent(file.listFiles()[i].getName());
+				msg.setStreamTo(message.getStreamTo());
 				if(support){
 					try {
 						InitialContext context = new InitialContext();
@@ -113,12 +81,6 @@ public class MapReduceMaster extends Agent{
 				}
 			}
 		}
-			break;
-		case REQUEST_WHEN:
-			break;
-		case REQUEST_WHENEVER:
-			break;
-		case SUBSCRIBE:
 			break;
 		default:
 			break;

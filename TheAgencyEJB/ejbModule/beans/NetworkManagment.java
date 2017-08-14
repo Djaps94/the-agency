@@ -6,7 +6,6 @@ import java.net.UnknownHostException;
 import java.util.concurrent.TimeoutException;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.ejb.EJB;
 import javax.ejb.Local;
 import javax.ejb.Singleton;
@@ -14,14 +13,14 @@ import javax.ejb.Startup;
 
 import exceptions.ConnectionException;
 import exceptions.NodeExistsException;
-import handshake.HandshakeRequesterLocal;
-import handshake.HandshakeResponseLocal;
 import heartbeat.HeartBeatResponseLocal;
 import heartbeat.HeartbeatRequestLocal;
-import intercommunication.HandlerRabbitLocal;
+import intercommunication.MediatorLocal;
 import model.AgentCenter;
-import model.HandshakeMessage;
-import model.HandshakeMessage.handshakeType;
+import model.ServiceMessage;
+import model.ServiceMessage.OperationType;
+import service.MessageRequestLocal;
+import service.MessageResponseLocal;
 import util.AgencyUtil;
 
 @Startup
@@ -40,37 +39,40 @@ public class NetworkManagment implements NetworkManagmentLocal{
 	private String masterIpAddress;																																																																																																																																																																																
 	
 	@EJB
-	private AgencyRegistryLocal registryBean;
+	private AgencyRegistryLocal registry;
 	
 	@EJB
-	private HandshakeRequesterLocal requester;
+	private MessageRequestLocal request;
 		
 	@EJB 
 	private AgencyManagerLocal agency;
 	
 	@EJB
-	private HeartbeatRequestLocal hrequester;
+	private HeartbeatRequestLocal beatRequest;
 	
 	@EJB
-	private HeartBeatResponseLocal hresponse;
+	private HeartBeatResponseLocal beatResponse;
 	
 	@EJB
-	private HandshakeResponseLocal handshakeResponse;
+	private MessageResponseLocal messageResponse;
 	
 	@EJB
-	private HandlerRabbitLocal rabbitHandler;
+	private MediatorLocal rabbitHandler;
+	
+	@EJB
+	private AgentRegistry agentRegistry;
 	
 	@PostConstruct
 	public void initialise(){		
 		if(System.getProperty(MASTER) == null){
 			master = true;
 			try {
-				registryBean.setThisCenter(createCenter());
+				registry.setThisCenter(createCenter());
+				beatRequest.startTimer();
+				beatResponse.pulseTick();
+				messageResponse.waitMessage();
+				rabbitHandler.recieveAgentMessage();
 				System.out.println("MASTER NODE UP");
-				hrequester.startTimer();
-				hresponse.pulseTick();
-				handshakeResponse.waitMessage();
-				rabbitHandler.recieveMessage();
 			} catch (IOException e) {
 				//TODO: shutdown script
 			}
@@ -81,26 +83,26 @@ public class NetworkManagment implements NetworkManagmentLocal{
 		try {
 			slave = createCenter();
 			System.out.println("SLAVE NODE UP "+slave.getAlias());
-			registryBean.setThisCenter(slave);
+			registry.setThisCenter(slave);
+			messageResponse.waitMessage();
+			rabbitHandler.recieveAgentMessage();
 			master = false;
-			handshakeResponse.waitMessage();
-			rabbitHandler.recieveMessage();
 			try {
-				HandshakeMessage message = sendMessageToMaster(masterIpAddress, slave);
+				ServiceMessage message = sendMessageToMaster(masterIpAddress, slave);
 				if(message != null){
 					for(AgentCenter center : message.getCenters())
-						registryBean.addCenter(center);
+						registry.addCenter(center);
 				}
 			} catch (ConnectionException | NodeExistsException | IOException | TimeoutException | InterruptedException e) {
 				try {
-					HandshakeMessage message = sendMessageToMaster(masterIpAddress, slave);
+					ServiceMessage message = sendMessageToMaster(masterIpAddress, slave);
 					if(message != null) {
 						for(AgentCenter center : message.getCenters())
-							registryBean.addCenter(center);
+							registry.addCenter(center);
 					}
 				} catch (ConnectionException | NodeExistsException | IOException | TimeoutException | InterruptedException e1) {
 					try {
-						HandshakeMessage message = rollback(masterIpAddress, slave);
+						ServiceMessage message = rollback(masterIpAddress, slave);
 						if(message != null) shutdownServer();
 					} catch (ConnectionException | IOException | TimeoutException | InterruptedException e2) {
 						System.out.println("Handshake failed. Rollback failed. Shuting down server...");
@@ -110,19 +112,15 @@ public class NetworkManagment implements NetworkManagmentLocal{
 			}
 			
 			try {
-				HandshakeMessage message = getAllAgentTypes(masterIpAddress, slave);
-				if(message != null) message.getOtherTypes().entrySet()
-														   .stream()
-														   .forEach(entry -> agency.addOtherTypes(entry.getKey(), entry.getValue()));
+				ServiceMessage message = getAllAgentTypes(masterIpAddress, slave);
+				if(message != null) message.getOtherTypes().entrySet().stream().forEach(entry -> agency.addOtherTypes(entry.getKey(), entry.getValue()));
 			} catch (ConnectionException | IOException | TimeoutException | InterruptedException e) {
 				try {
-					HandshakeMessage message = getAllAgentTypes(masterIpAddress, slave);
-					if(message != null) message.getOtherTypes().entrySet()
-															   .stream()
-															   .forEach(entry -> agency.addOtherTypes(entry.getKey(), entry.getValue()));
+					ServiceMessage message = getAllAgentTypes(masterIpAddress, slave);
+					if(message != null) message.getOtherTypes().entrySet().stream().forEach(entry -> agency.addOtherTypes(entry.getKey(), entry.getValue()));
 				} catch (ConnectionException | IOException | TimeoutException | InterruptedException e1) {
 					try {
-						HandshakeMessage message = rollback(masterIpAddress, slave);
+						ServiceMessage message = rollback(masterIpAddress, slave);
 						if(message != null) shutdownServer();
 					} catch (ConnectionException | IOException | TimeoutException | InterruptedException e2) {
 						System.out.println("Handshake failed. Rollback failed. Shuting down server...");
@@ -131,24 +129,24 @@ public class NetworkManagment implements NetworkManagmentLocal{
 				}
 			}
 			try {
-				HandshakeMessage message = getAllRunningAgents(masterIpAddress, slave);
-				if(message != null) agency.getCenterAgents().putAll(message.getOtherAgents());
+				ServiceMessage message = getAllRunningAgents(masterIpAddress, slave);
+				if(message != null) agency.addCenterAgents(message.getOtherAgents().entrySet().iterator());
 			} catch (ConnectionException | IOException | TimeoutException | InterruptedException e) {
 				try {
-					HandshakeMessage message = getAllRunningAgents(masterIpAddress, slave);
-					if(message != null) agency.getCenterAgents().putAll(message.getOtherAgents());									
+					ServiceMessage message = getAllRunningAgents(masterIpAddress, slave);
+					if(message != null) agency.addCenterAgents(message.getOtherAgents().entrySet().iterator());									
 				} catch (ConnectionException | IOException | TimeoutException | InterruptedException e1) {
 					try {
-						HandshakeMessage message = rollback(masterIpAddress, slave);
+						ServiceMessage message = rollback(masterIpAddress, slave);
 						if(message != null) shutdownServer();
 					} catch (ConnectionException | IOException | TimeoutException | InterruptedException e2) {
-						System.out.println("Handshake failed. Rollback failed. Shuting down serve...");
+						System.out.println("Handshake failed. Rollback failed. Shuting down server...");
 						shutdownServer();
 					}
 				}
 			}
-			hrequester.startTimer();
-			hresponse.pulseTick();
+			beatRequest.startTimer();
+			beatResponse.pulseTick();
 		} catch (IOException e) {
 			shutdownServer();
 		}
@@ -167,36 +165,31 @@ public class NetworkManagment implements NetworkManagmentLocal{
 		return center;
 	}
 		
-	private HandshakeMessage sendMessageToMaster(String masterIpAddress, AgentCenter slave) throws ConnectionException, IOException, TimeoutException, InterruptedException{
-		return requester.sendMessage(masterIpAddress, new HandshakeMessage(slave, handshakeType.REGISTER));
+	private ServiceMessage sendMessageToMaster(String masterIpAddress, AgentCenter slave) throws ConnectionException, IOException, TimeoutException, InterruptedException{
+		return request.sendMessage(masterIpAddress, new ServiceMessage(slave, OperationType.REGISTER));
 	}
 	
-	private HandshakeMessage getAllAgentTypes(String masterIpAddress, AgentCenter slave) throws ConnectionException, IOException, TimeoutException, InterruptedException{
-		return requester.sendMessage(masterIpAddress, createMessage(slave, handshakeType.GET_TYPES));
+	private ServiceMessage getAllAgentTypes(String masterIpAddress, AgentCenter slave) throws ConnectionException, IOException, TimeoutException, InterruptedException{
+		return request.sendMessage(masterIpAddress, createMessage(slave, OperationType.GET_TYPES));
 	}
 	
-	private HandshakeMessage getAllRunningAgents(String masterIpAddress, AgentCenter slave) throws ConnectionException, IOException, TimeoutException, InterruptedException{
-		return requester.sendMessage(masterIpAddress, createMessage(slave, handshakeType.GET_RUNNING));
+	private ServiceMessage getAllRunningAgents(String masterIpAddress, AgentCenter slave) throws ConnectionException, IOException, TimeoutException, InterruptedException{
+		return request.sendMessage(masterIpAddress, createMessage(slave, OperationType.GET_RUNNING));
 	}
 
-	private HandshakeMessage rollback(String masterIpAddress, AgentCenter slave) throws ConnectionException, IOException, TimeoutException, InterruptedException{
-		return requester.sendMessage(masterIpAddress, createMessage(slave, handshakeType.ROLLBACK));
+	private ServiceMessage rollback(String masterIpAddress, AgentCenter slave) throws ConnectionException, IOException, TimeoutException, InterruptedException{
+		return request.sendMessage(masterIpAddress, createMessage(slave, OperationType.ROLLBACK));
 	}
 	
-	private HandshakeMessage createMessage(AgentCenter slave, handshakeType type){
-		HandshakeMessage message = new HandshakeMessage();
+	private ServiceMessage createMessage(AgentCenter slave, OperationType type){
+		ServiceMessage message = new ServiceMessage();
 		message.setType(type);
-		message.setAgentTypes(agency.getSupportedTypes());
+		message.setTypesViaIter(agency.getSupportedTypes());
 		message.setCenter(slave);
-		message.setRunningAgents(agency.getRunningAgents());
+		message.setAIDsViaIter(agentRegistry.getRunningAID());
 		return message;
 	}
-	
-	@PreDestroy
-	private void destroy(){
 		
-	}
-	
 	private void shutdownServer(){
 		//TODO: Load script and exec it
 	}

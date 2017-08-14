@@ -6,8 +6,8 @@ import model.ACLMessage;
 import model.AID;
 
 @Local
-public interface MessageDispatcherLocal {
+public interface DispatcherLocal {
 	
-	public void sendMesssage(ACLMessage message, AID aid);
+	void sendMesssage(ACLMessage message, AID aid);
 
 }

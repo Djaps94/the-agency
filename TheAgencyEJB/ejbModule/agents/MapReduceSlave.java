@@ -15,7 +15,8 @@ import javax.ejb.EJB;
 import javax.ejb.LocalBean;
 import javax.ejb.Stateful;
 
-import intercommunication.HandlerLocal;
+import beans.MessageStreamLocal;
+import intercommunication.ReceiverLocal;
 import model.ACLMessage;
 import model.ACLMessage.Performative;
 import model.AID;
@@ -30,7 +31,10 @@ public class MapReduceSlave extends Agent{
 	private Map<Character, Integer> numberOfChars;
 	
     @EJB
-    private HandlerLocal handler;
+    private ReceiverLocal handler;
+    
+    @EJB
+    private MessageStreamLocal streamer;
     
 	public MapReduceSlave() {
    
@@ -45,45 +49,9 @@ public class MapReduceSlave extends Agent{
 	@Asynchronous
 	public void handleMessage(ACLMessage message) {
 		switch(message.getPerformative()){
-		case ACCEPT_PROPOSAL:
-			break;
-		case AGREE:
-			break;
-		case CANCEL:
-			break;
-		case CFP:
-			break;
-		case CONFIRM:
-			break;
-		case DISCONFIRM:
-			break;
-		case FAILURE:
-			break;
-		case INFORM:
-			break;
-		case INFORM_IF:
-			break;
-		case INFORM_REF:
-			break;
-		case NOT_UNDERSTOOD:
-			break;
-		case PROPAGATE:
-			break;
-		case PROPOSE:
-			break;
-		case PROXY:
-			break;
-		case QUERY_IF:
-			break;
-		case QUERY_REF:
-			break;
-		case REFUSE:
-			break;
-		case REJECT_PROPOSAL:
-			break;
 		case REQUEST: {
-			System.out.println("Message from "+message.getSender().getName());
-			System.out.println("Count words in: "+message.getContent());
+			streamer.streamMessage("Message from "+message.getSender().getName()+". Count words in: "+message.getContent(), message.getStreamTo());
+			
 			InputStream in 		= this.getClass().getResourceAsStream("/"+message.getContent());
 			BufferedReader br   = new BufferedReader(new InputStreamReader(in));
 			StringBuffer buffer = new StringBuffer();
@@ -101,19 +69,14 @@ public class MapReduceSlave extends Agent{
 			ACLMessage msg = new ACLMessage();
 			msg.setContentObject(numberOfChars);
 			msg.setContent("I've finished.");
+			msg.setStreamTo(message.getStreamTo());
 			List<AID> recievers = new LinkedList<>();
 			recievers.add(message.getSender());
 			msg.setRecievers(recievers);
 			msg.setPerformative(Performative.INFORM);
-			handler.sendAgentMessage(msg);
+			handler.recieveAgentMessage(msg);
 			
 		}
-			break;
-		case REQUEST_WHEN:
-			break;
-		case REQUEST_WHENEVER:
-			break;
-		case SUBSCRIBE:
 			break;
 		default:
 			break;

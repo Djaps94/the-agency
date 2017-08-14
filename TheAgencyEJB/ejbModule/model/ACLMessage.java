@@ -23,6 +23,7 @@ public class ACLMessage implements Serializable{
 	private String replyWith;
 	private String inReplyTo;
 	private Long replyBy;
+	private String streamTo;
 	
 	public enum Performative { ACCEPT_PROPOSAL,
 							   AGREE,
@@ -140,5 +141,13 @@ public class ACLMessage implements Serializable{
 
 	public void setPerformative(Performative performative) {
 		this.performative = performative;
+	}
+
+	public String getStreamTo() {
+		return streamTo;
+	}
+
+	public void setStreamTo(String streamTo) {
+		this.streamTo = streamTo;
 	}
 }

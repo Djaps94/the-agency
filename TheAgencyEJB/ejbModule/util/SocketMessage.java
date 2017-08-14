@@ -1,6 +1,8 @@
 package util;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -11,25 +13,20 @@ import model.AgentType;
 @SuppressWarnings("serial")
 public class SocketMessage implements Serializable{
 
-	public enum messageType { GET_TYPES,
-							  GET_AGENTS,
-							  ADD_TYPE,
-							  SEND_MESSAGE,
-							  START_AGENT,
-							  STOP_AGENT,
-							  REMOVE_AGENTS,
-							  REMOVE_TYPES
+	public enum messageType {
+		GET_TYPES, GET_AGENTS, ADD_TYPE, SEND_MESSAGE, START_AGENT, STOP_AGENT, REMOVE_AGENTS, REMOVE_TYPES, STREAM_MESSAGE
 	};
 	
 	private AID aid;
 	private AgentType type;
-	private List<AID> runningAgents;
-	private Set<AgentType> agentTypes;
+	private List<AID> runningAgents = new ArrayList<>();
+	private Set<AgentType> agentTypes = new HashSet<>();
 	private String agentName;
 	private String typeModule;
 	private String typeName;
 	private messageType msgType;
 	private ACLMessage message;
+	private String infoStream;
 	
 	
 	public SocketMessage() { }
@@ -58,7 +55,6 @@ public class SocketMessage implements Serializable{
 	public List<AID> getRunningAgents() {
 		return runningAgents;
 	}
-
 
 	public void setRunningAgents(List<AID> runningAgents) {
 		this.runningAgents = runningAgents;
@@ -122,5 +118,15 @@ public class SocketMessage implements Serializable{
 
 	public void setMessage(ACLMessage message) {
 		this.message = message;
+	}
+
+
+	public String getInfoStream() {
+		return infoStream;
+	}
+
+
+	public void setInfoStream(String infoStream) {
+		this.infoStream = infoStream;
 	}
 }

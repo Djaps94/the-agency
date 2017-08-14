@@ -4,18 +4,33 @@ html {
 	margin: 0px;
 	height: 100%;
 	width: 100%;
+	overflow-x: hidden;
 }
 
 body {
 	margin: 0px;
 	min-height: 100%;
 	width: 100%;
+	background-image:url('../images/mirrorcs.jpg');
+    background-repeat:repeat-y;
+    background-size:cover;
 }
 
-.responsive-image {
-	background-image:url('../images/agency.jpg');
-	background-repeat:no-repeat;
-	background-size:cover;
+#index {
+	position: absolute; 
 	width: 100%; 
-	height: 100%;
+	height: 100%; 
+}
+
+#navbar {
+	font-family: sans-serif;
+	background-color: transparent;
+}
+
+#home {
+	color: #C8DEC1;
+}
+
+#contacts {
+	color: #C8DEC1;
 }

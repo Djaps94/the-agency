@@ -1,5 +1,6 @@
 package intercommunication;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -15,7 +16,7 @@ import model.AID;
 
 @Stateless
 @LocalBean
-public class Handler implements HandlerLocal{
+public class Receiver implements ReceiverLocal{
 
 	@EJB
 	private AgencyManagerLocal agency;
@@ -24,24 +25,26 @@ public class Handler implements HandlerLocal{
 	private AgencyRegistryLocal registry;
 	
 	@EJB
-	private RabbitDispatcherLocal rabbit;
+	private MediatorDispatcherLocal rabbit;
 	
 	@EJB
-	private MessageDispatcherLocal dispatcher;
+	private DispatcherLocal dispatcher;
 	
-    public Handler() {
+    public Receiver() {
 
     }
 	
 	@Override
-	public void sendAgentMessage(ACLMessage message) {
+	public void recieveAgentMessage(ACLMessage message) {
 		if(message == null)
 			return;
 		for(AID aid : message.getRecievers()){
 			if(aid.getHost().getAlias().equals(registry.getThisCenter().getAlias())){
 				dispatcher.sendMesssage(message, aid);
 			}else{
-				for(Entry<String, List<AID>> entry : agency.getCenterAgents().entrySet()){
+				Iterator<Entry<String, List<AID>>> agents = agency.getCenterAgents();
+				while(agents.hasNext()){
+					Entry<String, List<AID>> entry = agents.next();
 					if(entry.getKey().equals(aid.getHost().getAlias())){
 						rabbit.notifyCenter(message, aid, entry.getKey());
 						break;

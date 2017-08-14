@@ -7,5 +7,5 @@ import util.SocketMessage;
 @Local
 public interface SocketSenderLocal {
 
-	public void socketSend(SocketMessage message);
+	void socketSend(SocketMessage message);
 }

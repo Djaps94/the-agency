@@ -1,28 +1,30 @@
 package intercommunication;
 
+import java.util.Iterator;
+
 import javax.ejb.EJB;
 import javax.ejb.LocalBean;
 import javax.ejb.Singleton;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import beans.AgencyManagerLocal;
+import beans.AgentRegistryLocal;
 import model.ACLMessage;
 import model.AID;
 import model.Agent;
 
 /**
- * Session Bean implementation class MessageDispatcher
+ * Session Bean implementation class Dispatcher
  * Aka Diana Burnwood
  */
 @Singleton
 @LocalBean
-public class MessageDispatcher implements MessageDispatcherLocal {
+public class Dispatcher implements DispatcherLocal {
 	
     @EJB
-    private AgencyManagerLocal manager;
-	
-	public MessageDispatcher() {
+    private AgentRegistryLocal registry;
+    
+	public Dispatcher() {
     
     }
 
@@ -31,8 +33,10 @@ public class MessageDispatcher implements MessageDispatcherLocal {
 	  		InitialContext context = new InitialContext();
 			Agent a = (Agent)context.lookup("java:module/"+aid.getType().getName());
 			a.setId(aid);
+			Iterator<Agent> iter = registry.getRunningAgents();
 			
-			for(Agent agent : manager.getStartedAgents()){
+			while(iter.hasNext()){
+				Agent agent = iter.next();
 				if(agent.getId().getName().equals(a.getId().getName())){
 					agent.handleMessage(message);
 					return;
