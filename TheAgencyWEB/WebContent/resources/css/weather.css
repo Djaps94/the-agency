@@ -1,0 +1,37 @@
+#weatherHeading {
+	text-align: center;
+	margin: 2%;
+	color: #8083F6;
+	margin-bottom: 4%;
+	margin-top: 10%;
+	margin-left: 10%;
+	float: left;
+}
+
+#master {
+	margin-left: 10%;
+	margin-top: 10%;
+	color: #C8DEC1;
+	display: flex;
+	margin-bottom: 5%;
+}
+
+#inner {
+	width: 50%;
+}
+
+#description > span {   
+    font-size: 20px;	
+}
+
+#description > button {
+	margin-top: 2%;
+}
+
+img {
+	margin-left: 5%;
+}
+
+#running {
+	margin-bottom: 5%;
+}
