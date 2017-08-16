@@ -1,12 +1,18 @@
 package agents;
 
-import javax.ejb.Stateless;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.ejb.Stateful;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 
 import model.ACLMessage;
+import model.ACLMessage.Performative;
 import model.Agent;
 
 
-@Stateless
+@Stateful
 public class WeatherMaster extends Agent{
 
 	private static final long serialVersionUID = -7609277672062916060L;
@@ -56,7 +62,27 @@ public class WeatherMaster extends Agent{
 			break;
 		case REJECT_PROPOSAL:
 			break;
-		case REQUEST:
+		case REQUEST: {
+			//TODO: Does this node support weather slaves?
+			List<ACLMessage> messageList = new ArrayList<>();
+			String[] cities = message.getContent().split(",");
+			for(String city : cities){
+				ACLMessage msg = new ACLMessage();
+				msg.setContent(city.trim());
+				msg.setPerformative(Performative.REQUEST);
+				msg.setSender(getId());
+				messageList.add(msg);
+			}
+			
+			if(message.isAccu()){
+				AccuWeather(messageList);
+			}else if(message.isUmbrella()){
+				
+			}else if(message.isMix()) {
+				
+			}
+		
+		}
 			break;
 		case REQUEST_WHEN:
 			break;
@@ -67,6 +93,18 @@ public class WeatherMaster extends Agent{
 		default:
 			break;
 		
+		}
+	}
+	
+	private void AccuWeather(List<ACLMessage> messages){
+		for(ACLMessage msg : messages){
+			try {
+				InitialContext context = new InitialContext();
+				Agent accu = (Agent)context.lookup("java:module/WeatherAccu");
+				accu.handleMessage(msg);
+			} catch (NamingException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

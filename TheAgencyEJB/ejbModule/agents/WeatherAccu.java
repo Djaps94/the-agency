@@ -1,16 +1,16 @@
 package agents;
 
-import javax.ejb.Stateless;
+import javax.ejb.Stateful;
 
 import model.ACLMessage;
 import model.Agent;
 
-@Stateless
-public class WeatherSlave extends Agent {
+@Stateful
+public class WeatherAccu extends Agent {
     
 	private static final long serialVersionUID = -7183133844763416517L;
 
-	public WeatherSlave() {
+	public WeatherAccu() {
         
     }
 
