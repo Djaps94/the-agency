@@ -2,3 +2,4 @@ ejbModule.agents PongAgent
 ejbModule.agents ContractNetInitiator
 ejbModule.agents MapReduceMaster
 ejbModule.agents MapReduceSlave
+ejbModule.agents WeatherMaster

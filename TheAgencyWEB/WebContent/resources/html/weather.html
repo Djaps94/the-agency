@@ -12,18 +12,23 @@
 	            <hr>
 	        </div>
 	            <div ng-if="show">
-	                <input class="start" type="text" ng-model="agentName"/> <button class="btn btn-sm btn-primary" ng-click="startAgent()">Start</button>
+	                <input class="start" type="text" ng-model="weatherMaster.agentName"/> <button class="btn btn-sm btn-primary" ng-click="startAgent()">Start</button>
 	            </div>
 	    </div>
         <div id="description">
 	       <span>Wanna know what's the weather today? Or the next few days?</span> <br />
 	       <span>Start a weather master and send him a message. Select your or any other city.</span> <br />
 	       <span>Watch the answer unfolds!</span> <br />  
-	       <button class="btn btn-sm btn-info" ng-if="collections.runningAgents.length > 0" data-toggle="modal" data-target="#messageModal">Send message</button>
+	       <button class="btn btn-sm btn-info" ng-show="collections.runningAgents.length > 0" data-toggle="modal" data-target="#messageModal" ng-click="fillModal()">Send message</button>
+           <input type="radio" ng-click="setRest()" name="comm" value="Rest"/>
+           <i class="fa fa-level-up fa-2x" area-hidden="true" data-toggle="tooltip" title="Rest"></i>
+           <input type="radio" ng-click="setSocket()" name="comm" value="Websocket"/>
+           <i class="fa fa-exchange fa-2x" area-hidden="true" data-toggle="tooltip" title="Websockets"></i>
         </div> 
     </div>
     <div id="running">
         <h3 id="agentTypes">Running agents</h3>
+        <span id="hideTypes" class="hvr-icon-spin" ng-show="collections.runningAgents.length > 0" ng-click="hideRunning()">{{text}}</span> 
         <hr>
         <div class="row slide-toggle-js" ng-repeat="aid in collections.runningAgents" ng-if="$index % 4 == 0 && showAgents">
           <div class="col-sm-3 hvr-grow" ng-if="($index < collections.runningAgents.length)">
@@ -111,6 +116,12 @@
 	      </div>
 	      <div class="modal-body">
 	        <form>
+	           <div class="form-group>">
+	               <label>Weather from: </label> <br>
+	               <input type="radio" name="weather" value="AccuWeather" ng-click="setAccu()" /> AccuWeather <br>
+	               <input type="radio" name="weather" value="Weather2Umbrella" ng-click="setUmbrella()" /> Weather2Umbrella <br>
+	               <input type="radio" name="weather" value="Mix" ng-click="setMix()" /> Mix <br>
+	           </div>
 	            <div class="form-group">
 	                <label>Performative:</label>
 	                <select class="form-control" ng-model="ACLMessage.performative" ng-options="perform for perform in modalPerformative">
@@ -133,31 +144,31 @@
 	            </div>
 	            <div class="form-group">
 	                <label>Content:</label>
-	                <input type="text" ng-model="ACLMessage.content"/>
+	                <input class="form-control" type="text" ng-model="ACLMessage.content" placeholder="City names separated by comma..." />
 	            </div>
 	            <div class="form-group">
 	                <label>Language:</label>
-	                <input type="text" ng-model="ACLMessage.language" />
+	                <input class="form-control" type="text" ng-model="ACLMessage.language" />
 	            </div>
 	            <div class="form-group">
 	                <label>Encoding:</label>
-	                <input type="text" ng-model="ACLMessage.encoding" />
+	                <input class="form-control" type="text" ng-model="ACLMessage.encoding" />
 	            </div>
 	            <div class="form-group">
 	                <label>Protocol:</label>
-	                <input type="text" ng-model="ACLMessage.protocol" />
+	                <input class="form-control" type="text" ng-model="ACLMessage.protocol" />
 	            </div>
 	            <div class="form-group">
 	                <label>Ontology:</label>
-	                <input type="text" ng-model="ACLMessage.ontology" />
+	                <input class="form-control" type="text" ng-model="ACLMessage.ontology" />
 	            </div>
 	            <div class="form-group">
 	                <label>Reply With:</label>
-	                <input type="text" ng-model="ACLMessage.replyWith" />
+	                <input class="form-control" type="text" ng-model="ACLMessage.replyWith" />
 	            </div>
 	            <div class="form-group">
 	                <label>In reply to:</label>
-	                <input type="text" ng-model="ACLMessage.inReplyTo" />
+	                <input class="form-control" type="text" ng-model="ACLMessage.inReplyTo" />
 	            </div>
 	        </form> 
 	      </div>
