@@ -18,11 +18,13 @@ app.controller('weatherController', ['$scope', '$http', '$rootScope', function($
 	}
 
 	$scope.collections = {
-			runningAgents : []
+			runningAgents : [],
+			weathers: []
 	}
 	
 	$scope.modalRunningAgents = [];
 	$scope.modalPerformative = [];
+	
 	
 	$scope.ACLMessage = {
 			performative : "",
@@ -99,6 +101,7 @@ app.controller('weatherController', ['$scope', '$http', '$rootScope', function($
 			switch(socketMessage.msgType){
 			case 'START_AGENT': socketStartAgents(socketMessage); break;
 			case 'STOP_AGENT': socketStopAgents(socketMessage); break;
+			case 'STREAM_WEATHER': streamWeather(socketMessage); break;
 			}
 		}
 	} catch(exception) {
@@ -114,6 +117,15 @@ app.controller('weatherController', ['$scope', '$http', '$rootScope', function($
 			return true;
 		}
 		return false;
+	}
+	
+	var streamWeather = function(socketMessage) {
+		var weather = socketMessage.infoStream;
+		for(var i = 0; i < weather.length; i++){
+			$scope.$apply(function(){
+				$scope.collections.weathers.push(weather[i]);
+			})
+		}
 	}
 	
 	var socketStartAgents = function(socketMessage){

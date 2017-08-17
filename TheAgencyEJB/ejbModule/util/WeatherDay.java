@@ -1,6 +1,8 @@
 package util;
 
-public class WeatherDay {
+import java.io.Serializable;
+
+public class WeatherDay implements Serializable {
 
 	private String day;
 	private String date;
@@ -13,6 +15,14 @@ public class WeatherDay {
 		
 	}
 	
+	public WeatherDay(String day, String date, String largeTemp, String smallTemp, String conditions) {
+		this.day = day;
+		this.date = date;
+		this.largeTemp = largeTemp;
+		this.smallTemp = smallTemp;
+		this.conditions = conditions;
+	}
+
 	public String getDay() {
 		return day;
 	}

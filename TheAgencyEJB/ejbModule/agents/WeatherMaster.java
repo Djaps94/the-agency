@@ -3,23 +3,41 @@ package agents;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+import javax.ejb.EJB;
 import javax.ejb.Stateful;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import beans.SocketSenderLocal;
 import model.ACLMessage;
 import model.ACLMessage.Performative;
 import model.Agent;
+import util.SocketMessage;
+import util.SocketMessage.messageType;
+import util.Weather;
 
 
 @Stateful
 public class WeatherMaster extends Agent{
 
+	@EJB
+	private SocketSenderLocal sender;
+	
 	private static final long serialVersionUID = -7609277672062916060L;
+	
+	private int slaves;
+	
+	private List<Weather> weather;
 
 	public WeatherMaster() {
        
     }
+	
+	@PostConstruct
+	private void init() {
+		weather = new ArrayList<>();
+	}
 
 	@Override
 	public void handleMessage(ACLMessage message) {
@@ -39,7 +57,18 @@ public class WeatherMaster extends Agent{
 		case FAILURE:
 			break;
 		case INFORM: {
-			System.out.println("IT IS WORKING");
+			synchronized (message) {
+				Weather response = (Weather)message.getContentObject();
+				weather.add(response);
+				slaves--;
+				
+				if(slaves == 0){
+					SocketMessage socketMsg = new SocketMessage();
+					socketMsg.setMsgType(messageType.STREAM_WEATHER);
+					socketMsg.setInfoStream(weather);
+					sender.socketSend(socketMsg);
+				}
+			}
 		}
 			break;
 		case INFORM_IF:
@@ -65,7 +94,8 @@ public class WeatherMaster extends Agent{
 		case REQUEST: {
 			//TODO: Does this node support weather slaves?
 			List<ACLMessage> messageList = new ArrayList<>();
-			String[] cities = message.getContent().split(",");
+			String[] cities = message.getContent().split(";");
+			slaves = cities.length;
 			for(String city : cities){
 				ACLMessage msg = new ACLMessage();
 				msg.setContent(city.trim());

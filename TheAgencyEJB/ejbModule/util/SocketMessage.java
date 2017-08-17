@@ -14,7 +14,8 @@ import model.AgentType;
 public class SocketMessage implements Serializable{
 
 	public enum messageType {
-		GET_TYPES, GET_AGENTS, ADD_TYPE, SEND_MESSAGE, START_AGENT, STOP_AGENT, REMOVE_AGENTS, REMOVE_TYPES, STREAM_MESSAGE
+		GET_TYPES, GET_AGENTS, ADD_TYPE, SEND_MESSAGE, START_AGENT, STOP_AGENT, REMOVE_AGENTS, REMOVE_TYPES,
+		STREAM_MESSAGE, STREAM_WEATHER
 	};
 	
 	private AID aid;
@@ -26,7 +27,7 @@ public class SocketMessage implements Serializable{
 	private String typeName;
 	private messageType msgType;
 	private ACLMessage message;
-	private String infoStream;
+	private Object infoStream;
 	
 	
 	public SocketMessage() { }
@@ -121,12 +122,12 @@ public class SocketMessage implements Serializable{
 	}
 
 
-	public String getInfoStream() {
+	public Object getInfoStream() {
 		return infoStream;
 	}
 
 
-	public void setInfoStream(String infoStream) {
+	public void setInfoStream(Object infoStream) {
 		this.infoStream = infoStream;
 	}
 }
