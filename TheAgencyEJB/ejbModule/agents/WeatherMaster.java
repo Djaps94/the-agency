@@ -75,11 +75,11 @@ public class WeatherMaster extends Agent{
 			}
 			
 			if(message.isAccu()){
-				AccuWeather(messageList);
+				accuWeather(messageList);
 			}else if(message.isUmbrella()){
-				
+				umbrellaWeather(messageList);
 			}else if(message.isMix()) {
-				
+				mixWeather(messageList);
 			}
 		
 		}
@@ -96,15 +96,34 @@ public class WeatherMaster extends Agent{
 		}
 	}
 	
-	private void AccuWeather(List<ACLMessage> messages){
+	private void callWeatherBoy(ACLMessage msg, String boy) { 
+		try {
+			InitialContext context = new InitialContext();
+			Agent accu = (Agent)context.lookup("java:module/"+boy);
+			accu.handleMessage(msg);
+		} catch (NamingException e) {
+			e.printStackTrace();
+		}	
+	}
+	
+	private void accuWeather(List<ACLMessage> messages){
 		for(ACLMessage msg : messages){
-			try {
-				InitialContext context = new InitialContext();
-				Agent accu = (Agent)context.lookup("java:module/WeatherAccu");
-				accu.handleMessage(msg);
-			} catch (NamingException e) {
-				e.printStackTrace();
-			}
+			callWeatherBoy(msg, "WeatherAccu");
+		}
+	}
+	
+	private void umbrellaWeather(List<ACLMessage> messages) {
+		for(ACLMessage msg : messages){
+			callWeatherBoy(msg, "WeatherUmbrella");
+		}	
+	}
+	
+	private void mixWeather(List<ACLMessage> messages) {
+		for(int i = 0; i < messages.size(); i++){
+			if(i%2 == 0)
+				callWeatherBoy(messages.get(i), "WeatherAccu");
+			else
+				callWeatherBoy(messages.get(i), "WeatherUmbrella");
 		}
 	}
 
