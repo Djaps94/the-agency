@@ -151,6 +151,25 @@ app.controller('weatherController', ['$scope', '$http', '$rootScope', function($
 				 $scope.collections.runningAgents.splice(index, 1);
 			 });
 	}
+	
+	$scope.getWeatherAgents = function() {
+		if($rootScope.action.valueREST){
+			$http.get('/TheAgency/rest/agency/agents/weather/'+$scope.weatherMaster.name+"/"+$scope.weatherMaster.module)
+				.then(function(response){
+					var agentList = response.data;
+					if(agentList === undefined || agentList === null || agentList === ""){
+						return;
+					}
+					
+					for(var x in agentList){
+						if(checkRunningAgents($scope.collections.runningAgents, agentList[x]))
+							continue;
+						
+						$scope.collections.runningAgents.push(agentList[x]);
+					}
+				});
+		}
+	}
 
 	$scope.startAgent = function(){
 		if($rootScope.action.valueREST){
@@ -215,7 +234,7 @@ app.controller('weatherController', ['$scope', '$http', '$rootScope', function($
 		};
 		
 		
-	$scope.fillModal = function(){
+	$scope.fillModal = function(){		
 		$http.get('/TheAgency/rest/agency/agents/running').then(function(response){
 			response.data.forEach(function(el){
 				if(!checkRunningAgents($scope.modalRunningAgents, el))

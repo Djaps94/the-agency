@@ -163,7 +163,7 @@ public class WeatherAccu extends Agent {
 		if(temp.equals("Min"))
 			return temp;
 		
-		String fahrenhait= temp.replace("&deg;", "").replace("/", "").trim();
+		String fahrenhait= temp.replace("&deg;", "").replace("/", "").replace("F", "").trim();
 		int celsius = (int) ((Integer.parseInt(fahrenhait) - 32) / 1.8); 
 		return String.valueOf(celsius)+"&deg;";
 	}

@@ -35,3 +35,25 @@ img {
 #running {
 	margin-bottom: 5%;
 }
+
+#runningAgents {
+	margin-top: 5%;
+}
+
+#weather {
+	margin-top: 3%;
+}
+
+#weatherHeader {
+	margin-left: 2%;
+	font-style: italic;
+	color: #C8DEC1;
+	text-align: center;
+}
+
+#cityName {
+	margin-left: 5%;
+	font-style: italic;
+	color: #C8DEC1;
+	margin-bottom: 3%;
+}
