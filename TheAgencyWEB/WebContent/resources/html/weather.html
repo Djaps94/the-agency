@@ -15,6 +15,7 @@
 	                <input class="start" type="text" ng-model="weatherMaster.agentName"/> <button class="btn btn-sm btn-primary" ng-click="startAgent()">Start</button>
 	            </div>
 	        <button id="runningAgents" class="btn btn-sm btn-info" ng-click="getWeatherAgents()">Running weather agents</button>
+	        <button id="weatherResults" class="btn btn-sm btn-info slide-toggle-js" ng-click="clearWeather()" ng-show="collections.weathers.length > 0">Clear weather results</button>
 	    </div>
         <div id="description">
 	       <span>Wanna know what's the weather today? Or the next few days?</span> <br />
@@ -104,7 +105,7 @@
     </div>
     <div>
         <h2 id="weatherHeader" ng-if="weather.weatherDays.length > 0">Weather</h2>
-        <div id="weather" ng-repeat="weather in collections.weathers">
+        <div id="weather" class="slide-toggle-js" ng-repeat="weather in collections.weathers">
             <h4 id="cityName">{{weather.cityName}}</h4>
             <hr>
             <div class="row" ng-repeat="day in weather.weatherDays" ng-if="$index % 5 == 0">
@@ -112,9 +113,12 @@
             <div class="thumbnail">
                 <div class="caption">
                     <h5>{{weather.weatherDays[$index].day}}</h5>
-                    <hr>
                     <h5>{{weather.weatherDays[$index].date}}</h5>
                     <hr>
+                    <div>
+                        <span class="largeTemp">{{weather.weatherDays[$index].largeTemp}}&deg;</span>
+                        <span class="smallTemp">/{{weather.weatherDays[$index].smallTemp}}&deg;C</span>
+                    </div>
                     <h5>{{weather.weatherDays[$index].conditions}}</h5>
                 </div>
             </div>
@@ -123,9 +127,12 @@
             <div class="thumbnail">
                 <div class="caption">
                     <h5>{{weather.weatherDays[$index + 1].day}}</h5>
-                    <hr>
                     <h5>{{weather.weatherDays[$index + 1].date}}</h5>
                     <hr>
+                    <div>
+                        <span class="largeTemp">{{weather.weatherDays[$index + 1].largeTemp}}&deg;</span>
+                        <span class="smallTemp">/{{weather.weatherDays[$index + 1].smallTemp}}&deg;</span>
+                    </div>
                     <h5>{{weather.weatherDays[$index + 1].conditions}}</h5>
                 </div>
             </div>
@@ -134,9 +141,12 @@
             <div class="thumbnail">
                 <div class="caption">
                     <h5>{{weather.weatherDays[$index + 2].day}}</h5>
-                    <hr>
                     <h5>{{weather.weatherDays[$index + 2].date}}</h5>
                     <hr>
+                    <div>
+                        <span class="largeTemp">{{weather.weatherDays[$index + 2].largeTemp}}&deg;</span>
+                        <span class="smallTemp">/{{weather.weatherDays[$index + 2].smallTemp}}&deg;</span>
+                    </div>
                     <h5>{{weather.weatherDays[$index + 2].conditions}}</h5>
                 </div>
             </div>
@@ -145,9 +155,12 @@
             <div class="thumbnail">
                 <div class="caption">
                     <h5>{{weather.weatherDays[$index + 3].day}}</h5>
-                    <hr>
                     <h5>{{weather.weatherDays[$index + 3].date}}</h5>
                     <hr>
+                    <div>
+                        <span class="largeTemp">{{weather.weatherDays[$index + 3].largeTemp}}&deg;</span>
+                        <span class="smallTemp">/{{weather.weatherDays[$index + 3].smallTemp}}&deg;</span>
+                    </div>
                     <h5>{{weather.weatherDays[$index + 3].conditions}}</h5>
                 </div>
             </div>
@@ -156,9 +169,12 @@
             <div class="thumbnail">
                 <div class="caption">
                     <h5>{{weather.weatherDays[$index + 4].day}}</h5>
-                    <hr>
                     <h5>{{weather.weatherDays[$index + 4].date}}</h5>
                     <hr>
+                    <div>
+                        <span class="largeTemp">{{weather.weatherDays[$index + 4].largeTemp}}&deg;</span>
+                        <span class="smallTemp">/{{weather.weatherDays[$index + 4].smallTemp}}&deg;</span>
+                    </div>
                     <h5>{{weather.weatherDays[$index + 4].conditions}}</h5>
                 </div>
             </div>
@@ -236,7 +252,7 @@
 	      </div>
 	      <div class="modal-footer">
 	        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-	        <button type="button" class="btn btn-primary" ng-click="sendMessage()">Send</button>
+	        <button type="button" class="btn btn-primary" ng-click="sendMessage()" data-dismiss="modal">Send</button>
 	      </div>
 	    </div>
 	  </div>

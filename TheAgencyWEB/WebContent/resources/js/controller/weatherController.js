@@ -84,6 +84,11 @@ app.controller('weatherController', ['$scope', '$http', '$rootScope', function($
 		$scope.ACLMessage.umbrella = false;
 		$scope.ACLMessage.mix = true;
 	}
+	
+	$scope.clearWeather = function() {
+		$scope.collections.weathers.length = 0;
+	}
+	
 	try{
 		var socket = new WebSocket(wsaddress);
 		
@@ -105,7 +110,7 @@ app.controller('weatherController', ['$scope', '$http', '$rootScope', function($
 			}
 		}
 	} catch(exception) {
-		
+		console.log(exception)
 	}
 	
 	var checkRunningAgents = function(array, el){
@@ -119,9 +124,19 @@ app.controller('weatherController', ['$scope', '$http', '$rootScope', function($
 		return false;
 	}
 	
+	var checkWeather = function(array, day) {
+		for(x in array) {
+			if(array[x].cityName.indexOf(day.cityName) !== -1)
+				return false;
+		}
+		return true;
+	}
+	
 	var streamWeather = function(socketMessage) {
 		var weather = socketMessage.infoStream;
 		for(var i = 0; i < weather.length; i++){
+			if(!checkWeather($scope.collections.weathers, weather[i]))
+				continue;
 			$scope.$apply(function(){
 				$scope.collections.weathers.push(weather[i]);
 			})

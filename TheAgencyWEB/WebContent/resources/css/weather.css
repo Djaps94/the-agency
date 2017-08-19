@@ -57,3 +57,16 @@ img {
 	color: #C8DEC1;
 	margin-bottom: 3%;
 }
+
+.largeTemp {
+	font-size: 24px;
+}
+
+.smallTemp {
+	font-size: 20px;
+}
+
+#weatherResults {
+	margin-top: 5%;
+	margin-left: 5%;
+}

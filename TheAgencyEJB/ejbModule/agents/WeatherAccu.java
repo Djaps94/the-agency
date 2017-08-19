@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.ejb.Asynchronous;
 import javax.ejb.EJB;
 import javax.ejb.Stateful;
 
@@ -43,44 +44,9 @@ public class WeatherAccu extends Agent {
 	}
 
 	@Override
+	@Asynchronous
 	public void handleMessage(ACLMessage message) {
 		switch(message.getPerformative()) {
-		case ACCEPT_PROPOSAL:
-			break;
-		case AGREE:
-			break;
-		case CANCEL:
-			break;
-		case CFP:
-			break;
-		case CONFIRM:
-			break;
-		case DISCONFIRM:
-			break;
-		case FAILURE:
-			break;
-		case INFORM:
-			break;
-		case INFORM_IF:
-			break;
-		case INFORM_REF:
-			break;
-		case NOT_UNDERSTOOD:
-			break;
-		case PROPAGATE:
-			break;
-		case PROPOSE:
-			break;
-		case PROXY:
-			break;
-		case QUERY_IF:
-			break;
-		case QUERY_REF:
-			break;
-		case REFUSE:
-			break;
-		case REJECT_PROPOSAL:
-			break;
 		case REQUEST: {
 			UserAgent scraper = new UserAgent();
 			List<AID> recievers = new ArrayList<>();
@@ -113,12 +79,6 @@ public class WeatherAccu extends Agent {
 			}
 		}
 			break;
-		case REQUEST_WHEN:
-			break;
-		case REQUEST_WHENEVER:
-			break;
-		case SUBSCRIBE:
-			break;
 		default:
 			break;
 		
@@ -148,7 +108,6 @@ public class WeatherAccu extends Agent {
 				String day 	= weatherDiv.getElement(0).getElement(0).getText();
 				String date = weatherDiv.getElement(1).getText();
 				String conditions 	= infoDiv.getElement(1).getText();
-				//TODO: from Far to Celzius &deg /
 				String largeTemp 	= transformDegree(infoDiv.getElement(0).getElement(0).getText());
 				String smallTemp 	= transformDegree(infoDiv.getElement(0).getElement(1).getText());
 				WeatherDay weatherPerDay = new WeatherDay(day, date, largeTemp, smallTemp, conditions);
@@ -165,7 +124,7 @@ public class WeatherAccu extends Agent {
 		
 		String fahrenhait= temp.replace("&deg;", "").replace("/", "").replace("F", "").trim();
 		int celsius = (int) ((Integer.parseInt(fahrenhait) - 32) / 1.8); 
-		return String.valueOf(celsius)+"&deg;";
+		return String.valueOf(celsius);
 	}
 
 }

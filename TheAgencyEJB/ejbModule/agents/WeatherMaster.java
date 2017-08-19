@@ -42,18 +42,6 @@ public class WeatherMaster extends Agent{
 	@Override
 	public void handleMessage(ACLMessage message) {
 		switch(message.getPerformative()){
-		case ACCEPT_PROPOSAL:
-			break;
-		case AGREE:
-			break;
-		case CANCEL:
-			break;
-		case CFP:
-			break;
-		case CONFIRM:
-			break;
-		case DISCONFIRM:
-			break;
 		case FAILURE:
 			break;
 		case INFORM: {
@@ -67,6 +55,8 @@ public class WeatherMaster extends Agent{
 					socketMsg.setMsgType(messageType.STREAM_WEATHER);
 					socketMsg.setInfoStream(weather);
 					sender.socketSend(socketMsg);
+					
+					weather.clear();
 				}
 			}
 		}
