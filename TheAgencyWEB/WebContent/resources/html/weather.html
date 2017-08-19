@@ -1,0 +1,260 @@
+<div ng-controller="weatherController">
+    <h3 id="weatherHeading">Get to now what's the weather like!</h3>
+    <img src="resources/images/vault_boy_burned.png"></img>
+    <div id="master">
+	    <div id="inner">
+	        <div ng-click="show = !show">
+	            <h4>Name: </h4>
+	            <span>{{weatherMaster.name}}</span>
+	            <hr>
+	            <h6>Module: </h6>
+	            <span>{{weatherMaster.module}}</span>
+	            <hr>
+	        </div>
+	            <div ng-if="show">
+	                <input class="start" type="text" ng-model="weatherMaster.agentName"/> <button class="btn btn-sm btn-primary" ng-click="startAgent()">Start</button>
+	            </div>
+	        <button id="runningAgents" class="btn btn-sm btn-info" ng-click="getWeatherAgents()">Running weather agents</button>
+	        <button id="weatherResults" class="btn btn-sm btn-info slide-toggle-js" ng-click="clearWeather()" ng-show="collections.weathers.length > 0">Clear weather results</button>
+	    </div>
+        <div id="description">
+	       <span>Wanna know what's the weather today? Or the next few days?</span> <br />
+	       <span>Start a weather master and send him a message. Select your or any other city.</span> <br />
+	       <span>Watch the answer unfolds!</span> <br />  
+	       <button class="btn btn-sm btn-info" ng-show="collections.runningAgents.length > 0" data-toggle="modal" data-target="#messageModal" ng-click="fillModal()">Send message</button>
+           <input type="radio" ng-click="setRest()" name="comm" value="Rest"/>
+           <i class="fa fa-level-up fa-2x" area-hidden="true" data-toggle="tooltip" title="Rest"></i>
+           <input type="radio" ng-click="setSocket()" name="comm" value="Websocket"/>
+           <i class="fa fa-exchange fa-2x" area-hidden="true" data-toggle="tooltip" title="Websockets"></i>
+        </div> 
+    </div>
+    <div id="running">
+        <h3 id="agentTypes">Running agents</h3>
+        <span id="hideTypes" class="hvr-icon-spin" ng-show="collections.runningAgents.length > 0" ng-click="hideRunning()">{{text}}</span> 
+        <hr>
+        <div class="row slide-toggle-js" ng-repeat="aid in collections.runningAgents" ng-if="$index % 4 == 0 && showAgents">
+          <div class="col-sm-3 hvr-grow" ng-if="($index < collections.runningAgents.length)">
+            <div class="thumbnail">
+                <div class="caption" ng-click="turn = !turn">
+                    <h3>Agent name: </h3>
+                    <label>{{ collections.runningAgents[$index].name }}</label>
+                    <hr>
+                    <h4>Agent type: </h4>
+                    <span>{{ collections.runningAgents[$index].type.name }}</span>
+                    <hr>
+                    <h4>Agent center:</h4>
+                    <span>{{ collections.runningAgents[$index].host.alias }}</span>
+                </div>
+            </div>
+                <div class="turnoff" ng-if="turn">
+                    <button class="btn btn-sm btn-danger" ng-click="stopAgent(aid)">Stop</button>
+                </div>
+          </div>
+          <div class="col-sm-3 hvr-grow" ng-if="($index + 1 < collections.runningAgents.length)">
+            <div class="thumbnail">
+                <div class="caption" ng-click="turn = !turn">
+                    <h3>Agent name: </h3>
+                    <label>{{ collections.runningAgents[$index + 1].name }}</label>
+                    <hr>
+                    <h4>Agent type: </h4>
+                    <span>{{ collections.runningAgents[$index + 1].type.name }}</span>
+                    <hr>
+                    <h4>Agent center:</h4>
+                    <span>{{ collections.runningAgents[$index + 1].host.alias }}</span>
+                </div>
+            </div>
+                <div class="turnoff" ng-if="turn">
+                    <button class="btn btn-sm btn-danger" ng-click="stopAgent(aid)">Stop</button>
+                </div>
+          </div>
+          <div class="col-sm-3 hvr-grow" ng-if="($index + 2 < collections.runningAgents.length)">
+            <div class="thumbnail">
+                <div class="caption" ng-click="turn = !turn">
+                    <h3>Agent name: </h3>
+                    <label>{{ collections.runningAgents[$index + 2].name }}</label>
+                    <hr>
+                    <h4>Agent type: </h4>
+                    <span>{{ collections.runningAgents[$index + 2].type.name }}</span>
+                    <hr>
+                    <h4>Agent center:</h4>
+                    <span>{{ collections.runningAgents[$index + 2].host.alias }}</span>
+                </div>
+            </div>
+                <div class="turnoff" ng-if="turn">
+                    <button class="btn btn-sm btn-danger" ng-click="stopAgent(aid)">Stop</button>
+                </div>
+          </div>
+          <div class="col-sm-3 hvr-grow" ng-if="($index + 3 < collections.runningAgents.length)">
+            <div class="thumbnail">
+                <div class="caption" ng-click="turn = !turn">
+                    <h3>Agent name: </h3>
+                    <label>{{ collections.runningAgents[$index + 3].name }}</label>
+                    <hr>
+                    <h4>Agent type: </h4>
+                    <span>{{ collections.runningAgents[$index + 3].type.name }}</span>
+                    <hr>
+                    <h4>Agent center:</h4>
+                    <span>{{ collections.runningAgents[$index + 3].host.alias }}</span>
+                </div>
+            </div>
+                <div class="turnoff" ng-if="turn">
+                    <button class="btn btn-sm btn-danger" ng-click="stopAgent(aid)">Stop</button>
+                </div>
+          </div>
+        </div>
+    </div>
+    <div>
+        <h2 id="weatherHeader" ng-if="weather.weatherDays.length > 0">Weather</h2>
+        <div id="weather" class="slide-toggle-js" ng-repeat="weather in collections.weathers">
+            <h4 id="cityName">{{weather.cityName}}</h4>
+            <hr>
+            <div class="row" ng-repeat="day in weather.weatherDays" ng-if="$index % 5 == 0">
+          <div class="col-sm-4 hvr-grow" ng-if="($index < weather.weatherDays.length)">
+            <div class="thumbnail">
+                <div class="caption">
+                    <h5>{{weather.weatherDays[$index].day}}</h5>
+                    <h5>{{weather.weatherDays[$index].date}}</h5>
+                    <hr>
+                    <div>
+                        <span class="largeTemp">{{weather.weatherDays[$index].largeTemp}}&deg;</span>
+                        <span class="smallTemp">/{{weather.weatherDays[$index].smallTemp}}&deg;C</span>
+                    </div>
+                    <h5>{{weather.weatherDays[$index].conditions}}</h5>
+                </div>
+            </div>
+          </div>
+          <div class="col-sm-2 hvr-grow" ng-if="($index + 1 < weather.weatherDays.length)">
+            <div class="thumbnail">
+                <div class="caption">
+                    <h5>{{weather.weatherDays[$index + 1].day}}</h5>
+                    <h5>{{weather.weatherDays[$index + 1].date}}</h5>
+                    <hr>
+                    <div>
+                        <span class="largeTemp">{{weather.weatherDays[$index + 1].largeTemp}}&deg;</span>
+                        <span class="smallTemp">/{{weather.weatherDays[$index + 1].smallTemp}}&deg;</span>
+                    </div>
+                    <h5>{{weather.weatherDays[$index + 1].conditions}}</h5>
+                </div>
+            </div>
+          </div>
+          <div class="col-sm-2 hvr-grow" ng-if="($index + 2 < weather.weatherDays.length)">
+            <div class="thumbnail">
+                <div class="caption">
+                    <h5>{{weather.weatherDays[$index + 2].day}}</h5>
+                    <h5>{{weather.weatherDays[$index + 2].date}}</h5>
+                    <hr>
+                    <div>
+                        <span class="largeTemp">{{weather.weatherDays[$index + 2].largeTemp}}&deg;</span>
+                        <span class="smallTemp">/{{weather.weatherDays[$index + 2].smallTemp}}&deg;</span>
+                    </div>
+                    <h5>{{weather.weatherDays[$index + 2].conditions}}</h5>
+                </div>
+            </div>
+          </div>
+          <div class="col-sm-2 hvr-grow" ng-if="($index + 3 < weather.weatherDays.length)">
+            <div class="thumbnail">
+                <div class="caption">
+                    <h5>{{weather.weatherDays[$index + 3].day}}</h5>
+                    <h5>{{weather.weatherDays[$index + 3].date}}</h5>
+                    <hr>
+                    <div>
+                        <span class="largeTemp">{{weather.weatherDays[$index + 3].largeTemp}}&deg;</span>
+                        <span class="smallTemp">/{{weather.weatherDays[$index + 3].smallTemp}}&deg;</span>
+                    </div>
+                    <h5>{{weather.weatherDays[$index + 3].conditions}}</h5>
+                </div>
+            </div>
+          </div>
+          <div class="col-sm-2 hvr-grow" ng-if="($index + 4 < weather.weatherDays.length)">
+            <div class="thumbnail">
+                <div class="caption">
+                    <h5>{{weather.weatherDays[$index + 4].day}}</h5>
+                    <h5>{{weather.weatherDays[$index + 4].date}}</h5>
+                    <hr>
+                    <div>
+                        <span class="largeTemp">{{weather.weatherDays[$index + 4].largeTemp}}&deg;</span>
+                        <span class="smallTemp">/{{weather.weatherDays[$index + 4].smallTemp}}&deg;</span>
+                    </div>
+                    <h5>{{weather.weatherDays[$index + 4].conditions}}</h5>
+                </div>
+            </div>
+          </div>
+        </div>
+        </div>
+    </div>
+    
+	<div class="modal fade" id="messageModal" tabindex="-1" role="dialog"  aria-hidden="true">
+	  <div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="exampleModalLabel">Send message to weather boy</h5>
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	          <span aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+	      <div class="modal-body">
+	        <form>
+	           <div class="form-group>">
+	               <label>Weather from: </label> <br>
+	               <input type="radio" name="weather" value="AccuWeather" ng-click="setAccu()" /> AccuWeather <br>
+	               <input type="radio" name="weather" value="Weather2Umbrella" ng-click="setUmbrella()" /> Weather2Umbrella <br>
+	               <input type="radio" name="weather" value="Mix" ng-click="setMix()" /> Mix <br>
+	           </div>
+	            <div class="form-group">
+	                <label>Performative:</label>
+	                <select class="form-control" ng-model="ACLMessage.performative" ng-options="perform for perform in modalPerformative">
+	                </select>
+	            </div>
+	            <div class="form-group">
+	                <label>Sender:</label>
+	                <select class="form-control" ng-model="ACLMessage.sender" ng-options="aid.name for aid in modalRunningAgents">
+	                </select>
+	            </div>
+	            <div class="form-group">
+	                <label>Recievers:</label>
+	                <select multiple class="form-control" ng-model="ACLMessage.recievers" ng-options="aid.name for aid in modalRunningAgents">
+	                </select>
+	            </div>
+	            <div class="form-group">
+	                <label>Reply to:</label>
+	                <select class="form-control" ng-model="ACLMessage.replyTo" ng-options="aid.name for aid in modalRunningAgents">
+	                </select>
+	            </div>
+	            <div class="form-group">
+	                <label>Content:</label>
+	                <input class="form-control" type="text" ng-model="ACLMessage.content" placeholder="City names separated by comma..." />
+	            </div>
+	            <div class="form-group">
+	                <label>Language:</label>
+	                <input class="form-control" type="text" ng-model="ACLMessage.language" />
+	            </div>
+	            <div class="form-group">
+	                <label>Encoding:</label>
+	                <input class="form-control" type="text" ng-model="ACLMessage.encoding" />
+	            </div>
+	            <div class="form-group">
+	                <label>Protocol:</label>
+	                <input class="form-control" type="text" ng-model="ACLMessage.protocol" />
+	            </div>
+	            <div class="form-group">
+	                <label>Ontology:</label>
+	                <input class="form-control" type="text" ng-model="ACLMessage.ontology" />
+	            </div>
+	            <div class="form-group">
+	                <label>Reply With:</label>
+	                <input class="form-control" type="text" ng-model="ACLMessage.replyWith" />
+	            </div>
+	            <div class="form-group">
+	                <label>In reply to:</label>
+	                <input class="form-control" type="text" ng-model="ACLMessage.inReplyTo" />
+	            </div>
+	        </form> 
+	      </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+	        <button type="button" class="btn btn-primary" ng-click="sendMessage()" data-dismiss="modal">Send</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>        
+</div>

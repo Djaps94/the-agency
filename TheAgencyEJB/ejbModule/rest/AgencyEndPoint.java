@@ -103,6 +103,31 @@ public class AgencyEndPoint {
 	}
 	
 	@GET
+	@Path("/agents/weather/{typeName}/{typeModule}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<AID> getRunningAgentsByType(@PathParam("typeName") String typeName, @PathParam("typeModule") String typeModule) {
+		List<AID> agents = new ArrayList<>();
+		Iterator<AID> agentsIter = agentRegistry.getRunningAID();
+		AgentType type = new AgentType(typeName, typeModule);
+		
+		while(agentsIter.hasNext()){
+			AID aid = agentsIter.next();
+			if(aid.getType().equals(type))
+				agents.add(aid);
+		}
+		
+		Iterator<Entry<String, List<AID>>> aids = manager.getCenterAgents();
+
+		while(aids.hasNext()){
+			List<AID> aidList = aids.next().getValue();
+			for(AID aid : aidList)
+				if(aid.getType().equals(type))
+					agents.add(aid);
+		}
+		return agents;
+	}
+	
+	@GET
 	@Path("/messages")
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<String> getPerformatives(){

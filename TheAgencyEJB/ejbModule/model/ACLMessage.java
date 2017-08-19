@@ -24,6 +24,9 @@ public class ACLMessage implements Serializable{
 	private String inReplyTo;
 	private Long replyBy;
 	private String streamTo;
+	private boolean accu;
+	private boolean umbrella;
+	private boolean mix;
 	
 	public enum Performative { ACCEPT_PROPOSAL,
 							   AGREE,
@@ -149,5 +152,29 @@ public class ACLMessage implements Serializable{
 
 	public void setStreamTo(String streamTo) {
 		this.streamTo = streamTo;
+	}
+
+	public boolean isAccu() {
+		return accu;
+	}
+
+	public void setAccu(boolean accu) {
+		this.accu = accu;
+	}
+
+	public boolean isUmbrella() {
+		return umbrella;
+	}
+
+	public void setUmbrella(boolean umbrella) {
+		this.umbrella = umbrella;
+	}
+
+	public boolean isMix() {
+		return mix;
+	}
+
+	public void setMix(boolean mix) {
+		this.mix = mix;
 	}
 }

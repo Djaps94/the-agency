@@ -9,6 +9,9 @@ app.config(['$routeProvider', function($routeProvider){
 			.when('/agents', {
 				templateUrl: 'resources/html/agents.html'
 			})
+			.when('/weather', {
+				templateUrl: 'resources/html/weather.html'
+			})
 	
 	
 }]);
